@@ -112,7 +112,7 @@ public class DotLinker {
 				int frame, float area, int particleID){
 			this.x = x;
 			this.y = y;
-			this.frame = frame;
+			this.frame = frame;	//this starts from 1, not 0 currently
 			this.area = area;
 			this.particleID = particleID;
 		}
@@ -283,8 +283,8 @@ public class DotLinker {
 		}
 		// fill in the Myframe object
 		for (int i = 0 ; i< sliceA.length; i++){
-			Particle particle = new Particle(xA[i], yA[i], (int) sliceA[i], areaA[i], i);
-			frameA[particle.frame-1].particles.add(particle);
+			Particle particle = new Particle(xA[i], yA[i], (int) (sliceA[i] - 1), areaA[i], i);
+			frameA[particle.frame].particles.add(particle);
 		}
 		return frameA;
 	}
