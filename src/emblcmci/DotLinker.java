@@ -41,7 +41,7 @@ public class DotLinker {
 	
 	StackFrames[] frameA;
 	private int linkrange = 2;
-	private double displacement = 10;
+	private double displacement = 5;
 	private Vector<Trajectory> all_traj;
 	private int number_of_trajectories;
 	private ImagePlus imp;
@@ -75,7 +75,7 @@ public class DotLinker {
 		generateTrajectories(frameA, frameA.length);
 		
 		// viewing the trajectories
-		//generateView(this.imp);
+		generateView(this.imp);
 		printTrajectories();
 		putLinkedParticeID();
 	}
@@ -89,7 +89,7 @@ public class DotLinker {
 		
 		public StackFrames (int frameID){
 			this.frameID = frameID;
-			this.particles = new Vector(0); 
+			this.particles = new Vector<Particle>(); 
 		}
 
 		public Vector<Particle> getParticles() {
@@ -101,10 +101,10 @@ public class DotLinker {
 		float x = 0;
 		float y = 0;
 		float z = 0;
-		int frame = 0;
+		int frame = 0;			//starts from 0
 		float area = 0;
 		int particleID = 0;
-		int[] next = null; //array to hold linked ids
+		int[] next = null;		//array to hold linked ids
 		boolean special;		// a flag that is used while detecting and linking particles
 
 
@@ -112,9 +112,10 @@ public class DotLinker {
 				int frame, float area, int particleID){
 			this.x = x;
 			this.y = y;
-			this.frame = frame;	//this starts from 1, not 0 currently
+			this.frame = frame;	
 			this.area = area;
 			this.particleID = particleID;
+			this.next = new int[linkrange];
 		}
 
 
@@ -360,11 +361,12 @@ public class DotLinker {
 						cost[coord(i, j, nop_next + 1)] = 
 							(p1.elementAt(i).x - p2.elementAt(j).x)*(p1.elementAt(i).x - p2.elementAt(j).x) + 
 							(p1.elementAt(i).y - p2.elementAt(j).y)*(p1.elementAt(i).y - p2.elementAt(j).y) + 
-							(p1.elementAt(i).z - p2.elementAt(j).z)*(p1.elementAt(i).z - p2.elementAt(j).z) + 
+							(p1.elementAt(i).z - p2.elementAt(j).z)*(p1.elementAt(i).z - p2.elementAt(j).z) ; 
+//							(p1.elementAt(i).z - p2.elementAt(j).z)*(p1.elementAt(i).z - p2.elementAt(j).z) + 
 //							(p1.elementAt(i).m0 - p2.elementAt(j).m0)*(p1.elementAt(i).m0 - p2.elementAt(j).m0) + 
 //							(p1.elementAt(i).m2 - p2.elementAt(j).m2)*(p1.elementAt(i).m2 - p2.elementAt(j).m2);
 							//Math.sqrt((p1.elementAt(i).area- p2.elementAt(j).area)*(p1.elementAt(i).area - p2.elementAt(j).area));
-							(p1.elementAt(i).area- p2.elementAt(j).area)*(p1.elementAt(i).area - p2.elementAt(j).area);						
+//							(p1.elementAt(i).area- p2.elementAt(j).area)*(p1.elementAt(i).area - p2.elementAt(j).area);						
 					}
 				}
 
@@ -636,14 +638,14 @@ public class DotLinker {
 		int maxlength = 0; 
 		while (iter.hasNext()) {
 			Trajectory curr_traj = iter.next();	
-			IJ.log("Track"+curr_traj.serial_number);
+			//IJ.log("Track"+curr_traj.serial_number);
 			if (maxlength < curr_traj.existing_particles.length) maxlength = curr_traj.existing_particles.length;
 		}
 		int[] counter = new int[maxlength+1];
 		 iter = all_traj.iterator(); 
 		while (iter.hasNext()) {
 			Trajectory curr_traj = iter.next();	
-			IJ.log("Track"+curr_traj.serial_number);
+			//IJ.log("Track"+curr_traj.serial_number);
 			counter[curr_traj.existing_particles.length] += 1;
 		}
 		 iter = all_traj.iterator(); 
@@ -664,6 +666,12 @@ public class DotLinker {
 		ResultsTable rt = ResultsTable.getResultsTable();
 		Particle ptcl, linkedptcl;
 		int nextid;
+		int ptclID;
+		double value;
+		for (int i = 0; i< rt.getColumn(rt.getColumnIndex("X")).length; i++){
+			rt.addValue("LinkedID", 0);
+		}
+		rt.updateResults();
 		for (int i = 0; i < frameA.length; i++){
 			for(int j = 0; j < frameA[i].getParticles().size(); j++){
 				ptcl = frameA[i].getParticles().elementAt(j);
@@ -679,8 +687,11 @@ public class DotLinker {
 						nextid = linkedptcl.particleID;
 					} 
 				}
-				rt.setValue("LinkedID", ptcl.particleID , (double) nextid);
-				IJ.log(Integer.toString(ptcl.particleID) + ":" + nextid);
+				ptclID = ptcl.particleID;
+				value = (double) nextid;
+				rt.setValue("LinkedID", ptclID , value);
+				//rt.addValue("LinkedID", value);
+				//IJ.log(Integer.toString(ptcl.particleID) + ":" + nextid);
 			}
 		}
 		rt.updateResults();

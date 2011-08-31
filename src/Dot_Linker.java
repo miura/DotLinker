@@ -36,7 +36,7 @@ public class Dot_Linker implements PlugIn {
 		GenericDialog gd = new GenericDialog("Dot Linker...", IJ.getInstance());
 		gd.addMessage("Linking Parameters:\n");
 		gd.addNumericField("Link Range", 2, 0);
-		gd.addNumericField("Displacement", 10.0, 2); 
+		gd.addNumericField("Displacement", 5.0, 2); 
 		gd.showDialog();
 
 		this.linkrange = (int)gd.getNextNumber();
