@@ -5,7 +5,11 @@
 	<property name="build" location="bin" />
 	<property name="dist"  location="dist" />
 
-	<property name="pluginsDir"  location="$basedir/../../imagej/plugins/" />
+	<property name="pluginsDir"  location="$workspace_loc/../../imagej/plugins/" />
+		<echo>
+			Plugins directory
+			${basedir}
+		</echo>
  	<property name="user.name" value="Kota Miura" ></property>
  	<property name="jarname" value="Dot_Linker.jar" ></property>
  		

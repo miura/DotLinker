@@ -41,7 +41,7 @@ public class DotLinker {
 	
 	StackFrames[] frameA;
 	private int linkrange = 2;
-	private int displacement = 10;
+	private double displacement = 10;
 	private Vector<Trajectory> all_traj;
 	private int number_of_trajectories;
 	private ImagePlus imp;
@@ -50,12 +50,20 @@ public class DotLinker {
 	public DotLinker(ImagePlus imp){
 		this.imp = imp;
 	}
+
+	public DotLinker(ImagePlus imp, int linkrange, double displacement){
+		this.imp = imp;
+		this.linkrange = linkrange;
+		this.displacement = displacement;
+	}	
 	/** Method that should be called from a plugin, or from scripts to
 	 * do all the processing. 
 	 */
 	public void doLinking(){
 		frameA = dataloader();
 		if (frameA !=null){
+			
+			IJ.showStatus("Linking Particles");		
 			linkParticles(frameA, frameA.length, linkrange, displacement);
 			this.frames_number = frameA.length;
 		}
@@ -63,10 +71,13 @@ public class DotLinker {
 			IJ.error("data loading from Results table failed");
 			return;
 		}
+		IJ.showStatus("Generating Trajectories");		
 		generateTrajectories(frameA, frameA.length);
 		
 		// viewing the trajectories
-		generateView(this.imp);
+		//generateView(this.imp);
+		printTrajectories();
+		putLinkedParticeID();
 	}
 	
 	/** simplified version of MyFrame class in Particle tracker. 
@@ -313,8 +324,9 @@ public class DotLinker {
 			curr_linkrange = frames_number - 1;
 
 		max_cost = displacement * displacement;
-
+		IJ.showProgress(0.0);
 		for(m = 0; m < frames_number - curr_linkrange; m++) {
+			IJ.showProgress(m, (frames_number - curr_linkrange));
 			nop = frames[m].getParticles().size();
 			for(i = 0; i < nop; i++) {
 				frames[m].getParticles().elementAt(i).special = false;
@@ -351,7 +363,8 @@ public class DotLinker {
 							(p1.elementAt(i).z - p2.elementAt(j).z)*(p1.elementAt(i).z - p2.elementAt(j).z) + 
 //							(p1.elementAt(i).m0 - p2.elementAt(j).m0)*(p1.elementAt(i).m0 - p2.elementAt(j).m0) + 
 //							(p1.elementAt(i).m2 - p2.elementAt(j).m2)*(p1.elementAt(i).m2 - p2.elementAt(j).m2);
-							(p1.elementAt(i).area- p2.elementAt(j).area)*(p1.elementAt(i).area - p2.elementAt(j).area);
+							//Math.sqrt((p1.elementAt(i).area- p2.elementAt(j).area)*(p1.elementAt(i).area - p2.elementAt(j).area));
+							(p1.elementAt(i).area- p2.elementAt(j).area)*(p1.elementAt(i).area - p2.elementAt(j).area);						
 					}
 				}
 
@@ -615,6 +628,65 @@ public class DotLinker {
 			tc.zoomIn(0,0);
 		}		
 	}
+	
+	public void printTrajectories(){
+		Iterator<Trajectory> iter = all_traj.iterator();  	   
+		// Iterate over all the trajectories
+		// first get statistics
+		int maxlength = 0; 
+		while (iter.hasNext()) {
+			Trajectory curr_traj = iter.next();	
+			IJ.log("Track"+curr_traj.serial_number);
+			if (maxlength < curr_traj.existing_particles.length) maxlength = curr_traj.existing_particles.length;
+		}
+		int[] counter = new int[maxlength+1];
+		 iter = all_traj.iterator(); 
+		while (iter.hasNext()) {
+			Trajectory curr_traj = iter.next();	
+			IJ.log("Track"+curr_traj.serial_number);
+			counter[curr_traj.existing_particles.length] += 1;
+		}
+		 iter = all_traj.iterator(); 
+/*		 
+		while (iter.hasNext()) {
+			Trajectory curr_traj = iter.next();	
+			IJ.log("Track"+curr_traj.serial_number);
+			Particle[] ptcls = curr_traj.existing_particles;
+			for (int i = 0; i < ptcls.length; i++){
+				IJ.log("    " + i + ": " + ptcls[i].x + ", " + ptcls[i].y);
+			}
+		}*/
+		IJ.log("Mac track length = " + maxlength);
+		for (int i =1; i<counter.length; i++)
+			IJ.log("track length " + i + ": " + counter[i]);
+	}
+	public void putLinkedParticeID(){
+		ResultsTable rt = ResultsTable.getResultsTable();
+		Particle ptcl, linkedptcl;
+		int nextid;
+		for (int i = 0; i < frameA.length; i++){
+			for(int j = 0; j < frameA[i].getParticles().size(); j++){
+				ptcl = frameA[i].getParticles().elementAt(j);
+				nextid = -1;
+//				rt.setValue("LinkedID", ptcl.particleID , (ptcl.next[0] != -1) ? ptcl.next[0] : ptcl.next[1]);
+				if ( ptcl.next[0] != -1){
+					linkedptcl = frameA[i + 1].getParticles().elementAt(ptcl.next[0]);
+					nextid = linkedptcl.particleID;
+				
+				} else {
+					if ( ptcl.next[0] != -1) {
+						linkedptcl = frameA[i + 2].getParticles().elementAt(ptcl.next[0]);
+						nextid = linkedptcl.particleID;
+					} 
+				}
+				rt.setValue("LinkedID", ptcl.particleID , (double) nextid);
+				IJ.log(Integer.toString(ptcl.particleID) + ":" + nextid);
+			}
+		}
+		rt.updateResults();
+		
+	}
+	
 	private class TrajectoryStackWindow extends StackWindow {
 
 		private static final long serialVersionUID = 1L;
