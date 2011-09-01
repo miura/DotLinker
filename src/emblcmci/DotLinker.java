@@ -12,6 +12,7 @@ import ij.gui.ImageCanvas;
 import ij.gui.Roi;
 import ij.gui.StackWindow;
 import ij.measure.ResultsTable;
+import ij.plugin.Duplicator;
 import ij.plugin.filter.Duplicater;
 
 /**
@@ -596,26 +597,18 @@ public class DotLinker {
 		}		
 	}
 
-	public void generateView(ImagePlus duplicated_imp) {		
-
+	public void generateView() {		
+		ImagePlus duplicated_imp;
 		double magnification;
 		TrajectoryCanvas tc;		
 		String new_title = "All Trajectories Visual";		
 
-		if (duplicated_imp == null) {
-			// if there is no image to generate the view on:
-			// generate a new image by duplicating the original image
-			Duplicater dup = new Duplicater();
-			duplicated_imp= dup.duplicateStack(this.imp, "Tracks");
-
-			// Set magnification to the one of original_imp	
-			magnification = this.imp.getWindow().getCanvas().getMagnification();
-
-		} else { 
-			// if the view is generated on an already existing image, 
-			// set the updated view scale (magnification) to be the same as in the existing image
-			magnification = duplicated_imp.getWindow().getCanvas().getMagnification();
-		}
+		// if there is no image to generate the view on:
+		// generate a new image by duplicating the original image
+		Duplicator dup = new Duplicator();
+		duplicated_imp= dup.run(this.imp);
+		// Set magnification to the one of original_imp	
+		magnification = this.imp.getWindow().getCanvas().getMagnification();
 
 		// Create a new canvas based on the image - the canvas is the view
 		// The trajectories are drawn on this canvas when it is constructed and not on the image
