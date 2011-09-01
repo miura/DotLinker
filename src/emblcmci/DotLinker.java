@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Vector;
+
+import emblcmci.linker.LinkCosts;
+import emblcmci.linker.LinkCostsOnlyDistance;
+import emblcmci.linker.LinkCostswithAreaDynamics;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageCanvas;
@@ -13,7 +17,6 @@ import ij.gui.Roi;
 import ij.gui.StackWindow;
 import ij.measure.ResultsTable;
 import ij.plugin.Duplicator;
-import ij.plugin.filter.Duplicater;
 
 /**
  * DotLinker
@@ -76,7 +79,8 @@ public class DotLinker {
 		generateTrajectories(frameA, frameA.length);
 		
 		// viewing the trajectories
-		generateView(this.imp);
+//		generateView(this.imp);
+		generateView();
 		printTrajectories();
 		putLinkedParticeID();
 	}
@@ -99,29 +103,97 @@ public class DotLinker {
 	}
 	
 	public class Particle {
-		float x = 0;
-		float y = 0;
-		float z = 0;
+		private float x = 0;
+		private float y = 0;
+		private float z = 0;
 		int frame = 0;			//starts from 0
-		float area = 0;
+		private float area = 0;
 		int particleID = 0;
 		int[] next = null;		//array to hold linked ids
 		boolean special;		// a flag that is used while detecting and linking particles
+		
+		boolean hasArea = false;	//flag if particle has area data. 
 
 
 		public Particle(float x, float y, 
 				int frame, float area, int particleID){
-			this.x = x;
-			this.y = y;
+			this.setX(x);
+			this.setY(y);
 			this.frame = frame;	
-			this.area = area;
+			this.setArea(area);
 			this.particleID = particleID;
 			this.next = new int[linkrange];
+			
+			this.hasArea = true;
 		}
 
 
 		public int getFrame() {
 			return this.frame;
+		}
+
+
+		/**
+		 * @param x the x to set
+		 */
+		public void setX(float x) {
+			this.x = x;
+		}
+
+
+		/**
+		 * @return the x
+		 */
+		public float getX() {
+			return x;
+		}
+
+
+		/**
+		 * @param y the y to set
+		 */
+		public void setY(float y) {
+			this.y = y;
+		}
+
+
+		/**
+		 * @return the y
+		 */
+		public float getY() {
+			return y;
+		}
+
+
+		/**
+		 * @param z the z to set
+		 */
+		public void setZ(float z) {
+			this.z = z;
+		}
+
+
+		/**
+		 * @return the z
+		 */
+		public float getZ() {
+			return z;
+		}
+
+
+		/**
+		 * @param area the area to set
+		 */
+		public void setArea(float area) {
+			this.area = area;
+		}
+
+
+		/**
+		 * @return the area
+		 */
+		public float getArea() {
+			return area;
 		}
 		
 	}
@@ -190,17 +262,17 @@ public class DotLinker {
 				if (this.existing_particles[i+1].getFrame() - this.existing_particles[i].getFrame() > 1) {	    			   
 					g.setColor(Color.red); //gap
 				}
-				g.drawLine(ic.screenXD(this.existing_particles[i].y), 
-						ic.screenYD(this.existing_particles[i].x), 
-						ic.screenXD(this.existing_particles[i+1].y), 
-						ic.screenYD(this.existing_particles[i+1].x));
+				g.drawLine(ic.screenXD(this.existing_particles[i].getY()), 
+						ic.screenYD(this.existing_particles[i].getX()), 
+						ic.screenXD(this.existing_particles[i+1].getY()), 
+						ic.screenYD(this.existing_particles[i+1].getX()));
 
 				g.setColor(this.color);							
 			}
 			//mark death of particle
 			if((this.existing_particles[this.existing_particles.length-1].getFrame()) < frames_number - 1){
-				g.fillOval(ic.screenXD(this.existing_particles[this.existing_particles.length-1].y), 
-						ic.screenYD(this.existing_particles[this.existing_particles.length-1].x), 5, 5);
+				g.fillOval(ic.screenXD(this.existing_particles[this.existing_particles.length-1].getY()), 
+						ic.screenYD(this.existing_particles[this.existing_particles.length-1].getX()), 5, 5);
 			}
 		}
 	}
@@ -355,14 +427,19 @@ public class DotLinker {
 				//    			p1 = frames[m].particles;
 				//    			p2 = frames[m + (n + 1)].particles;
 
-
+				// here is some tests on cost function designing. 
+				// later, cost function should be selectable in GUI dialog. 
+				
+				//LinkCosts link = new LinkCostsOnlyDistance();
+				LinkCosts link = new LinkCostswithAreaDynamics(displacement, 2.0);
 				/* Fill in the costs */
 				for(i = 0; i < nop; i++) {
 					for(j = 0; j < nop_next; j++) {
-						cost[coord(i, j, nop_next + 1)] = 
-							(p1.elementAt(i).x - p2.elementAt(j).x)*(p1.elementAt(i).x - p2.elementAt(j).x) + 
-							(p1.elementAt(i).y - p2.elementAt(j).y)*(p1.elementAt(i).y - p2.elementAt(j).y) + 
-							(p1.elementAt(i).z - p2.elementAt(j).z)*(p1.elementAt(i).z - p2.elementAt(j).z) ; 
+						cost[coord(i, j, nop_next + 1)] = link.calccost(p1.elementAt(i), p2.elementAt(j));
+							
+//							(p1.elementAt(i).getX() - p2.elementAt(j).getX())*(p1.elementAt(i).getX() - p2.elementAt(j).getX()) + 
+//							(p1.elementAt(i).getY() - p2.elementAt(j).getY())*(p1.elementAt(i).getY() - p2.elementAt(j).getY()) + 
+//							(p1.elementAt(i).getZ() - p2.elementAt(j).getZ())*(p1.elementAt(i).getZ() - p2.elementAt(j).getZ()) ; 
 //							(p1.elementAt(i).z - p2.elementAt(j).z)*(p1.elementAt(i).z - p2.elementAt(j).z) + 
 //							(p1.elementAt(i).m0 - p2.elementAt(j).m0)*(p1.elementAt(i).m0 - p2.elementAt(j).m0) + 
 //							(p1.elementAt(i).m2 - p2.elementAt(j).m2)*(p1.elementAt(i).m2 - p2.elementAt(j).m2);
