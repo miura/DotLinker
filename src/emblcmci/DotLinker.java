@@ -49,7 +49,8 @@ public class DotLinker {
 	private Vector<Trajectory> all_traj;
 	private int number_of_trajectories;
 	private ImagePlus imp;
-	private int frames_number;	
+	private int frames_number;
+	private int TrajectoryThreshold;	
 	
 	public DotLinker(ImagePlus imp){
 		this.imp = imp;
@@ -60,6 +61,20 @@ public class DotLinker {
 		this.linkrange = linkrange;
 		this.displacement = displacement;
 	}	
+	/**
+	 * @return the trajectoryThreshold
+	 */
+	public int getTrajectoryThreshold() {
+		return TrajectoryThreshold;
+	}
+
+	/**
+	 * @param trajectoryThreshold the trajectoryThreshold to set
+	 */
+	public void setTrajectoryThreshold(int trajectoryThreshold) {
+		TrajectoryThreshold = trajectoryThreshold;
+	}
+
 	/** Method that should be called from a plugin, or from scripts to
 	 * do all the processing. 
 	 */
@@ -82,7 +97,9 @@ public class DotLinker {
 //		generateView(this.imp);
 		generateView();
 		printTrajectories();
-		putLinkedParticeID();
+		//putLinkedParticeID();
+		ResultsTable trackrt = showTrajectoryTable();
+		trackrt.show("Tracks");
 	}
 	
 	/** simplified version of MyFrame class in Particle tracker. 
@@ -593,8 +610,9 @@ public class DotLinker {
 		int i, j, k;
 		int found, n, m;
 		// Bank of colors from which the trjectories color will be selected
-		Color[] col={Color.blue,Color.green,Color.orange,Color.cyan,Color.magenta,Color.yellow,Color.white,Color.gray,Color.pink};
-
+		//Color[] col={Color.blue,Color.green,Color.orange,Color.cyan,Color.magenta,Color.yellow,Color.white,Color.gray,Color.pink};
+		Color[] col={Color.red};
+		
 		Trajectory curr_traj;
 		// temporary vector to hold particles for current trajctory
 		Vector<Particle> curr_traj_particles = new Vector<Particle>(frames_number);		
@@ -739,6 +757,7 @@ public class DotLinker {
 		int ptclID;
 		double value;
 		for (int i = 0; i< rt.getColumn(rt.getColumnIndex("X")).length; i++){
+			rt.incrementCounter();
 			rt.addValue("LinkedID", 0);
 		}
 		rt.updateResults();
@@ -784,6 +803,32 @@ public class DotLinker {
 		private TrajectoryStackWindow(ImagePlus aimp, ImageCanvas icanvas) {
 			super(aimp, icanvas);
 		}
+	}
+	
+	public ResultsTable showTrajectoryTable(){
+		ResultsTable rt = new ResultsTable();
+		
+		Iterator<Trajectory> iter = all_traj.iterator();  	   
+		int rowcount = 0;
+		
+		while (iter.hasNext()) {
+			Trajectory curr_traj = iter.next();
+			Particle[] ptcls = curr_traj.existing_particles;
+			if (ptcls.length > TrajectoryThreshold){
+				for (int i = 0; i < ptcls.length; i++){
+					rt.incrementCounter();
+					rt.addValue("TrackID", curr_traj.serial_number);
+					rt.addValue("frame", ptcls[i].frame);
+					rt.addValue("Xpos", ptcls[i].x);
+					rt.addValue("Ypos", ptcls[i].y);
+					rt.addValue("Area", ptcls[i].area);
+				}
+			}
+		}
+		return rt;
+//		IJ.log("Mac track length = " + maxlength);
+//		for (int i =1; i<counter.length; i++)
+//			IJ.log("track length " + i + ": " + counter[i]);
 	}
 
 	

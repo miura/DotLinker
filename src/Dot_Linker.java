@@ -17,6 +17,7 @@ public class Dot_Linker implements PlugIn {
 	// parameters for calculating links
 	int linkrange = 2;
 	double displacement = 2.0;
+	private int TrajectoryThreshold;
 	
 	public void run(String arg) {
 		ImagePlus imp = IJ.getImage();
@@ -29,6 +30,7 @@ public class Dot_Linker implements PlugIn {
 		} else {
 			dl = new DotLinker(imp);			
 		}
+		dl.setTrajectoryThreshold(TrajectoryThreshold);
 		dl.doLinking();
 	}
 	
@@ -37,11 +39,13 @@ public class Dot_Linker implements PlugIn {
 		gd.addMessage("Linking Parameters:\n");
 		gd.addNumericField("Link Range", 2, 0);
 		gd.addNumericField("Displacement", 5.0, 2); 
+		gd.addMessage("-----");
+		gd.addNumericField("Trajectory Lenght Threshold", 10, 0);
 		gd.showDialog();
 
 		this.linkrange = (int)gd.getNextNumber();
 		this.displacement = gd.getNextNumber();
-		
+		this.TrajectoryThreshold = (int) gd.getNextNumber();		
 		return true;
 	}
 }
