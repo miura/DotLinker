@@ -114,12 +114,21 @@ public class Overlay_Track implements PlugIn {
 		//IJ.log("first time point arera: " + area0);
 		int counter = 0;
 		Node n;
+		double minimum = 1000;
+		double maximum = 0;
 		while (iter.hasNext()) {
 			n = iter.next();
 			carea = (double) n.area;
 			n.areafraction = carea / area0;			
 			counter++;
-		}	
+			if (n.areafraction < minimum)
+				minimum = n.areafraction;
+			
+			if (n.areafraction > maximum)
+				maximum = n.areafraction;
+		}
+		track.areafracMIN = minimum;
+		track.areafracMAX = maximum;		
 	}
 	
 	
@@ -227,6 +236,8 @@ public class Overlay_Track implements PlugIn {
 		 
 	}
 	public class Track {
+		public double areafracMAX;
+		public double areafracMIN;
 		//HashMap<Integer, Node> nodes;
 		ArrayList<Node> nodes;
 		public Track(ArrayList<Node> nodes){
