@@ -94,8 +94,9 @@ public class DotLinker {
 		generateTrajectories(frameA, frameA.length);
 		
 		// viewing the trajectories
-//		generateView(this.imp);
-		generateView();
+
+		generateView(); //plot with xy coordinate inverted, the particle tracker bug 
+		
 		printTrajectories();
 		//putLinkedParticeID();
 		ResultsTable trackrt = showTrajectoryTable();
@@ -358,8 +359,8 @@ public class DotLinker {
 			return null;
 		}
 		
-		float[] yA = rt.getColumn(rt.getColumnIndex("X"));
-		float[] xA = rt.getColumn(rt.getColumnIndex("Y"));
+		float[] xA = rt.getColumn(rt.getColumnIndex("X"));
+		float[] yA = rt.getColumn(rt.getColumnIndex("Y"));
 		float[] areaA = rt.getColumn(rt.getColumnIndex("Area"));
 		float[] sliceA = rt.getColumn(rt.getColumnIndex("Slice"));
 		float[] sliceAsort = sliceA.clone();
