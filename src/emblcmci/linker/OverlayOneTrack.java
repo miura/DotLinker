@@ -54,29 +54,29 @@ public class OverlayOneTrack implements PlugIn {
 		int count = 0;
 		for (int i = 0; i< rowlength-1; i++){
 			if (xycoords[i][0] == ChosenTrackNumber){
-				IJ.log(""+ xycoords[i][1] + ", " + xycoords[i][2]);
 				count++;
-				
+				IJ.log("index:"+ i + ": "+ xycoords[i][1] + ", " + xycoords[i][2]);
 			}
 		}
 		xA = new int[count];
 		yA = new int[count];
 		int count2 = 0;
+		IJ.log("" + count);
 		for (int i = 0; i < count; i++){
 			if (xycoords[i][0] == ChosenTrackNumber){
 				xA[count2] = (int) xycoords[i][1];
-				yA[count2] = (int) xycoords[i][2];				
+				yA[count2] = (int) xycoords[i][2];
+				IJ.log("index:"+ i + ": "+ xA[count2] + ", " + yA[count2]);
+				count2++;
 			}			
 		}
 		Roi roi1 = new PolygonRoi(xA, yA, count, Roi.POLYLINE);
 		imp.setRoi(roi1);
 		Overlay overlay = imp.getOverlay();
-		if (overlay != null)
-			overlay.add(roi1);
-		else
-			overlay = new Overlay(roi1);
-		Color red = new Color(1, 0, 0);
-		overlay.setStrokeColor(red); 
+		if (overlay == null)
+			overlay = new Overlay();
+		overlay.setStrokeColor(Color.red);
+		overlay.add(roi1);			
 		imp.setOverlay(overlay);
 		imp.updateAndDraw() ;		
 		
