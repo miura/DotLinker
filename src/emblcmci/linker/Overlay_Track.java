@@ -85,6 +85,10 @@ public class Overlay_Track implements PlugIn {
 		}
 		IJ.log("Area Fraction Minimum: " + areafracMin);
 		IJ.log("Area Fraction Maximum: " + areafracMax);
+		if (areafracMax > 2.0){
+			areafracMax = 2.0;
+			IJ.log("... areaFracMax Corrected to:" + areafracMax);
+		}
 		
 		
 		if (arg.equals("plot"))
@@ -109,6 +113,7 @@ public class Overlay_Track implements PlugIn {
 				if (v != null)
 					trackAreaColorCoder(imp, (Track) v, areafracMin, areafracMax);
 		}
+		imp.updateAndDraw();
 
 	}
 	
@@ -117,14 +122,18 @@ public class Overlay_Track implements PlugIn {
 		Iterator<Node> iter = track.nodes.iterator();
 		Node n;
 		int counter = 0;
+		double areaFrac;
 		while (iter.hasNext()) {
 			n = iter.next();
 			// normalize to 255 scale. 0 will be the segmented background, black
+			areaFrac = n.areafraction;
+			if (areaFrac > areafracMax)
+				areaFrac = areafracMax;
 			areascale = (int) Math.floor( 
-					((n.areafraction - areafracMin) 
+					((areaFrac - areafracMin) 
 							/ (areafracMax - areafracMin))* 255 +1);
-			IJ.log(""+counter+": area fraction=" + 
-					n.areafraction + " 255 scaled = " + areascale);
+//			IJ.log(""+counter+": area fraction=" + 
+//					n.areafraction + " 255 scaled = " + areascale);
 			fillArea(imp, n, areascale);
 			counter++;
 		}
@@ -143,7 +152,7 @@ public class Overlay_Track implements PlugIn {
 		//there should be set color here.
 		if (wandroi != null){
 			ip.setColor(areascale);		//value according to own reference area.
-			wandroi.drawPixels(ip);
+			//wandroi.drawPixels(ip); //this may connect neighboring cells
 			ip.fill(wandroi);
 		} else {
 			IJ.log("Null ROI returned: id" + n.id + 
