@@ -1,4 +1,4 @@
-package emblcmci;
+package emblcmci.linker;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -7,9 +7,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Vector;
 
-import emblcmci.linker.LinkCosts;
-import emblcmci.linker.LinkCostsOnlyDistance;
-import emblcmci.linker.LinkCostswithAreaDynamics;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageCanvas;

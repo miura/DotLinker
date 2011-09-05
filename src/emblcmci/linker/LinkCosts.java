@@ -3,7 +3,7 @@
  */
 package emblcmci.linker;
 
-import emblcmci.DotLinker.Particle;
+import emblcmci.linker.DotLinker.Particle;
 
 /**
  * Interface for Calculating costs between a particle and another particle in successive frame. 

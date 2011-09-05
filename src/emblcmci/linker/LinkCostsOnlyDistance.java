@@ -1,6 +1,6 @@
 package emblcmci.linker;
 
-import emblcmci.DotLinker.Particle;
+import emblcmci.linker.DotLinker.Particle;
 
 /** an implementation of cost calculation only by distance. The simplest form of "Nearest neighbor".
  * 

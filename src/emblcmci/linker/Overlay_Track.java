@@ -28,7 +28,7 @@ public class Overlay_Track implements PlugIn {
 	       
 	private boolean multicolor = false;
 	private int colorid = 0;
-	private HashMap<Integer, Track> Tarcks;
+	//private HashMap<Integer, Track> Tarcks;
 
 	public void run(String arg) {
 	    ImagePlus imp = IJ.getImage();
@@ -68,7 +68,7 @@ public class Overlay_Track implements PlugIn {
 			track.nodes.add(node);
 		
 		}
-		this.Tarcks = Tracks;
+		//this.Tarcks = Tracks;
 
 		// calculate fraction of area to the first time point area
 		for (Track v : Tracks.values()) //iterate for tracks
