@@ -1,5 +1,5 @@
+package emblcmci.linker;
 
-import emblcmci.linker.DotLinker;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
