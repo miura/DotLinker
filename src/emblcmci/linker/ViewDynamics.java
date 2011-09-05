@@ -158,7 +158,13 @@ public class ViewDynamics {
 
 	public void AreaPlotter(HashMap<Integer, Track> Tracks, ImagePlus imp,
 			double areafracMin, double areafracMax){
-		int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", 1);
+		int defaultID = 1;
+		if (imp.getRoi() != null){
+			Roi pntroi = imp.getRoi();
+			defaultID = getTrackClosesttoPointROI(Tracks, pntroi);
+			imp.killRoi();
+		}
+		int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", defaultID);
 		Track track;
 
 		if (ChosenTrackNumber != 0){
@@ -174,6 +180,23 @@ public class ViewDynamics {
 		}
 		imp.updateAndDraw();
 
+	}
+	public int getTrackClosesttoPointROI(HashMap<Integer, Track> Tracks, Roi pntroi){
+		int closestTrackID = 1;
+		if (pntroi.getType() != Roi.POINT)
+			return closestTrackID;
+		double rx = pntroi.getBounds().getCenterX();
+		double ry = pntroi.getBounds().getCenterY();
+		double mindist = 10000;
+		double dist;
+		for (Track v : Tracks.values()){
+			dist = Math.sqrt(Math.pow((v.nodes.get(0).getX() - rx), 2) + 	Math.pow((v.nodes.get(0).getY() - ry), 2) );
+			if (dist < mindist) {
+				mindist = dist;
+				closestTrackID = v.nodes.get(0).trackID;
+			}
+		}	
+		return closestTrackID;
 	}
 	
 	public boolean trackAreaColorCoder(ImagePlus imp, Track track, double areafracMin, double areafracMax){
