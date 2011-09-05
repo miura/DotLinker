@@ -5,9 +5,9 @@
 	<property name="build" location="bin" />
 	<property name="dist"  location="dist" />
 <!--
-	<property name="pluginsDir"  location="$workspace_loc/../../imagej/plugins/" />
+	<property name="pluginsDir"  location="$workspace_loc/imagej/plugins/" />
 -->
-	<property name="pluginsDir"  location="${basedir}/../ws1/imagej/plugins/" />	
+	<property name="pluginsDir"  location="${basedir}/../imagej/plugins/" />	
 		<echo>
 			Plugins directory
 			${basedir}

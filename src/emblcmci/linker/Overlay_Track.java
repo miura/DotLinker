@@ -12,8 +12,10 @@ import ij.WindowManager;
 import ij.gui.Overlay;
 import ij.gui.PolygonRoi;
 import ij.gui.Roi;
+import ij.gui.Wand;
 import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
+import ij.process.ImageProcessor;
 import ij.text.TextWindow;
 
 /**
@@ -71,19 +73,29 @@ public class Overlay_Track implements PlugIn {
 		// calculate fraction of area to the first time point area
 		for (Track v : Tracks.values()) //iterate for tracks
 			if (v != null)
-				calcAreaFraction(v);		
+				calcAreaFraction(v);
+		// get minimum and maximum fraction through all tracks
+		double areafracMax = 0;
+		double areafracMin =100;
+		for (Track v : Tracks.values()){ //iterate for tracks
+			if (v != null) {
+				if (v.areafracMIN < areafracMin) areafracMin = v.areafracMIN;
+				if (v.areafracMAX > areafracMax) areafracMax = v.areafracMAX;
+			}
+		}
 		
 		
 		if (arg.equals("plot"))
 			TrackPlotter(Tracks, imp);
 		if (arg.equals("area"))
-			AreaPlotter(Tracks, imp);
+			AreaPlotter(Tracks, imp, areafracMin, areafracMax);
 	}
 
-	public void AreaPlotter(HashMap<Integer, Track> Tracks, ImagePlus imp){
+	public void AreaPlotter(HashMap<Integer, Track> Tracks, ImagePlus imp,
+			double areafracMin, double areafracMax){
 		int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", 1);
 		Track track;
-		
+		int areascale = 0; 
 		if (ChosenTrackNumber != 0){
 			track = Tracks.get(ChosenTrackNumber);
 			if (track != null){
@@ -93,6 +105,13 @@ public class Overlay_Track implements PlugIn {
 				while (iter.hasNext()) {
 					n = iter.next();
 					IJ.log(""+counter+": "+ n.areafraction);
+					// normalize to 255 scale. 0 will be the segmented background, black
+					areascale = (int) Math.floor( 
+							((n.areafraction - areafracMin) 
+									/ (areafracMax - areafracMin)) 
+									* 255 +1);
+					IJ.log(""+counter+": "+ areascale);
+					fillArea(imp, n, areascale);
 					counter++;
 				}					
 				
@@ -106,7 +125,39 @@ public class Overlay_Track implements PlugIn {
 //					plotTrack((Track) v, imp);
 		}
 
-	}	
+	}
+	
+	public void fillArea(ImagePlus imp, Node n, int areascale){
+		if (n == null) return;
+		imp.setSlice(n.getFrame()+1);	//n.frame starts from 0, but slice number starts from 1
+		PolygonRoi wandroi = wandRoi(imp, n.getX(), n.getY(), n.getFrame()+1);
+		//there should be set color here.
+		ImageProcessor ip = imp.getStack().getProcessor(n.getFrame()+1);
+		ip.setColor(areascale);		//value according to own reference area.
+		wandroi.drawPixels(ip);
+		ip.fill(wandroi);
+	}
+	
+	/**
+	 * Does auto-wand at the given coordinate in given slice, and return a polygon ROI.
+	 * @param imp: supposed to be stack. 
+	 * @param wandx
+	 * @param wandy
+	 * @param slicenum
+	 * @return
+	 */
+	public PolygonRoi wandRoi(ImagePlus imp, double wandx, double wandy, int slicenum){
+		PolygonRoi wandroi = null;
+		ImageProcessor ip = imp.getStack().getProcessor(slicenum);
+		Wand wand = new Wand(ip);
+		int currentpixvalue = ip.getPixel((int) wandx, (int) wandy);
+		if (currentpixvalue == 255){
+			wand.autoOutline((int) wandx, (int) wandy, currentpixvalue, currentpixvalue, wand.EIGHT_CONNECTED);
+			wandroi = new PolygonRoi(wand.xpoints, wand.ypoints, wand.npoints, Roi.FREEROI);
+		}
+		return wandroi;
+	}
+	
 	public void calcAreaFraction(Track track){
 		Iterator<Node> iter = track.nodes.iterator();
 		double area0 = (double) track.nodes.get(0).area;
