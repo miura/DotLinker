@@ -83,6 +83,8 @@ public class Overlay_Track implements PlugIn {
 				if (v.areafracMAX > areafracMax) areafracMax = v.areafracMAX;
 			}
 		}
+		IJ.log("Area Fraction Minimum: " + areafracMin);
+		IJ.log("Area Fraction Maximum: " + areafracMax);
 		
 		
 		if (arg.equals("plot"))
@@ -95,47 +97,63 @@ public class Overlay_Track implements PlugIn {
 			double areafracMin, double areafracMax){
 		int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", 1);
 		Track track;
-		int areascale = 0; 
+
 		if (ChosenTrackNumber != 0){
 			track = Tracks.get(ChosenTrackNumber);
-			if (track != null){
-				Iterator<Node> iter = track.nodes.iterator();
-				Node n;
-				int counter = 0;
-				while (iter.hasNext()) {
-					n = iter.next();
-					IJ.log(""+counter+": "+ n.areafraction);
-					// normalize to 255 scale. 0 will be the segmented background, black
-					areascale = (int) Math.floor( 
-							((n.areafraction - areafracMin) 
-									/ (areafracMax - areafracMin)) 
-									* 255 +1);
-					IJ.log(""+counter+": "+ areascale);
-					fillArea(imp, n, areascale);
-					counter++;
-				}					
-				
-			} else {
+			if (track != null)
+				trackAreaColorCoder(imp, track, areafracMin, areafracMax);
+			else
 				IJ.showMessageWithCancel("No Track", "no such track could be found");
-			}
 		} else {
-//			multicolor  = true;
-//			for (Object v : Tracks.values()) //iterate for tracks
-//				if (v != null)
-//					plotTrack((Track) v, imp);
+			for (Object v : Tracks.values()) //iterate for tracks
+				if (v != null)
+					trackAreaColorCoder(imp, (Track) v, areafracMin, areafracMax);
 		}
 
 	}
 	
+	public boolean trackAreaColorCoder(ImagePlus imp, Track track, double areafracMin, double areafracMax){
+		int areascale = 0; 
+		Iterator<Node> iter = track.nodes.iterator();
+		Node n;
+		int counter = 0;
+		while (iter.hasNext()) {
+			n = iter.next();
+			// normalize to 255 scale. 0 will be the segmented background, black
+			areascale = (int) Math.floor( 
+					((n.areafraction - areafracMin) 
+							/ (areafracMax - areafracMin))* 255 +1);
+			IJ.log(""+counter+": area fraction=" + 
+					n.areafraction + " 255 scaled = " + areascale);
+			fillArea(imp, n, areascale);
+			counter++;
+		}
+		return true;
+	}
+	
+	
 	public void fillArea(ImagePlus imp, Node n, int areascale){
 		if (n == null) return;
-		imp.setSlice(n.getFrame()+1);	//n.frame starts from 0, but slice number starts from 1
-		PolygonRoi wandroi = wandRoi(imp, n.getX(), n.getY(), n.getFrame()+1);
-		//there should be set color here.
+		//imp.setSlice(n.getFrame()+1);	//n.frame starts from 0, but slice number starts from 1
+		if (imp.getRoi() != null)
+			imp.killRoi();
 		ImageProcessor ip = imp.getStack().getProcessor(n.getFrame()+1);
-		ip.setColor(areascale);		//value according to own reference area.
-		wandroi.drawPixels(ip);
-		ip.fill(wandroi);
+		//ip.setRoi((Roi) null);
+		PolygonRoi wandroi = wandRoi(ip, n.getX(), n.getY(), n.getFrame()+1);
+		//there should be set color here.
+		if (wandroi != null){
+			ip.setColor(areascale);		//value according to own reference area.
+			wandroi.drawPixels(ip);
+			ip.fill(wandroi);
+		} else {
+			IJ.log("Null ROI returned: id" + n.id + 
+					" frame:" + n.frame + 
+					" AreaFrac:" + n.areafraction + 
+					" X:" + n.getX() +
+					" Y:" + n.getY() +
+					" trackID:" + n.trackID
+					);
+		}
 	}
 	
 	/**
@@ -146,9 +164,8 @@ public class Overlay_Track implements PlugIn {
 	 * @param slicenum
 	 * @return
 	 */
-	public PolygonRoi wandRoi(ImagePlus imp, double wandx, double wandy, int slicenum){
+	public PolygonRoi wandRoi(ImageProcessor ip, double wandx, double wandy, int slicenum){
 		PolygonRoi wandroi = null;
-		ImageProcessor ip = imp.getStack().getProcessor(slicenum);
 		Wand wand = new Wand(ip);
 		int currentpixvalue = ip.getPixel((int) wandx, (int) wandy);
 		if (currentpixvalue == 255){
