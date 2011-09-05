@@ -20,13 +20,18 @@ import ij.plugin.Duplicator;
  * 
  * Loads data from Results window (such as the particle analysis results)
  * and links detected particles. Linked results will be drawn
- * on the duplicate of the original stack. 
+ * on the duplicate of the original stack.
  * 
- * Algorithm is from ParticleTrackr3DModular_.java, and other Mosaic resources. 
+ * Linking Algorithm is based on ParticleTrackr3DModular_.java, and other Mosaic resources. 
  * These sources are available from svn repository linked in 
  * http://www.mosaic.ethz.ch/Downloads/ParticleTracker 
  * Huge thanks to Janick Cardinale @ ETH Zuerich, 
- * for making all these resources available as open source. Applause. 
+ * for making all these resources available as open source. Applause.
+ * 
+ * A modification to the original algorithm by MOSAIC is that the cost-function is now a 
+ * Interface "LinkCosts", and should be implemented. 
+ * 
+ * In this plugin, emblcmci.linker.LinkCostswithAreaDynamics implements the cost function. 
  * 
  * @author Kota Miura
  * Centre for Molecular and Cellular Imaging, EMBL Heidelberg
@@ -71,7 +76,25 @@ public class DotLinker {
 	public void setTrajectoryThreshold(int trajectoryThreshold) {
 		TrajectoryThreshold = trajectoryThreshold;
 	}
-
+	
+	public static boolean checkResultsTableParameters(){
+		boolean rtOK = false;
+		ResultsTable rt = ResultsTable.getResultsTable();
+		if (rt != null){
+			if (	rt.columnExists(ResultsTable.AREA) 			&&
+					rt.columnExists(ResultsTable.X_CENTROID) 	&&
+					rt.columnExists(ResultsTable.Y_CENTROID) 	&&
+					rt.columnExists(ResultsTable.SLICE)			){
+				rtOK = true;
+			} else {
+				IJ.log("some results parameter missing");
+			}
+		} else {
+			IJ.log("need Analyze particle Results!");
+		}
+		return rtOK;
+	}
+	
 	/** Method that should be called from a plugin, or from scripts to
 	 * do all the processing. 
 	 */
