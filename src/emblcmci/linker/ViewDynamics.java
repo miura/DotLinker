@@ -15,16 +15,20 @@ package emblcmci.linker;
  */
 import ij.IJ;
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.WindowManager;
+import ij.gui.Line;
 import ij.gui.Overlay;
 import ij.gui.PolygonRoi;
 import ij.gui.Roi;
 import ij.gui.Wand;
 import ij.measure.ResultsTable;
+import ij.plugin.CanvasResizer;
 import ij.process.ImageProcessor;
 import ij.text.TextWindow;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,7 +77,7 @@ public class ViewDynamics {
 		}
 			
 		AreaPlotter(Tracks, imp, areafracMin, areafracMax);		
-	
+		//addAreaColorScale(imp, areafracMin, areafracMax);
 	}
 	/**
 	 * Does the plotting of tracks. 
@@ -222,6 +226,56 @@ public class ViewDynamics {
 		return true;
 	}
 	
+	/**
+	 * Adds color scale bar to the stack painted with area dynamics.  
+	 * Resizes canvas so that the scale could be placed in the right side of original stack.  
+	 * @param imp
+	 */
+	public void addAreaColorScale(){
+		ResultsTable trt = getTrackTable("Tracks");
+		HashMap<Integer, Track> Tracks = generateTracksHashMap(trt);
+		// get minimum and maximum fraction through all tracks
+		double areafracMax = 0;
+		double areafracMin =100;
+		for (Track v : Tracks.values()){ //iterate for tracks
+			if (v != null) {
+				if (v.areafracMIN < areafracMin) areafracMin = v.areafracMIN;
+				if (v.areafracMAX > areafracMax) areafracMax = v.areafracMAX;
+			}
+		}
+		IJ.log("Area Fraction Minimum: " + areafracMin);
+		IJ.log("Area Fraction Maximum: " + areafracMax);
+		if (areafracMax > 2.0){
+			areafracMax = 2.0;
+			IJ.log("... areaFracMax Corrected to:" + areafracMax);
+		}		
+		CanvasResizer cr = new CanvasResizer();
+		int oldwidth = imp.getWidth();
+		int oldheight = imp.getHeight();
+		int addwidth = 50;
+		ImageStack ipresized = cr.expandStack(imp.getStack(), oldwidth + addwidth, oldheight, 0, 0);
+		imp.setStack(ipresized);
+		double unitheight = 1.0; //this could be adjusted
+		double stepwidth = 256*unitheight/256;
+		int toppos = oldheight - 10 - (int) Math.round(256*unitheight);
+		ImageProcessor ipslice;
+		Font font = new Font("SansSerif", Font.PLAIN, 8);
+		for (int k = 0; k < imp.getStackSize(); k++){
+			ipslice = ipresized.getProcessor(k+1);
+			for (double i = 0; i < 256*unitheight; i+=stepwidth){
+				for (int j = oldwidth+5; j < oldwidth + 25; j++){
+					ipslice.set( j, toppos + (int) Math.round(i),  256 - (int) Math.round(i/unitheight));
+				}
+			}
+			ipslice.setFont(font);
+			ipslice.setColor(128);
+			
+			ipslice.drawString(Double.toString(areafracMax), oldwidth + 28, toppos);
+			ipslice.drawString(Double.toString(areafracMin), oldwidth + 28, (int) (toppos + 256*unitheight));
+		}
+       
+		imp.updateAndDraw();
+	}
 	
 	public void fillArea(ImagePlus imp, Node n, int areascale){
 		if (n == null) return;
@@ -266,7 +320,6 @@ public class ViewDynamics {
 		return wandroi;
 	}
 		
-	
 	public void calcAreaFraction(Track track){
 		Iterator<Node> iter = track.nodes.iterator();
 		double area0 = (double) track.nodes.get(0).area;
@@ -290,6 +343,10 @@ public class ViewDynamics {
 		track.areafracMIN = minimum;
 		track.areafracMAX = maximum;		
 	}
+	
+	
+	
+	//--------------- Area Plottting tools down to here ---------------
 
 	public void TrackPlotter(HashMap<Integer, Track> Tracks, ImagePlus imp){
 	int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", 1);

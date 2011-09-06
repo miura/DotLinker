@@ -36,6 +36,9 @@ public class Overlay_Track implements PlugIn {
 	    	vdyna.plotTracks();
 	    
 	    if (arg.equals("area"))
-	    	vdyna.plotAreaDynamics();	    
+	    	vdyna.plotAreaDynamics();
+	    
+	    if (arg.equals("areascale"))
+	    	vdyna.addAreaColorScale();
 	}
 }
