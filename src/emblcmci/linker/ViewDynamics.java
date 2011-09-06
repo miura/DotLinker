@@ -160,9 +160,23 @@ public class ViewDynamics {
 		return Tracks;
 	}
 
+	/**
+	 * Plotting of Color Coded area, relative to the area for the first time point in each track. 
+	 * All tracks will be plotted if track "0" is selected. 
+	 * Otherwise, user-input track (by track ID) will be plotted. 
+	 * When there is pointROI in the image stack, then the trackID closest to the 
+	 * selected position will be returned as the default value 
+	 * 
+	 * @param Tracks: hashmap of Tracks. 
+	 * @param imp: image stack to be plotted
+	 * @param areafracMin: maximum of all the area fraction value in Tracks. 
+	 * @param areafracMax: minimum of all the area fraction value in Tracks. 
+	 */
 	public void AreaPlotter(HashMap<Integer, Track> Tracks, ImagePlus imp,
 			double areafracMin, double areafracMax){
+
 		int defaultID = 1;
+		//if there is a pointROI, then search for the track closest to the ROI.
 		if (imp.getRoi() != null){
 			Roi pntroi = imp.getRoi();
 			defaultID = getTrackClosesttoPointROI(Tracks, pntroi);
@@ -228,13 +242,17 @@ public class ViewDynamics {
 	
 	/**
 	 * Adds color scale bar to the stack painted with area dynamics.  
-	 * Resizes canvas so that the scale could be placed in the right side of original stack.  
+	 * Resizes canvas so that the scale could be placed in the right side of original stack.
+	 * 
+	 * ...way it is done is a bit ugly so this should be redone...  
 	 * @param imp
 	 */
 	public void addAreaColorScale(){
 		ResultsTable trt = getTrackTable("Tracks");
 		HashMap<Integer, Track> Tracks = generateTracksHashMap(trt);
+		
 		// get minimum and maximum fraction through all tracks
+		// this part is common to the others
 		double areafracMax = 0;
 		double areafracMin =100;
 		for (Track v : Tracks.values()){ //iterate for tracks
@@ -248,18 +266,33 @@ public class ViewDynamics {
 		if (areafracMax > 2.0){
 			areafracMax = 2.0;
 			IJ.log("... areaFracMax Corrected to:" + areafracMax);
-		}		
+		}
+		
+		//resizing canvas, adding extra space in the left side. 
 		CanvasResizer cr = new CanvasResizer();
 		int oldwidth = imp.getWidth();
 		int oldheight = imp.getHeight();
 		int addwidth = 50;
 		ImageStack ipresized = cr.expandStack(imp.getStack(), oldwidth + addwidth, oldheight, 0, 0);
 		imp.setStack(ipresized);
-		double unitheight = 1.0; //this could be adjusted
+		
+		//construct the color scale bar
+		double unitheight = 1.0; // *** this could be adjusted ****
+		if (oldheight < 256)
+			unitheight = (oldheight/2)/256;	//if the window height is small, adust the scale bar height accordingly
+		
+		//pixel height per color scale step, could be less than 1.
 		double stepwidth = 256*unitheight/256;
+		
+		//y-position of the top of the scale bar
 		int toppos = oldheight - 10 - (int) Math.round(256*unitheight);
+		
+		// y-position corresponding to 1.0 relative area ... reference area at [0] of each track.
+		int pos1 = toppos + 256 - (int) ((1 - areafracMin)/((areafracMax - areafracMin))* 256 * unitheight); 
+			
 		ImageProcessor ipslice;
 		Font font = new Font("SansSerif", Font.PLAIN, 8);
+
 		for (int k = 0; k < imp.getStackSize(); k++){
 			ipslice = ipresized.getProcessor(k+1);
 			for (double i = 0; i < 256*unitheight; i+=stepwidth){
@@ -271,6 +304,7 @@ public class ViewDynamics {
 			ipslice.setColor(128);
 			
 			ipslice.drawString(Double.toString(areafracMax), oldwidth + 28, toppos);
+			ipslice.drawString(Double.toString(1.0), oldwidth + 28, pos1);
 			ipslice.drawString(Double.toString(areafracMin), oldwidth + 28, (int) (toppos + 256*unitheight));
 		}
        
@@ -349,22 +383,31 @@ public class ViewDynamics {
 	//--------------- Area Plottting tools down to here ---------------
 
 	public void TrackPlotter(HashMap<Integer, Track> Tracks, ImagePlus imp){
-	int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", 1);
-	Track track;
-	
-	if (ChosenTrackNumber != 0){
-		track = Tracks.get(ChosenTrackNumber);
-		if (track != null){
-			plotTrack(track, imp);
+
+		int defaultID = 1;
+		//if there is a pointROI, then search for the track closest to the ROI.
+		if (imp.getRoi() != null){
+			Roi pntroi = imp.getRoi();
+			defaultID = getTrackClosesttoPointROI(Tracks, pntroi);
+			imp.killRoi();
+		}		
+		int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", defaultID);
+
+		Track track;
+
+		if (ChosenTrackNumber != 0){
+			track = Tracks.get(ChosenTrackNumber);
+			if (track != null){
+				plotTrack(track, imp);
+			} else {
+				IJ.showMessageWithCancel("No Track", "no such track could be found");
+			}
 		} else {
-			IJ.showMessageWithCancel("No Track", "no such track could be found");
+			multicolor  = true;
+			for (Object v : Tracks.values()) //iterate for tracks
+				if (v != null)
+					plotTrack((Track) v, imp);
 		}
-	} else {
-		multicolor  = true;
-		for (Object v : Tracks.values()) //iterate for tracks
-			if (v != null)
-				plotTrack((Track) v, imp);
-	}
 
 }
 	

@@ -402,9 +402,22 @@ public class DotLinker {
 	}
 
 	/**
-	 * The algorithm of ParticleTracker plugin for Linking.
-	 * Cost function was changed, so that distance and area changes are considered.
-	 * No involvement of intensity.  
+	 * The linking algorithm, modified version of Mosaic ParticleTracker plugin.
+	 * Cost function (now an Interface) was changed, 
+	 * so that distance and area changes are considered.
+	 * Instead, no involvement of intensity in the cost function.
+	 * 
+	 * Key algorithm for linking is the  global optimization of the cost. 
+	 * This is done by testing all g(i, j)=0 positions by calculating the 
+	 * net increase/decrease in the cost (see 'z = ' equation, with 4 terms).
+	 *  
+	 * If net cost is negative, than this position temporarily becomes 1. 
+	 * all the other g(i, j) position will be tested, that would end up in 
+	 * the minimum global cost. 
+	 * 
+	 * Linking algorithm is well explained in 
+	 * "A MATLAB toolbox for virus particle tracking"
+	 * Sbalzarini (2006) p15.
 	 * 
 	 * Below is the description from the original:
 	 * <br>Identifies points corresponding to the 
@@ -465,8 +478,7 @@ public class DotLinker {
 				//    			p1 = frames[m].particles;
 				//    			p2 = frames[m + (n + 1)].particles;
 
-				// here is some tests on cost function designing. 
-				// later, cost function should be selectable in GUI dialog. 
+				// Kota: later, cost function should be selectable in GUI dialog. 
 				
 				//LinkCosts link = new LinkCostsOnlyDistance();
 				LinkCosts link = new LinkCostswithAreaDynamics(displacement, 2.0);
@@ -576,12 +588,12 @@ public class DotLinker {
 									x = nop;
 								if(i == nop)
 									y = nop_next;
-
+								//net increase/decrease in cost
 								z = cost[coord(i, j, nop_next + 1)] + 
 								cost[coord(x, y, nop_next + 1)] - 
 								cost[coord(i, y, nop_next + 1)] - 
 								cost[coord(x, j, nop_next + 1)];
-								if(z > -1.0e-10)
+								if(z > -1.0e-10)		//Kota: where did this value came from??
 									z = 0.0;
 								if(z < min) {
 									min = z;
