@@ -142,7 +142,9 @@ public class ViewDynamics {
 					(int) trt.getValue("Area", i), 
 					(int) trt.getValue("frame", i), 
 					(int) trt.getValue("TrackID", i),
+					(double) trt.getValue("AreaFraction", i),
 					i);			
+
 			if (Tracks.get(node.trackID) == null){
 				track =new Track(new ArrayList<Node>());
 				Tracks.put(node.trackID, track);
@@ -155,7 +157,8 @@ public class ViewDynamics {
 		// calculate fraction of area to the first time point area
 		for (Track v : Tracks.values()) //iterate for tracks
 			if (v != null)
-				calcAreaFraction(v);
+				calcAreaFractionMinMax(v);
+				//calcAreaFraction(v); // commented out, since this value is now calculated in DotLinker
 
 		return Tracks;
 	}
@@ -378,6 +381,40 @@ public class ViewDynamics {
 		track.areafracMAX = maximum;		
 	}
 	
+	public void calcAreaFractionMinMax(Track track){
+		Iterator<Node> iter = track.nodes.iterator();
+		Node n;
+		double minimum = 1000;
+		double maximum = 0;
+		while (iter.hasNext()) {
+			n = iter.next();
+			if (n.areafraction < minimum)
+				minimum = n.areafraction;
+			
+			if (n.areafraction > maximum)
+				maximum = n.areafraction;
+		}
+		track.areafracMIN = minimum;
+		track.areafracMAX = maximum;		
+	}
+	
+	//creates data table for area changes (normalized to 1) for each track specified. 
+	public String showAreaDataInTable(Track track){
+		String title = "AreaDataTable";
+		ResultsTable rt;
+		if (WindowManager.getFrame(title) != null){
+			Frame rtf = WindowManager.getFrame(title);
+			
+		} else {
+
+		}
+		
+		for (Node n : track.nodes){
+			
+		}
+		
+		return title;
+	}
 	
 	
 	//--------------- Area Plottting tools down to here ---------------
@@ -458,12 +495,13 @@ public class ViewDynamics {
 		int id;
 		double areafraction;	//fraction of area compared to the first time point in the trajectory
 		
-		public Node(double x, double y, int area, int frame, int trackID, int id){
+		public Node(double x, double y, int area, int frame, int trackID, double areafraction, int id){
 			this.x = x;
 			this.y = y;
 			this.area = area;
 			this.frame = frame;
 			this.trackID = trackID;
+			this.areafraction = areafraction;
 			this.id = id;			
 		}
 		public double getX() {

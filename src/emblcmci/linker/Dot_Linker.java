@@ -42,9 +42,7 @@ public class Dot_Linker implements PlugIn {
 		}
 		//check data in resultstable
 		// if no results, or parameter missing, try to do "analyze particle". 
-		if (!DotLinker.checkResultsTableParameters()){
-			redoAnalyzeParticle(imp);
-		}
+
 		
 		//check arguments, whether to do the analysis with GUI dialog or silently using the 
 		//default parameter setting. 
@@ -55,6 +53,9 @@ public class Dot_Linker implements PlugIn {
 			dl = new DotLinker(imp, linkrange, displacement);
 		} else {
 			dl = new DotLinker(imp);			
+		}
+		if (!dl.checkResultsTableParameters()){
+			redoAnalyzeParticle(imp);
 		}
 		dl.setTrajectoryThreshold(TrajectoryThreshold);
 		dl.doLinking();
@@ -82,7 +83,8 @@ public class Dot_Linker implements PlugIn {
 		gd.addMessage("-----");
 		gd.addNumericField("Trajectory Lenght Threshold", 10, 0);
 		gd.showDialog();
-
+		if (gd.wasCanceled())
+			return false;
 		this.linkrange = (int)gd.getNextNumber();
 		this.displacement = gd.getNextNumber();
 		this.TrajectoryThreshold = (int) gd.getNextNumber();		

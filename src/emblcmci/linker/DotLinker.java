@@ -7,6 +7,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Vector;
 
+import emblcmci.linker.ViewDynamics.Node;
+import emblcmci.linker.ViewDynamics.Track;
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageCanvas;
@@ -77,18 +80,17 @@ public class DotLinker {
 		TrajectoryThreshold = trajectoryThreshold;
 	}
 	
-	public static boolean checkResultsTableParameters(){
+	public boolean checkResultsTableParameters(){
 		boolean rtOK = false;
 		ResultsTable rt = ResultsTable.getResultsTable();
 		if (rt != null){
-			if (	rt.columnExists(ResultsTable.AREA) 			&&
-					rt.columnExists(ResultsTable.X_CENTROID) 	&&
-					rt.columnExists(ResultsTable.Y_CENTROID) 	&&
-					rt.columnExists(ResultsTable.SLICE)			){
-				rtOK = true;
-			} else {
-				IJ.log("some results parameter missing");
-			}
+			if (rt.columnExists(ResultsTable.AREA))
+				if (rt.columnExists(ResultsTable.X_CENTROID))
+					if (rt.columnExists(ResultsTable.Y_CENTROID))
+						if (rt.columnExists(ResultsTable.SLICE))
+							rtOK = true;
+						else 
+							IJ.log("some results parameter missing");
 		} else {
 			IJ.log("need Analyze particle Results!");
 		}
@@ -151,6 +153,7 @@ public class DotLinker {
 		boolean special;		// a flag that is used while detecting and linking particles
 		
 		boolean hasArea = false;	//flag if particle has area data. 
+		public double areafraction;
 
 
 		public Particle(float x, float y, 
@@ -257,6 +260,8 @@ public class DotLinker {
 		Color color;						// the display color of this Trajectory
 		Roi mouse_selection_area;			// The Roi area where a mouse click will select this trajectory
 		Roi focus_area;						// The Roi for focus display of this trajectory
+		public double areafracMIN;
+		public double areafracMAX;
 
 
 
@@ -847,6 +852,7 @@ public class DotLinker {
 		while (iter.hasNext()) {
 			Trajectory curr_traj = iter.next();
 			Particle[] ptcls = curr_traj.existing_particles;
+			calcAreaFraction(curr_traj);
 			if (ptcls.length > TrajectoryThreshold){
 				for (int i = 0; i < ptcls.length; i++){
 					rt.incrementCounter();
@@ -855,14 +861,39 @@ public class DotLinker {
 					rt.addValue("Xpos", ptcls[i].x);
 					rt.addValue("Ypos", ptcls[i].y);
 					rt.addValue("Area", ptcls[i].area);
+					rt.addValue("AreaFraction", ptcls[i].areafraction);
 				}
 			}
+
 		}
 		return rt;
 //		IJ.log("Mac track length = " + maxlength);
 //		for (int i =1; i<counter.length; i++)
 //			IJ.log("track length " + i + ": " + counter[i]);
 	}
+
+	public void calcAreaFraction(Trajectory track){
+		Particle[] ptcles = track.existing_particles;
+		double area0 = (double) ptcles[0].area;
+		double carea;
+		int counter = 0;
+		Particle p;
+		double minimum = 1000;
+		double maximum = 0;
+		for (int i = 0; i < ptcles.length; i++) {
+			p = ptcles[i];
+			carea = (double) p.area;
+			p.areafraction = carea / area0;			
+			counter++;
+			if (p.areafraction < minimum)
+				minimum = p.areafraction;
+			
+			if (p.areafraction > maximum)
+				maximum = p.areafraction;
+		}
+		track.areafracMIN = minimum;
+		track.areafracMAX = maximum;		
+	}	
 
 	
 	/**
