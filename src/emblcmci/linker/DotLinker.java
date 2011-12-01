@@ -168,7 +168,19 @@ public class DotLinker {
 			this.hasArea = true;
 		}
 
-
+		//3D PARTICLE
+		public Particle(float x, float y, float z,
+				int frame, int particleID){
+			this.setX(x);
+			this.setY(y);
+			this.setZ(z);			
+			this.frame = frame;	
+			this.particleID = particleID;
+			this.next = new int[linkrange];
+			
+			this.hasArea = true;
+		}
+		
 		public int getFrame() {
 			return this.frame;
 		}

@@ -1,12 +1,4 @@
 package emblcmci.linker;
-/**
- * modified methods for importing Volocity 3D data
- * 
- * Mette
- * Kota Miura (miura@embl.de)
- */
-import java.util.Arrays;
-
 import ij.IJ;
 import ij.ImagePlus;
 import ij.measure.ResultsTable;
@@ -52,7 +44,7 @@ public class DotLinker2 extends DotLinker{
 		}
 		// fill in the Myframe object
 		for (int i = 0 ; i< timeA.length; i++){
-			Particle3D particle3d = new Particle(xA[i], yA[i], (int) (timeA[i] - 1), areaA[i], i);
+			Particle particle = new Particle(xA[i], yA[i], zA[i], (int) (timeA[i] - 1), i);
 			frameA[particle.frame].particles.add(particle);
 		}
 		return frameA;
