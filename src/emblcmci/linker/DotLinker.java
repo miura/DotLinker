@@ -80,6 +80,7 @@ public class DotLinker {
 		TrajectoryThreshold = trajectoryThreshold;
 	}
 	
+	// analyze particle case. 
 	public boolean checkResultsTableParameters(){
 		boolean rtOK = false;
 		ResultsTable rt = ResultsTable.getResultsTable();
@@ -100,12 +101,12 @@ public class DotLinker {
 	/** Method that should be called from a plugin, or from scripts to
 	 * do all the processing. 
 	 */
-	public void doLinking(){
+	public void doLinking(LinkCosts linkcostmethod, boolean showtrack){
 		frameA = dataloader();
 		if (frameA !=null){
 			
 			IJ.showStatus("Linking Particles");		
-			linkParticles(frameA, frameA.length, linkrange, displacement);
+			linkParticles(frameA, frameA.length, linkrange, displacement, linkcostmethod);
 			this.frames_number = frameA.length;
 		}
 		else {
@@ -117,11 +118,12 @@ public class DotLinker {
 		
 		// viewing the trajectories
 
-		generateView(); //plot with xy coordinate inverted, the particle tracker bug 
+		if (showtrack)
+			generateView(); //plot with xy coordinate inverted, the particle tracker bug 
 		
 		printTrajectories();
 		//putLinkedParticeID();
-		ResultsTable trackrt = showTrajectoryTable();
+		ResultsTable trackrt = showTrajectoryTable(all_traj);
 		trackrt.show("Tracks");
 	}
 	
@@ -443,7 +445,7 @@ public class DotLinker {
 	 * <br>Adapted from Ingo Oppermann implementation
 	 */	
 	
-	public void linkParticles(StackFrames[] frames, int frames_number, int linkrange, double displacement) {
+	public void linkParticles(StackFrames[] frames, int frames_number, int linkrange, double displacement, LinkCosts link) {
 
 		int m, i, j, k, nop, nop_next, n;
 		int ok, prev, prev_s, x = 0, y = 0, curr_linkrange;
@@ -498,7 +500,7 @@ public class DotLinker {
 				// Kota: later, cost function should be selectable in GUI dialog. 
 				
 				//LinkCosts link = new LinkCostsOnlyDistance();
-				LinkCosts link = new LinkCostswithAreaDynamics(displacement, 2.0);
+				//LinkCosts link = new LinkCostswithAreaDynamics(displacement, 2.0);
 				/* Fill in the costs */
 				for(i = 0; i < nop; i++) {
 					for(j = 0; j < nop_next; j++) {
@@ -855,7 +857,7 @@ public class DotLinker {
 		}
 	}
 	
-	public ResultsTable showTrajectoryTable(){
+	public ResultsTable showTrajectoryTable(Vector<Trajectory> all_traj){
 		ResultsTable rt = new ResultsTable();
 		
 		Iterator<Trajectory> iter = all_traj.iterator();  	   

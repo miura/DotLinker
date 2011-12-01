@@ -34,6 +34,8 @@ public class Dot_Linker implements PlugIn {
 	public void run(String arg) {
 		ImagePlus imp = IJ.getImage();
 		DotLinker dl;
+		LinkCosts linkcostmethod;
+		boolean showtrack = true; 
 		
 		//check image stack
 		if (imp == null){
@@ -47,18 +49,33 @@ public class Dot_Linker implements PlugIn {
 		//check arguments, whether to do the analysis with GUI dialog or silently using the 
 		//default parameter setting. 
 		if (arg.equals("gui")){
-			if (!getParameterDialog()){
-				return;
-			} 
+			if (!getParameterDialog())
+				return;			 
 			dl = new DotLinker(imp, linkrange, displacement);
-		} else {
-			dl = new DotLinker(imp);			
-		}
+			
+		} else if (arg.equals("gui_volocity")){
+			if (!getParameterDialog())
+				return;
+			dl = new DotLinker2(imp, linkrange, displacement);
+			showtrack = false;
+			
+		} else if (arg.equals("volocity")) {
+			dl = new DotLinker2(imp);
+			showtrack = false;
+		} else
+			dl = new DotLinker(imp);
+
+		// incase of volocity data (Mette), choose only distance cost. 
+		if (arg.equals("volocity") || arg.equals("gui_volocity"))
+			linkcostmethod = new LinkCostsOnlyDistance();
+		else
+			linkcostmethod = new LinkCostswithAreaDynamics(displacement, 2.0);
+		
 		if (!dl.checkResultsTableParameters()){
 			redoAnalyzeParticle(imp);
 		}
 		dl.setTrajectoryThreshold(TrajectoryThreshold);
-		dl.doLinking();
+		dl.doLinking(linkcostmethod, showtrack);
 	}
 	
 	public void redoAnalyzeParticle(ImagePlus imp){
