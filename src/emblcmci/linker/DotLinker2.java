@@ -25,7 +25,7 @@ public class DotLinker2 extends DotLinker{
 	/** data loader for Volocity file. 
 	 * 
 	 */
-	public StackFrames[] dataloader(){
+	public StackFrames[] dataloaderOLD(){
 		
 		//data loading from results table
 		ResultsTable rt = ResultsTable.getResultsTable();
@@ -62,6 +62,44 @@ public class DotLinker2 extends DotLinker{
 		}
 		return frameA;
 	}
+	
+	public StackFrames[] dataloader(){
+		String[] dataA;
+		
+		// data from text file
+		String datapath = "C:\\dropbox\\My Dropbox\\Mette\\centroid position ROI_1_4_embryoComma.csv";
+		String str = IJ.openAsString(datapath);
+		String[] linesA = ij.util.Tools.split(str, "\n");
+		int[] timeA = new int[linesA.length-1];
+		float[] xA = new float[linesA.length-1];
+		float[] yA = new float[linesA.length-1];
+		float[] zA = new float[linesA.length-1];
+		for (int i = 0; i < timeA.length; i++){
+			dataA = ij.util.Tools.split(linesA[i+1], "\t");
+			timeA[i] =  Integer.valueOf(dataA[4]).intValue();
+			xA[i] =  Float.valueOf(dataA[8].trim()).floatValue();
+			yA[i] =  Float.valueOf(dataA[9].trim()).floatValue();
+			zA[i] =  Float.valueOf(dataA[10].trim()).floatValue();
+		}
+		IJ.log(" --- volocity data format ---");
+		int startframe = (int) timeA[1];
+		int endframe = (int) timeA[timeA.length-1];		
+		int framenumber = endframe - startframe + 1;
+		IJ.log("start frame:" + Integer.toString(startframe));
+		IJ.log("end frame:" + Integer.toString(endframe));		
+		IJ.log("frame number:" + Integer.toString(framenumber));
+		frameA = new StackFrames[framenumber];
+		for (int i = 0; i < framenumber; i++){
+			frameA[i] = new StackFrames(i);
+			//frameA[i].particles.next = new Particle[linkrange];
+		}
+		// fill in the Myframe object
+		for (int i = 0 ; i< timeA.length; i++){
+			Particle particle = new Particle(xA[i], yA[i], zA[i], (int) (timeA[i] - 1), i);
+			frameA[particle.frame].particles.add(particle);
+		}
+		return frameA;
+	}	
 	
 	/** overrides. 
 	* currently dummy, should be implemented at some point.
