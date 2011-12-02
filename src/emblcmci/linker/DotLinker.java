@@ -150,7 +150,7 @@ public class DotLinker {
 		private float z = 0;
 		int frame = 0;			//starts from 0
 		private float area = 0;
-		int particleID = 0;
+		private int particleID = 0;
 		int[] next = null;		//array to hold linked ids
 		boolean special;		// a flag that is used while detecting and linking particles
 		
@@ -249,6 +249,14 @@ public class DotLinker {
 		 */
 		public float getArea() {
 			return area;
+		}
+
+		public int getParticleID() {
+			return particleID;
+		}
+
+		public void setParticleID(int particleID) {
+			this.particleID = particleID;
 		}
 		
 	}

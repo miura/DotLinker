@@ -2,6 +2,7 @@ package emblcmci.linker;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.WindowManager;
 import ij.gui.GenericDialog;
 import ij.plugin.PlugIn;
 
@@ -32,16 +33,23 @@ public class Dot_Linker implements PlugIn {
 	private int TrajectoryThreshold;
 	
 	public void run(String arg) {
-		ImagePlus imp = IJ.getImage();
+		ImagePlus imp;
+		if (WindowManager.getImageCount()>0)
+			imp = IJ.getImage();
+		else
+			imp = null;
+		
 		DotLinker dl;
 		LinkCosts linkcostmethod;
 		boolean showtrack = true; 
 		
 		//check image stack
+		// commented out for volovity data
+/*		
 		if (imp == null){
 			IJ.error("No image Stack!");
 			return;
-		}
+		}*/
 		//check data in resultstable
 		// if no results, or parameter missing, try to do "analyze particle". 
 

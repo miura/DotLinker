@@ -1,4 +1,5 @@
 package emblcmci.linker;
+import java.io.File;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -6,12 +7,14 @@ import emblcmci.linker.DotLinker.Particle;
 import emblcmci.linker.DotLinker.Trajectory;
 import ij.IJ;
 import ij.ImagePlus;
+import ij.io.OpenDialog;
 import ij.measure.ResultsTable;
 
 public class DotLinker2 extends DotLinker{
 	
 	int znum = 27; //this should be at some point be given
 	
+	static String datapath = "C:\\dropbox\\My Dropbox\\Mette\\centroid position ROI_1_4_embryoComma.csv";
 	public DotLinker2(ImagePlus imp) {
 		super(imp);
 		// TODO Auto-generated constructor stub
@@ -62,12 +65,23 @@ public class DotLinker2 extends DotLinker{
 		}
 		return frameA;
 	}
-	
+
+	/**
+	 * Loads data from file system.
+	 * currently, Volocity csv file must be converted to tab delimited.
+	 * 
+	 */
 	public StackFrames[] dataloader(){
 		String[] dataA;
+		File fi = new File(datapath);
 		
+		//check if the file exists
+		if (!fi.exists()){
+			OpenDialog od = new OpenDialog("track file", OpenDialog.getLastDirectory());
+			datapath = od.getDirectory() + od.getFileName();
+			IJ.log("Selected file:\n " + datapath);
+		}
 		// data from text file
-		String datapath = "C:\\dropbox\\My Dropbox\\Mette\\centroid position ROI_1_4_embryoComma.csv";
 		String str = IJ.openAsString(datapath);
 		String[] linesA = ij.util.Tools.split(str, "\n");
 		int[] timeA = new int[linesA.length-1];
@@ -144,6 +158,7 @@ public class DotLinker2 extends DotLinker{
 					rt.addValue("Xpos", ptcls[i].getX());
 					rt.addValue("Ypos", ptcls[i].getY());
 					rt.addValue("Zpos", ptcls[i].getZ());
+					rt.addValue("ParticleID", ptcls[i].getParticleID());
 					//rt.addValue("Area", ptcls[i].area);
 					//rt.addValue("AreaFraction", ptcls[i].areafraction);
 				}
