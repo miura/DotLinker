@@ -148,6 +148,9 @@ public class DotLinker {
 		private float x = 0;
 		private float y = 0;
 		private float z = 0;
+		private float sx = 0;
+		private float sy = 0;
+		private float sz = 0;
 		int frame = 0;			//starts from 0
 		private float area = 0;
 		private int particleID = 0;
@@ -183,6 +186,23 @@ public class DotLinker {
 			this.hasArea = true;
 		}
 		
+		//3D PARTICLE, with scaled coordinates
+		public Particle(
+				float x, float y, float z,
+				float sx, float sy, float sz,
+				int frame, int particleID){
+			this.setX(x);
+			this.setY(y);
+			this.setZ(z);
+			this.setSx(sx);
+			this.setSy(sy);
+			this.setSz(sz);
+			this.frame = frame;	
+			this.particleID = particleID;
+			this.next = new int[linkrange];
+			
+			this.hasArea = true;
+		}
 		public int getFrame() {
 			return this.frame;
 		}
@@ -235,6 +255,48 @@ public class DotLinker {
 			return z;
 		}
 
+
+		/**
+		 * @return the sx
+		 */
+		public float getSx() {
+			return sx;
+		}
+
+		/**
+		 * @param sx the sx to set
+		 */
+		public void setSx(float sx) {
+			this.sx = sx;
+		}
+
+		/**
+		 * @return the sy
+		 */
+		public float getSy() {
+			return sy;
+		}
+
+		/**
+		 * @param sy the sy to set
+		 */
+		public void setSy(float sy) {
+			this.sy = sy;
+		}
+
+		/**
+		 * @return the sz
+		 */
+		public float getSz() {
+			return sz;
+		}
+
+		/**
+		 * @param sz the sz to set
+		 */
+		public void setSz(float sz) {
+			this.sz = sz;
+		}
 
 		/**
 		 * @param area the area to set

@@ -20,7 +20,10 @@ import ij.plugin.PlugIn;
  *  
  *  Kota Miura
  *  Center for Molecular and Cellular Imaging, EMBL Heidelberg
- *  20110905
+ *  started: 20110905
+ *  20111202: linking using 3D coordinates, output of Volocity segmentation (Mette).
+ *  	added linking algorithm using real scale. 		 
+ *  
  * 
  */
 public class Dot_Linker implements PlugIn {
@@ -75,7 +78,8 @@ public class Dot_Linker implements PlugIn {
 
 		// incase of volocity data (Mette), choose only distance cost. 
 		if (arg.equals("volocity") || arg.equals("gui_volocity"))
-			linkcostmethod = new LinkCostsOnlyDistance();
+			//linkcostmethod = new LinkCostsOnlyDistance();
+			linkcostmethod = new LinkCostsOnlyScaledDistance();
 		else
 			linkcostmethod = new LinkCostswithAreaDynamics(displacement, 2.0);
 		
