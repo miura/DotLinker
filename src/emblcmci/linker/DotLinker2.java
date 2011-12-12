@@ -14,7 +14,8 @@ public class DotLinker2 extends DotLinker{
 	
 	int znum = 27; //this should be at some point be given
 	
-	static String datapath = "C:\\dropbox\\My Dropbox\\Mette\\centroid position ROI_1_4_embryoComma.csv";
+//	static String datapath = "C:\\dropbox\\My Dropbox\\Mette\\centroid position ROI_1_4_embryoComma.csv";
+	static String datapath = "C:\\dropbox\\My Dropbox\\Mette\\dummy.csv";	
 	public DotLinker2(ImagePlus imp) {
 		super(imp);
 		// TODO Auto-generated constructor stub
@@ -30,7 +31,7 @@ public class DotLinker2 extends DotLinker{
 	/**
 	 * Loads data from file system.
 	 * currently, Volocity csv file must be converted to tab delimited.
-	 * 
+	 * use "volocityResultsLoader.js" 
 	 */
 	/* (non-Javadoc)
 	 * @see emblcmci.linker.DotLinker#dataloader()
@@ -61,13 +62,24 @@ public class DotLinker2 extends DotLinker{
 		float[] szA = new float[linesA.length-1];
 		for (int i = 0; i < timeA.length; i++){
 			dataA = ij.util.Tools.split(linesA[i+1], "\t");
-			timeA[i] =  Integer.valueOf(dataA[4]).intValue();
+/*
+ * 			// old version, manually converted column positions
+ * 			timeA[i] =  Integer.valueOf(dataA[4]).intValue();
 			xA[i] =  Float.valueOf(dataA[8].trim()).floatValue();
 			yA[i] =  Float.valueOf(dataA[9].trim()).floatValue();
 			zA[i] =  Float.valueOf(dataA[10].trim()).floatValue();
 			sxA[i] =  Float.valueOf(dataA[11].trim()).floatValue();
 			syA[i] =  Float.valueOf(dataA[12].trim()).floatValue();
 			szA[i] =  Float.valueOf(dataA[13].trim()).floatValue();
+*/
+			// 20111212 version, importing file converted by volocityResultsLoader.js
+			timeA[i] =  Integer.valueOf(dataA[2]).intValue();
+			xA[i] =  Float.valueOf(dataA[10].trim()).floatValue();
+			yA[i] =  Float.valueOf(dataA[11].trim()).floatValue();
+			zA[i] =  Float.valueOf(dataA[12].trim()).floatValue();
+			sxA[i] =  Float.valueOf(dataA[13].trim()).floatValue();
+			syA[i] =  Float.valueOf(dataA[14].trim()).floatValue();
+			szA[i] =  Float.valueOf(dataA[15].trim()).floatValue();			
 		}
 		IJ.log(" --- volocity data format ---");
 		int startframe = (int) timeA[1];
