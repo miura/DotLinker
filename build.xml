@@ -29,5 +29,8 @@
 			</manifest>
 		</jar>
 		<copy file="${jarname}" toDir="${pluginsDir}" />
+ 		<echo>
+ 			Copied to ${pluginsDir}
+ 		</echo>	
 	</target>
 </project>
