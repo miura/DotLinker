@@ -79,7 +79,8 @@ public class Dot_Linker implements PlugIn {
 		// incase of volocity data (Mette), choose only distance cost. 
 		if (arg.equals("volocity") || arg.equals("gui_volocity"))
 			//linkcostmethod = new LinkCostsOnlyDistance();
-			linkcostmethod = new LinkCostsOnlyScaledDistance();
+			//linkcostmethod = new LinkCostsOnlyScaledDistance();
+			linkcostmethod = new LinkCostswithVolumeDynamics(displacement, 2.0);
 		else
 			linkcostmethod = new LinkCostswithAreaDynamics(displacement, 2.0);
 		

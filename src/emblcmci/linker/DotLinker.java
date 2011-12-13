@@ -905,7 +905,7 @@ public class DotLinker {
 				IJ.log("    " + i + ": " + ptcls[i].x + ", " + ptcls[i].y);
 			}
 		}*/
-		IJ.log("Mac track length = " + maxlength);
+		IJ.log("Max track length = " + maxlength);
 		for (int i =1; i<counter.length; i++)
 			IJ.log("track length " + i + ": " + counter[i]);
 	}

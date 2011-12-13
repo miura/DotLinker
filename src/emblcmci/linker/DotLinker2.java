@@ -3,8 +3,6 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.Vector;
 
-import emblcmci.linker.DotLinker.Particle;
-import emblcmci.linker.DotLinker.Trajectory;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.io.OpenDialog;
@@ -15,7 +13,7 @@ public class DotLinker2 extends DotLinker{
 	int znum = 27; //this should be at some point be given
 	
 //	static String datapath = "C:\\dropbox\\My Dropbox\\Mette\\centroid position ROI_1_4_embryoComma.csv";
-	static String datapath = "C:\\dropbox\\My Dropbox\\Mette\\dummy.csv";	
+	String datapath = "C:\\dropbox\\My Dropbox\\Mette\\dummy.csv";	
 	public DotLinker2(ImagePlus imp) {
 		super(imp);
 		// TODO Auto-generated constructor stub
@@ -38,14 +36,15 @@ public class DotLinker2 extends DotLinker{
 	 */
 	public StackFrames[] dataloader(){
 		String[] dataA;
-		File fi = new File(datapath);
+		//File fi = new File(datapath);
 		
 		//check if the file exists
-		if (!fi.exists()){
-			OpenDialog od = new OpenDialog("track file", OpenDialog.getLastDirectory());
-			datapath = od.getDirectory() + od.getFileName();
-			IJ.log("Selected file:\n " + datapath);
-		}
+		//if (!fi.exists()){
+//		OpenDialog od = new OpenDialog("track file", OpenDialog.getLastDirectory());
+		OpenDialog od = new OpenDialog("track file", "");
+		datapath = od.getDirectory() + od.getFileName();
+		//}
+		IJ.log("Selected file:\n " + datapath);
 		// data from text file
 		String str = IJ.openAsString(datapath);
 		String[] linesA = ij.util.Tools.split(str, "\n");
@@ -67,7 +66,8 @@ public class DotLinker2 extends DotLinker{
 		float[] totalintA = new float[linesA.length-1];
 
 		for (int i = 0; i < timeA.length; i++){
-			dataA = ij.util.Tools.split(linesA[i+1], "\t");
+			//dataA = ij.util.Tools.split(linesA[i+1], "\t");
+			dataA = ij.util.Tools.split(linesA[i+1], ",");
 /*
  * 			// old version, manually converted column positions
  * 			timeA[i] =  Integer.valueOf(dataA[4]).intValue();
@@ -92,8 +92,8 @@ public class DotLinker2 extends DotLinker{
 			szA[i] =  Float.valueOf(dataA[15].trim()).floatValue();			
 		}
 		IJ.log(" --- volocity data format ---");
-		int startframe = (int) timeA[1];
-		int endframe = (int) timeA[timeA.length-1];		
+		int startframe = timeA[1];
+		int endframe = timeA[timeA.length-1];		
 		int framenumber = endframe - startframe + 1;
 		IJ.log("start frame:" + Integer.toString(startframe));
 		IJ.log("end frame:" + Integer.toString(endframe));		
@@ -107,6 +107,11 @@ public class DotLinker2 extends DotLinker{
 		for (int i = 0 ; i< timeA.length; i++){
 //			Particle particle = new Particle(xA[i], yA[i], zA[i], (int) (timeA[i] - 1), i);
 			Particle particle = new Particle(xA[i], yA[i], zA[i], sxA[i], syA[i], szA[i], (int) (timeA[i] - 1), i);
+			particle.setVolume(volA[i]);
+			particle.setSvolume(svolA[i]);
+			particle.setMeanint(meanintA[i]);
+			particle.setTotalint(totalintA[i]);
+			
 			frameA[particle.frame].particles.add(particle);
 		}
 		return frameA;
@@ -157,7 +162,13 @@ public class DotLinker2 extends DotLinker{
 					rt.addValue("Zpos", ptcls[i].getZ());
 					rt.addValue("SXpos", ptcls[i].getSx());
 					rt.addValue("SYpos", ptcls[i].getSy());
-					rt.addValue("SZpos", ptcls[i].getSz());					rt.addValue("ParticleID", ptcls[i].getParticleID());
+					rt.addValue("SZpos", ptcls[i].getSz());					
+					rt.addValue("ParticleID", ptcls[i].getParticleID());
+					rt.addValue("Volume", ptcls[i].getVolume());					
+					rt.addValue("VolumeScaled", ptcls[i].getSvolume());					
+					rt.addValue("MeanInt", ptcls[i].getMeanint());					
+					rt.addValue("TotalInt", ptcls[i].getTotalint());					
+					
 					//rt.addValue("Area", ptcls[i].area);
 					//rt.addValue("AreaFraction", ptcls[i].areafraction);
 				}
