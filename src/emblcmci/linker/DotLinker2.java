@@ -60,6 +60,12 @@ public class DotLinker2 extends DotLinker{
 		float[] sxA = new float[linesA.length-1];
 		float[] syA = new float[linesA.length-1];
 		float[] szA = new float[linesA.length-1];
+		
+		float[] volA = new float[linesA.length-1];
+		float[] svolA = new float[linesA.length-1];
+		float[] meanintA = new float[linesA.length-1];
+		float[] totalintA = new float[linesA.length-1];
+
 		for (int i = 0; i < timeA.length; i++){
 			dataA = ij.util.Tools.split(linesA[i+1], "\t");
 /*
@@ -74,6 +80,10 @@ public class DotLinker2 extends DotLinker{
 */
 			// 20111212 version, importing file converted by volocityResultsLoader.js
 			timeA[i] =  Integer.valueOf(dataA[2]).intValue();
+			volA[i] =  Float.valueOf(dataA[3].trim()).floatValue();
+			svolA[i] =  Float.valueOf(dataA[4].trim()).floatValue();
+			meanintA[i] =  Float.valueOf(dataA[7].trim()).floatValue();
+			totalintA[i] =  Float.valueOf(dataA[8].trim()).floatValue();
 			xA[i] =  Float.valueOf(dataA[10].trim()).floatValue();
 			yA[i] =  Float.valueOf(dataA[11].trim()).floatValue();
 			zA[i] =  Float.valueOf(dataA[12].trim()).floatValue();

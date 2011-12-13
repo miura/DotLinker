@@ -148,11 +148,16 @@ public class DotLinker {
 		private float x = 0;
 		private float y = 0;
 		private float z = 0;
-		private float sx = 0;
-		private float sy = 0;
-		private float sz = 0;
+		private float sx = 0; //scaled coordinate x
+		private float sy = 0; //scaled coordinate y
+		private float sz = 0; //scaled coordinate z
 		int frame = 0;			//starts from 0
-		private float area = 0;
+		private float area = 0; //2D useage
+		private float volume = 0;
+		private float svolume = 0; //scaled volume
+		private float meanint = 0;
+		private float totalint = 0;
+		
 		private int particleID = 0;
 		int[] next = null;		//array to hold linked ids
 		boolean special;		// a flag that is used while detecting and linking particles
@@ -319,6 +324,38 @@ public class DotLinker {
 
 		public void setParticleID(int particleID) {
 			this.particleID = particleID;
+		}
+
+		public float getVolume() {
+			return volume;
+		}
+
+		public void setVolume(float volume) {
+			this.volume = volume;
+		}
+
+		public float getSvolume() {
+			return svolume;
+		}
+
+		public void setSvolume(float svolume) {
+			this.svolume = svolume;
+		}
+
+		public float getMeanint() {
+			return meanint;
+		}
+
+		public void setMeanint(float meanint) {
+			this.meanint = meanint;
+		}
+
+		public float getTotalint() {
+			return totalint;
+		}
+
+		public void setTotalint(float totalint) {
+			this.totalint = totalint;
 		}
 		
 	}
