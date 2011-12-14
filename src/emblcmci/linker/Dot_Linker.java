@@ -80,7 +80,7 @@ public class Dot_Linker implements PlugIn {
 		if (arg.equals("volocity") || arg.equals("gui_volocity"))
 			//linkcostmethod = new LinkCostsOnlyDistance();
 			//linkcostmethod = new LinkCostsOnlyScaledDistance();
-			linkcostmethod = new LinkCostswithVolumeDynamics(displacement, 2.0);
+			linkcostmethod = new LinkCostswithIntensityDynamics(displacement, 2.0);
 		else
 			linkcostmethod = new LinkCostswithAreaDynamics(displacement, 2.0);
 		
