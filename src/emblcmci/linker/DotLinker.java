@@ -629,6 +629,9 @@ public class DotLinker {
 				for(j = 0; j < nop_next + 1; j++)
 					cost[coord(nop, j, nop_next + 1)] = max_cost;
 				cost[coord(nop, nop_next, nop_next + 1)] = 0.0;
+				//for (int ii = 0; ii<cost.length; ii+=1000)
+				//	IJ.log("example cost : " + Double.toString(cost[ii]));
+				
 
 				/* Initialize the relation matrix */
 				for(i = 0; i < nop; i++) { // Loop over the x-axis
