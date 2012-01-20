@@ -79,7 +79,8 @@ public class DotLinker2 extends DotLinker{
 			szA[i] =  Float.valueOf(dataA[13].trim()).floatValue();
 */
 			// 20111212 version, importing file converted by volocityResultsLoader.js
-			timeA[i] =  Integer.valueOf(dataA[2]).intValue();
+//			timeA[i] =  Integer.valueOf(dataA[2]).intValue(); //modified to one below, 20120120
+			timeA[i] = (int) Float.valueOf(dataA[2]).floatValue();
 			volA[i] =  Float.valueOf(dataA[3].trim()).floatValue();
 			svolA[i] =  Float.valueOf(dataA[4].trim()).floatValue();
 			meanintA[i] =  Float.valueOf(dataA[7].trim()).floatValue();
