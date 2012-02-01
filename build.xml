@@ -8,6 +8,7 @@
 	<property name="pluginsDir"  location="$workspace_loc/imagej/plugins/" />
 -->
 	<property name="pluginsDir"  location="${basedir}/../imagej/plugins/" />	
+	<property name="fijipluginsDir"  location="/Applications/Fiji.app/plugins/" />	
 		<echo>
 			Plugins directory
 			${basedir}
@@ -32,5 +33,9 @@
  		<echo>
  			Copied to ${pluginsDir}
  		</echo>	
+		<copy file="${jarname}" toDir="${fijipluginsDir}" />
+ 		<echo>
+ 			Copied to ${fijipluginsDir}
+ 		</echo>	 		
 	</target>
 </project>
