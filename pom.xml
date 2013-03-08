@@ -11,7 +11,7 @@
 		<version>1.24</version>
 	</parent>
 
-	<groupId>sc.fiji</groupId>
+	<groupId>embl.cmci</groupId>
 	<artifactId>Dot_Linker</artifactId>
 	<version>1.0.0</version>
 
