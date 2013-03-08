@@ -1,1 +1,4 @@
 */.DS_Store
+.externalToolBuilders/*
+.DS_Store
+bin/*
