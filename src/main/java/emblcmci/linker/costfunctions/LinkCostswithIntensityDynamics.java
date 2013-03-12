@@ -1,4 +1,4 @@
-package emblcmci.linker;
+package emblcmci.linker.costfunctions;
 /**
  * For 3D tracking, cost calculation using volume changes (should be mostly constant)
  *  try with volumeweight 2 or so
@@ -7,6 +7,8 @@ package emblcmci.linker;
  * @author Kota Miura
  */
 import emblcmci.linker.AbstractDotLinker;
+import emblcmci.linker.LinkCosts;
+import emblcmci.linker.AbstractDotLinker.Particle;
 
 public class LinkCostswithIntensityDynamics implements LinkCosts{
 

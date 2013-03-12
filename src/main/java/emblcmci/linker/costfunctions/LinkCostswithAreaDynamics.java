@@ -1,6 +1,8 @@
-package emblcmci.linker;
+package emblcmci.linker.costfunctions;
 
 import emblcmci.linker.AbstractDotLinker;
+import emblcmci.linker.LinkCosts;
+import emblcmci.linker.AbstractDotLinker.Particle;
 
 /** an implementation of cost calculation only by distance between linked particle and area change. 
  *  cost = (2D or 3D distance)^2 + MaxSisplacement^2 * abs(ratio of area change);
