@@ -42,7 +42,7 @@ public class Dot_Linker implements PlugIn {
 		else
 			imp = null;
 		
-		DotLinker dl;
+		AbstractDotLinker dl;
 		LinkCosts linkcostmethod;
 		boolean showtrack = true; 
 		

@@ -8,7 +8,7 @@ import ij.ImagePlus;
 import ij.io.OpenDialog;
 import ij.measure.ResultsTable;
 
-public class DotLinker2 extends DotLinker{
+public class DotLinker2 extends AbstractDotLinker{
 	
 	int znum = 27; //this should be at some point be given
 	
