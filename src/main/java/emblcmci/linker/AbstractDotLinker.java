@@ -11,7 +11,6 @@ import ij.plugin.Duplicator;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -50,6 +49,9 @@ public abstract class AbstractDotLinker {
 	private ImagePlus imp;
 	private int frames_number;
 	private int TrajectoryThreshold;	
+
+	public AbstractDotLinker(){
+	}
 	
 	public AbstractDotLinker(ImagePlus imp){
 		this.imp = imp;
@@ -90,7 +92,6 @@ public abstract class AbstractDotLinker {
 	/** Method that should be called from a plugin, or from scripts to
 	 * do all the processing. 
 	 */
-	
 	public void doLinking(LinkCosts linkcostmethod, boolean showtrack){
 		frameA = dataloader();
 		if (frameA !=null){
@@ -155,6 +156,12 @@ public abstract class AbstractDotLinker {
 		boolean hasArea = false;	//flag if particle has area data. 
 		public double areafraction;
 
+		public Particle(int x, int y, int frame, int particleID) {
+			this.setX(x);
+			this.setY(y);
+			this.frame = frame;
+			this.particleID = particleID;			
+		}
 
 		public Particle(float x, float y, 
 				int frame, float area, int particleID){
@@ -198,6 +205,8 @@ public abstract class AbstractDotLinker {
 			
 			this.hasArea = true;
 		}
+
+
 		public int getFrame() {
 			return this.frame;
 		}
