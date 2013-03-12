@@ -17,6 +17,7 @@ import emblcmci.linker.AbstractDotLinker;
  * and links listed particles. Linked results will be drawn
  * on the duplicate of the original stack.
  * 
+ * This class was initially wrote for Tina.
  * 
  * @author Kota Miura
  * Centre for Molecular and Cellular Imaging, EMBL Heidelberg
@@ -133,28 +134,7 @@ public class DotLinker extends AbstractDotLinker{
 //			IJ.log("track length " + i + ": " + counter[i]);
 	}
 
-	public void calcAreaFraction(Trajectory track){
-		Particle[] ptcles = track.existing_particles;
-		double area0 = (double) ptcles[0].getArea();
-		double carea;
-		int counter = 0;
-		Particle p;
-		double minimum = 1000;
-		double maximum = 0;
-		for (int i = 0; i < ptcles.length; i++) {
-			p = ptcles[i];
-			carea = (double) p.getArea();
-			p.areafraction = carea / area0;			
-			counter++;
-			if (p.areafraction < minimum)
-				minimum = p.areafraction;
-			
-			if (p.areafraction > maximum)
-				maximum = p.areafraction;
-		}
-		track.areafracMIN = minimum;
-		track.areafracMAX = maximum;		
-	}	
+
 
 	
 }
