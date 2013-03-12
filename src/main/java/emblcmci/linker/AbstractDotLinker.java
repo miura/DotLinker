@@ -80,7 +80,7 @@ public abstract class AbstractDotLinker {
 	 *  in case of volocity file, currently is the dummy method. 
 	 * @return
 	 */
-	abstract boolean checkResultsTableParameters();	
+	public abstract boolean checkResultsTableParameters();	
 
 	abstract ResultsTable showTrajectoryTable(Vector<Trajectory> all_traj);
 	

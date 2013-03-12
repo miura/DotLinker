@@ -20,13 +20,13 @@ public class DotLinkerHeadless extends AbstractDotLinker {
 	}
 
 	@Override
-	boolean checkResultsTableParameters() {
+	public boolean checkResultsTableParameters() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	ResultsTable showTrajectoryTable(Vector<Trajectory> all_traj) {
+	public ResultsTable showTrajectoryTable(Vector<Trajectory> all_traj) {
 		// TODO Auto-generated method stub
 		return null;
 	}

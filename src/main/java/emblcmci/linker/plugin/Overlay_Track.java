@@ -1,5 +1,6 @@
 package emblcmci.linker.plugin;
 
+import emblcmci.linker.ViewDynamics;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.plugin.PlugIn;
