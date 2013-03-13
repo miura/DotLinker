@@ -31,6 +31,10 @@ public class DotLinkerHeadless extends AbstractDotLinker {
 		return null;
 	}
 
+	/**
+	 * dataloader directly via arguments of setData method. 
+	 * 2D time series data. 
+	 */
 	@Override
 	public StackFrames[] dataloader() {
 		IJ.log(" --- data  ---");
