@@ -9,7 +9,8 @@ def maxFinder(ip):
   polygon = MaximumFinder().getMaxima(ip, 1.0, False)
   npnts = len(polygon.xpoints)
   return polygon.xpoints, polygon.ypoints
-  
+ 
+# legacy class  
 class Point:
     def __init__(self, pntid, x, y, frame):
         self.pntid = pntid
@@ -48,7 +49,7 @@ for j in range(framenum):
     frames.append(pointlist)
 
 IJ.log('test ')
-dlh = DLH(imp, 1, 10)
+dlh = DLH(imp, 2, 15) # linkrange, distance
 # becareful with the swapped X and Y axis
 dlh.setData(jarray.array(fullxA, 'i'), jarray.array(fullyA, 'i'),  jarray.array(fulltA, 'i'))
 nearestneighbor = LinkCostsOnlyDistance()
