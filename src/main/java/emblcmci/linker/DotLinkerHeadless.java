@@ -3,10 +3,15 @@ package emblcmci.linker;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.measure.ResultsTable;
+
+import java.util.Iterator;
 import java.util.Vector;
+
+
 
 public class DotLinkerHeadless extends AbstractDotLinker {
 
+	private static final int TrajectoryThreshold = 0;
 	int[] xA;
 	int[] yA;
 	int[] timeA;
@@ -18,6 +23,10 @@ public class DotLinkerHeadless extends AbstractDotLinker {
 		super(imp);
 		// TODO Auto-generated constructor stub
 	}
+	
+	public DotLinkerHeadless(ImagePlus imp, int linkrange, double displacement){
+		super(imp, linkrange, displacement);
+	}
 
 	@Override
 	public boolean checkResultsTableParameters() {
@@ -27,8 +36,25 @@ public class DotLinkerHeadless extends AbstractDotLinker {
 
 	@Override
 	public ResultsTable showTrajectoryTable(Vector<Trajectory> all_traj) {
-		// TODO Auto-generated method stub
-		return null;
+		ResultsTable rt = new ResultsTable();
+		
+		Iterator<Trajectory> iter = all_traj.iterator();  	   
+		
+		while (iter.hasNext()) {
+			Trajectory curr_traj = iter.next();
+			Particle[] ptcls = curr_traj.existing_particles;
+			calcAreaFraction(curr_traj);
+			if (ptcls.length > TrajectoryThreshold){
+				for (int i = 0; i < ptcls.length; i++){
+					rt.incrementCounter();
+					rt.addValue("TrackID", curr_traj.serial_number);
+					rt.addValue("frame", ptcls[i].frame);
+					rt.addValue("Xpos", ptcls[i].getX());
+					rt.addValue("Ypos", ptcls[i].getY());
+				}
+			}
+		}
+		return rt;			
 	}
 
 	/**
@@ -38,6 +64,7 @@ public class DotLinkerHeadless extends AbstractDotLinker {
 	@Override
 	public StackFrames[] dataloader() {
 		IJ.log(" --- data  ---");
+		if (timeA == null) return null;
 		int startframe = timeA[0];
 		int endframe = timeA[timeA.length-1];		
 		int framenumber = endframe - startframe + 1;

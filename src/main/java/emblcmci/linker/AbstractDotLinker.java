@@ -112,12 +112,13 @@ public abstract class AbstractDotLinker {
 		// viewing the trajectories
 
 		if (showtrack)
-			generateView(); //plot with xy coordinate inverted, the particle tracker bug 
+			generateViewXYinverted(); //plot with xy coordinate inverted, the particle tracker bug 
 		
 		printTrajectories();
 		//putLinkedParticeID();
 		ResultsTable trackrt = showTrajectoryTable(all_traj);
-		trackrt.show("Tracks");
+		if (trackrt != null)
+			trackrt.show("Tracks");
 	}
 	
 	/** simplified version of MyFrame class in Particle tracker. 
@@ -725,7 +726,10 @@ public abstract class AbstractDotLinker {
 				frames[frames_number - 1].getParticles().elementAt(i).next[n] = -1;
 		}
 	}
-	 
+
+	public Vector<Trajectory> getAll_traj() {
+		return all_traj;
+	}
 
 	/**
 	 * Generates <code>Trajectory</code> objects according to the infoamtion 
@@ -819,31 +823,34 @@ public abstract class AbstractDotLinker {
 		}		
 	}
 
-	public void generateView() {		
-		ImagePlus duplicated_imp;
-		double magnification;
-		TrajectoryCanvas tc;		
-		String new_title = "All Trajectories Visual";		
+	public void generateViewXYinverted() {		
+		if (imp != null) {
+			ImagePlus duplicated_imp;
+			double magnification = 1.0;
+			TrajectoryCanvas tc;		
+			String new_title = "All Trajectories Visual";		
 
-		// if there is no image to generate the view on:
-		// generate a new image by duplicating the original image
-		Duplicator dup = new Duplicator();
-		duplicated_imp= dup.run(this.imp);
-		// Set magnification to the one of original_imp	
-		magnification = this.imp.getWindow().getCanvas().getMagnification();
+			// if there is no image to generate the view on:
+			// generate a new image by duplicating the original image
+			Duplicator dup = new Duplicator();
+			duplicated_imp= dup.run(this.imp);
+			// Set magnification to the one of original_imp
+			if (imp.isVisible())
+				magnification = this.imp.getWindow().getCanvas().getMagnification();
+			
+			// Create a new canvas based on the image - the canvas is the view
+			// The trajectories are drawn on this canvas when it is constructed and not on the image
+			// Canvas is an overlay window on top of the ImagePlus
+			tc = new TrajectoryCanvas(duplicated_imp);
 
-		// Create a new canvas based on the image - the canvas is the view
-		// The trajectories are drawn on this canvas when it is constructed and not on the image
-		// Canvas is an overlay window on top of the ImagePlus
-		tc = new TrajectoryCanvas(duplicated_imp);
+			// Create a new window to hold the image and canvas
+			TrajectoryStackWindow tsw = new TrajectoryStackWindow(duplicated_imp, tc);
 
-		// Create a new window to hold the image and canvas
-		TrajectoryStackWindow tsw = new TrajectoryStackWindow(duplicated_imp, tc);
-
-		// zoom the window until its magnification will reach the set magnification magnification
-		while (tsw.getCanvas().getMagnification() < magnification) {
-			tc.zoomIn(0,0);
-		}		
+			// zoom the window until its magnification will reach the set magnification magnification
+			while (tsw.getCanvas().getMagnification() < magnification) {
+				tc.zoomIn(0,0);
+			}
+		}
 	}
 	
 	public void printTrajectories(){

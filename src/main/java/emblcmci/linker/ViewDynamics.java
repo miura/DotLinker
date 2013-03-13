@@ -17,7 +17,6 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.WindowManager;
-import ij.gui.Line;
 import ij.gui.Overlay;
 import ij.gui.PolygonRoi;
 import ij.gui.Roi;
@@ -30,10 +29,13 @@ import ij.text.TextWindow;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import emblcmci.obj.Node;
+import emblcmci.obj.Track;
 
 public class ViewDynamics {
 
@@ -94,6 +96,17 @@ public class ViewDynamics {
 		HashMap<Integer, Track> Tracks = generateTracksHashMap(trt);
 		TrackPlotter(Tracks, imp);
 	}	
+
+	/**
+	 * Does plotting to a specific ImagePlus object. 
+	 * 
+	 * @param outimp
+	 */
+	public void plotTracks(ImagePlus outimp){
+		ResultsTable trt = getTrackTable("Tracks");
+		HashMap<Integer, Track> Tracks = generateTracksHashMap(trt);
+		TrackPlotter(Tracks, outimp);
+	}		
 	
 	/** 
 	 * returns ResultsTable object according to the Window name passed as an argument 
@@ -122,7 +135,7 @@ public class ViewDynamics {
 	 * @return
 	 */
 	public HashMap<Integer, Track> generateTracksHashMap(ResultsTable trt){
-
+		boolean Areadata_Exists = false;
 		if (trt == null){
 			IJ.error("no track data available");
 			return null;
@@ -132,26 +145,37 @@ public class ViewDynamics {
 			IJ.error("... it seems that there are very few data available in the table");
 			return null;
 		}
+		if (trt.getColumnHeadings().contains("Area") && trt.getColumnHeadings().contains("AreaFraction"))
+			Areadata_Exists = true;
+		
 		HashMap<Integer, Track> Tracks = new HashMap<Integer, Track>();
 		Track track;
 		Node node;		
 		for (int i = 0; i < rowlength; i++){
-			node = new Node(
-					trt.getValue("Xpos", i), 
-					trt.getValue("Ypos", i),
-					(int) trt.getValue("Area", i), 
-					(int) trt.getValue("frame", i), 
-					(int) trt.getValue("TrackID", i),
-					(double) trt.getValue("AreaFraction", i),
-					i);			
+			if (Areadata_Exists)
+				node = new Node(
+						trt.getValue("Xpos", i), 
+						trt.getValue("Ypos", i),
+						(int) trt.getValue("Area", i), 
+						(int) trt.getValue("frame", i), 
+						(int) trt.getValue("TrackID", i),
+						(double) trt.getValue("AreaFraction", i),
+						i);
+			else
+				node = new Node(
+						trt.getValue("Xpos", i), 
+						trt.getValue("Ypos", i),
+						(int) trt.getValue("frame", i), 
+						(int) trt.getValue("TrackID", i),
+						i);	
 
-			if (Tracks.get(node.trackID) == null){
+			if (Tracks.get(node.getTrackID()) == null){
 				track =new Track(new ArrayList<Node>());
-				Tracks.put(node.trackID, track);
+				Tracks.put(node.getTrackID(), track);
 			}
 			else
-				track = Tracks.get(node.trackID);
-			track.nodes.add(node);
+				track = Tracks.get(node.getTrackID());
+			track.getNodes().add(node);
 		
 		}
 		// calculate fraction of area to the first time point area
@@ -211,10 +235,10 @@ public class ViewDynamics {
 		double mindist = 10000;
 		double dist;
 		for (Track v : Tracks.values()){
-			dist = Math.sqrt(Math.pow((v.nodes.get(0).getX() - rx), 2) + 	Math.pow((v.nodes.get(0).getY() - ry), 2) );
+			dist = Math.sqrt(Math.pow((v.getNodes().get(0).getX() - rx), 2) + 	Math.pow((v.getNodes().get(0).getY() - ry), 2) );
 			if (dist < mindist) {
 				mindist = dist;
-				closestTrackID = v.nodes.get(0).trackID;
+				closestTrackID = v.getNodes().get(0).getTrackID();
 			}
 		}	
 		return closestTrackID;
@@ -222,14 +246,13 @@ public class ViewDynamics {
 	
 	public boolean trackAreaColorCoder(ImagePlus imp, Track track, double areafracMin, double areafracMax){
 		int areascale = 0; 
-		Iterator<Node> iter = track.nodes.iterator();
+		Iterator<Node> iter = track.getNodes().iterator();
 		Node n;
-		int counter = 0;
 		double areaFrac;
 		while (iter.hasNext()) {
 			n = iter.next();
 			// normalize to 255 scale. 0 will be the segmented background, black
-			areaFrac = n.areafraction;
+			areaFrac = n.getAreaFraction();
 			if (areaFrac > areafracMax)
 				areaFrac = areafracMax;
 			areascale = (int) Math.floor( 
@@ -238,7 +261,6 @@ public class ViewDynamics {
 //			IJ.log(""+counter+": area fraction=" + 
 //					n.areafraction + " 255 scaled = " + areascale);
 			fillArea(imp, n, areascale);
-			counter++;
 		}
 		return true;
 	}
@@ -328,12 +350,12 @@ public class ViewDynamics {
 			//wandroi.drawPixels(ip); //this may connect neighboring cells
 			ip.fill(wandroi);
 		} else {
-			IJ.log("Null ROI returned: id" + n.id + 
-					" frame:" + n.frame + 
-					" AreaFrac:" + n.areafraction + 
+			IJ.log("Null ROI returned: id" + n.getId() + 
+					" frame:" + n.getFrame() + 
+					" AreaFrac:" + n.getAreaFraction() + 
 					" X:" + n.getX() +
 					" Y:" + n.getY() +
-					" trackID:" + n.trackID
+					" trackID:" + n.getTrackID()
 					);
 		}
 	}
@@ -358,41 +380,39 @@ public class ViewDynamics {
 	}
 		
 	public void calcAreaFraction(Track track){
-		Iterator<Node> iter = track.nodes.iterator();
-		double area0 = (double) track.nodes.get(0).area;
+		Iterator<Node> iter = track.getNodes().iterator();
+		double area0 = (double) track.getNodes().get(0).getArea();
 		double carea;
 		//IJ.log("first time point arera: " + area0);
-		int counter = 0;
 		Node n;
 		double minimum = 1000;
 		double maximum = 0;
 		while (iter.hasNext()) {
 			n = iter.next();
-			carea = (double) n.area;
-			n.areafraction = carea / area0;			
-			counter++;
-			if (n.areafraction < minimum)
-				minimum = n.areafraction;
+			carea = (double) n.getArea();
+			n.setAreaFraction( carea / area0);			
+			if (n.getAreaFraction() < minimum)
+				minimum = n.getAreaFraction();
 			
-			if (n.areafraction > maximum)
-				maximum = n.areafraction;
+			if (n.getAreaFraction() > maximum)
+				maximum = n.getAreaFraction();
 		}
 		track.areafracMIN = minimum;
 		track.areafracMAX = maximum;		
 	}
 	
 	public void calcAreaFractionMinMax(Track track){
-		Iterator<Node> iter = track.nodes.iterator();
+		Iterator<Node> iter = track.getNodes().iterator();
 		Node n;
 		double minimum = 1000;
 		double maximum = 0;
 		while (iter.hasNext()) {
 			n = iter.next();
-			if (n.areafraction < minimum)
-				minimum = n.areafraction;
+			if (n.getAreaFraction() < minimum)
+				minimum = n.getAreaFraction();
 			
-			if (n.areafraction > maximum)
-				maximum = n.areafraction;
+			if (n.getAreaFraction() > maximum)
+				maximum = n.getAreaFraction();
 		}
 		track.areafracMIN = minimum;
 		track.areafracMAX = maximum;		
@@ -409,7 +429,7 @@ public class ViewDynamics {
 
 		}
 		
-		for (Node n : track.nodes){
+		for (Node n : track.getNodes()){
 			
 		}
 		
@@ -443,7 +463,8 @@ public class ViewDynamics {
 			multicolor  = true;
 			for (Object v : Tracks.values()) //iterate for tracks
 				if (v != null)
-					plotTrack((Track) v, imp);
+					//plotTrack((Track) v, imp);
+					plotProgressiveTrack((Track) v, imp);
 		}
 
 }
@@ -455,17 +476,17 @@ public class ViewDynamics {
 			int[] rgb = returnPhysicsLut();
 			plotcolor = new Color(rgb[0], rgb[1], rgb[2]);
 		}
-		Iterator<Node> iter = track.nodes.iterator();
+		Iterator<Node> iter = track.getNodes().iterator();
 		Node n;
-		int[] xA = new int[track.nodes.size()];
-		int[] yA = new int[track.nodes.size()];
+		int[] xA = new int[track.getNodes().size()];
+		int[] yA = new int[track.getNodes().size()];
 
 		int counter = 0;
 		while (iter.hasNext()) {
 			n = iter.next();
-			//IJ.log("index:" + n.id + "- " + n.x + "," +n.y);
-			xA[counter] = (int) Math.round(n.x);
-			yA[counter] = (int) Math.round(n.y);
+			IJ.log("index:" + n.getId() + "- " + n.getX() + "," +n.getY());
+			xA[counter] = (int) Math.round(n.getX());
+			yA[counter] = (int) Math.round(n.getY());
 			counter++;
 		}
 		Roi roi1 = new PolygonRoi( xA, yA, xA.length, Roi.POLYLINE);
@@ -478,78 +499,53 @@ public class ViewDynamics {
 			overlay = new Overlay();
 			imp.setOverlay(overlay);
 		}
-		overlay.add(roi1);			
-		imp.updateAndDraw() ;
-	}
-	/**
-	 * Node class represents a single cell (particle) in a single time point.
-	 * All cell parameters will be stored in this object
-	 *
-	 */
-	public class Node {
-		double x;
-		double y;
-		int area;
-		int frame;		
-		int trackID;
-		int id;
-		double areafraction;	//fraction of area compared to the first time point in the trajectory
-		
-		public Node(double x, double y, int area, int frame, int trackID, double areafraction, int id){
-			this.x = x;
-			this.y = y;
-			this.area = area;
-			this.frame = frame;
-			this.trackID = trackID;
-			this.areafraction = areafraction;
-			this.id = id;			
-		}
-		public double getX() {
-			return x;
-		}
-		public void setX(double x) {
-			this.x = x;
-		}
-
-		public double getY() {
-			return y;
-		}
-
-		public void setY(double y) {
-			this.y = y;
-		}
-
-		public int getArea() {
-			return area;
-		}
-		public void setArea(int area) {
-			this.area = area;
-		}
-
-		public int getFrame() {
-			return frame;
-		}
-		public void setFrame(int frame) {
-			this.frame = frame;
-		}
-		 
+		overlay.add(roi1);
+		if (imp.isVisible())
+			imp.updateAndDraw();
+		else
+			imp.show();
 	}
 	
-	/**
-	 * Track class represents a track, consisteing of an ArrayList of Nodes. 
-	 * 
-	 *
-	 */
-	public class Track {
-		public double areafracMAX;
-		public double areafracMIN;
-		//HashMap<Integer, Node> nodes;
-		ArrayList<Node> nodes;
-		public Track(ArrayList<Node> nodes){
-			this.nodes = nodes;
+	public void plotProgressiveTrack(Track track, ImagePlus imp){
+		Color plotcolor = new Color(255, 0, 0); //red
+		if (multicolor) {
+			IJ.run(imp, "RGB Color", "");
+			int[] rgb = returnPhysicsLut();
+			plotcolor = new Color(rgb[0], rgb[1], rgb[2]);
 		}
-		 
-	}
+		ArrayList<Node> nodes = track.getNodes();
+		Node n;
+		int sx, sy, drawframe;
+		ImageProcessor ip;
+		Polygon poly = null;
+		PolygonRoi proi = null;
+		for (int i = 1; i < nodes.size(); i++){
+			n = track.getNodes().get(i);
+			IJ.log("index:" + n.getId() + "- " + n.getX() + "," +n.getY());
+			poly = new Polygon();
+			for (int j = 0; j < i+1; j++){
+				sx = (int) nodes.get( j ).getX();
+				sy = (int) nodes.get( j ).getY();
+				poly.addPoint(sx, sy);
+				if (poly.npoints > 1){
+					drawframe = nodes.get(j).getFrame();
+					ip = imp.getStack().getProcessor(drawframe + 1);
+					//ip.setColor(plotcolor);
+					//ip.drawPolygon(poly);
+					proi = new PolygonRoi(poly, Roi.POLYLINE);
+					proi.setStrokeColor(plotcolor);
+					ip.drawRoi(proi);
+				}
+			}
+		}
+
+		if (imp.isVisible())
+			imp.updateAndDraw();
+		else
+			imp.show();
+	}	
+
+
 	
 	/**
 	 * An example LUT. 
