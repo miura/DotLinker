@@ -1,7 +1,6 @@
 package emblcmci.linker.costfunctions;
 
 import emblcmci.linker.AbstractDotLinker;
-import emblcmci.linker.LinkCosts;
 import emblcmci.linker.AbstractDotLinker.Particle;
 
 /** an implementation of cost calculation only by distance between linked particle and area change. 

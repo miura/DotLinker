@@ -1,8 +1,9 @@
 /**
  * 
  */
-package emblcmci.linker;
+package emblcmci.linker.costfunctions;
 
+import emblcmci.linker.AbstractDotLinker;
 import emblcmci.linker.AbstractDotLinker.Particle;
 
 /**

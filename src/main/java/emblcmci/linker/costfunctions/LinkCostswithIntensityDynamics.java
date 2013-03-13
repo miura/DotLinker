@@ -7,7 +7,6 @@ package emblcmci.linker.costfunctions;
  * @author Kota Miura
  */
 import emblcmci.linker.AbstractDotLinker;
-import emblcmci.linker.LinkCosts;
 import emblcmci.linker.AbstractDotLinker.Particle;
 
 public class LinkCostswithIntensityDynamics implements LinkCosts{

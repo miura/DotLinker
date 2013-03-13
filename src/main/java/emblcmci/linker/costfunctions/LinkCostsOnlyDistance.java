@@ -1,7 +1,6 @@
 package emblcmci.linker.costfunctions;
 
 import emblcmci.linker.AbstractDotLinker;
-import emblcmci.linker.LinkCosts;
 
 /** an implementation of cost calculation only by distance. The simplest form of "Nearest neighbor".
  * 

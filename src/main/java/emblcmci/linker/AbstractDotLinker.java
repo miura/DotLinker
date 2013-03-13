@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
+import emblcmci.linker.costfunctions.LinkCosts;
+
 /**
  * AbstractDotLinker
  * 

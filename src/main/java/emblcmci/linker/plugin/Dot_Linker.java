@@ -3,7 +3,7 @@ package emblcmci.linker.plugin;
 import emblcmci.linker.AbstractDotLinker;
 import emblcmci.linker.DotLinker;
 import emblcmci.linker.DotLinker2;
-import emblcmci.linker.LinkCosts;
+import emblcmci.linker.costfunctions.LinkCosts;
 import emblcmci.linker.costfunctions.LinkCostswithAreaDynamics;
 import emblcmci.linker.costfunctions.LinkCostswithIntensityDynamics;
 import ij.IJ;
