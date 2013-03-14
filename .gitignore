@@ -1,6 +1,6 @@
 */.DS_Store
 .externalToolBuilders/*
-.DS_Store
+*.DS_Store
 bin/*
 settings/*
 target/*
