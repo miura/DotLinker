@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import emblcmci.obj.Node;
+import emblcmci.obj.ResultTableToTracks;
 import emblcmci.obj.Track;
 
 public class ViewDynamics {
@@ -61,7 +62,8 @@ public class ViewDynamics {
 	 */
 	public void plotAreaDynamics(){
 		ResultsTable trt = getTrackTable("Tracks");
-		HashMap<Integer, Track> Tracks = generateTracksHashMap(trt);
+		ResultTableToTracks rttracks = new ResultTableToTracks();
+		HashMap<Integer, Track> Tracks = rttracks.run(trt);
 		// get minimum and maximum fraction through all tracks
 		double areafracMax = 0;
 		double areafracMin =100;
@@ -93,7 +95,8 @@ public class ViewDynamics {
 	 */
 	public void plotTracks(){
 		ResultsTable trt = getTrackTable("Tracks");
-		HashMap<Integer, Track> Tracks = generateTracksHashMap(trt);
+		ResultTableToTracks rttracks = new ResultTableToTracks();
+		HashMap<Integer, Track> Tracks = rttracks.run(trt);
 		TrackPlotter(Tracks, imp);
 	}	
 
@@ -104,7 +107,8 @@ public class ViewDynamics {
 	 */
 	public void plotTracks(ImagePlus outimp){
 		ResultsTable trt = getTrackTable("Tracks");
-		HashMap<Integer, Track> Tracks = generateTracksHashMap(trt);
+		ResultTableToTracks rttracks = new ResultTableToTracks();
+		HashMap<Integer, Track> Tracks = rttracks.run(trt);
 		TrackPlotter(Tracks, outimp);
 	}		
 	
@@ -127,65 +131,7 @@ public class ViewDynamics {
 		return trt;
 	}
 	
-	/**
-	 * Converts data in table to HashMap of individual Track.
-	 * Each track is a class with Node objects stroed as an AraryList.  
-	 * 
-	 * @param trt
-	 * @return
-	 */
-	public HashMap<Integer, Track> generateTracksHashMap(ResultsTable trt){
-		boolean Areadata_Exists = false;
-		if (trt == null){
-			IJ.error("no track data available");
-			return null;
-		}
-		int rowlength = trt.getColumn(0).length;
-		if (rowlength < 10){		//this 10 is just meaning too few data number. 
-			IJ.error("... it seems that there are very few data available in the table");
-			return null;
-		}
-		if (trt.getColumnHeadings().contains("Area") && trt.getColumnHeadings().contains("AreaFraction"))
-			Areadata_Exists = true;
-		
-		HashMap<Integer, Track> Tracks = new HashMap<Integer, Track>();
-		Track track;
-		Node node;		
-		for (int i = 0; i < rowlength; i++){
-			if (Areadata_Exists)
-				node = new Node(
-						trt.getValue("Xpos", i), 
-						trt.getValue("Ypos", i),
-						(int) trt.getValue("Area", i), 
-						(int) trt.getValue("frame", i), 
-						(int) trt.getValue("TrackID", i),
-						(double) trt.getValue("AreaFraction", i),
-						i);
-			else
-				node = new Node(
-						trt.getValue("Xpos", i), 
-						trt.getValue("Ypos", i),
-						(int) trt.getValue("frame", i), 
-						(int) trt.getValue("TrackID", i),
-						i);	
 
-			if (Tracks.get(node.getTrackID()) == null){
-				track =new Track(new ArrayList<Node>());
-				Tracks.put(node.getTrackID(), track);
-			}
-			else
-				track = Tracks.get(node.getTrackID());
-			track.getNodes().add(node);
-		
-		}
-		// calculate fraction of area to the first time point area
-		for (Track v : Tracks.values()) //iterate for tracks
-			if (v != null)
-				calcAreaFractionMinMax(v);
-				//calcAreaFraction(v); // commented out, since this value is now calculated in DotLinker
-
-		return Tracks;
-	}
 
 	/**
 	 * Plotting of Color Coded area, relative to the area for the first time point in each track. 
@@ -274,7 +220,8 @@ public class ViewDynamics {
 	 */
 	public void addAreaColorScale(){
 		ResultsTable trt = getTrackTable("Tracks");
-		HashMap<Integer, Track> Tracks = generateTracksHashMap(trt);
+		ResultTableToTracks rttracks = new ResultTableToTracks();
+		HashMap<Integer, Track> Tracks = rttracks.run(trt);
 		
 		// get minimum and maximum fraction through all tracks
 		// this part is common to the others
@@ -379,44 +326,7 @@ public class ViewDynamics {
 		return wandroi;
 	}
 		
-	public void calcAreaFraction(Track track){
-		Iterator<Node> iter = track.getNodes().iterator();
-		double area0 = (double) track.getNodes().get(0).getArea();
-		double carea;
-		//IJ.log("first time point arera: " + area0);
-		Node n;
-		double minimum = 1000;
-		double maximum = 0;
-		while (iter.hasNext()) {
-			n = iter.next();
-			carea = (double) n.getArea();
-			n.setAreaFraction( carea / area0);			
-			if (n.getAreaFraction() < minimum)
-				minimum = n.getAreaFraction();
-			
-			if (n.getAreaFraction() > maximum)
-				maximum = n.getAreaFraction();
-		}
-		track.areafracMIN = minimum;
-		track.areafracMAX = maximum;		
-	}
-	
-	public void calcAreaFractionMinMax(Track track){
-		Iterator<Node> iter = track.getNodes().iterator();
-		Node n;
-		double minimum = 1000;
-		double maximum = 0;
-		while (iter.hasNext()) {
-			n = iter.next();
-			if (n.getAreaFraction() < minimum)
-				minimum = n.getAreaFraction();
-			
-			if (n.getAreaFraction() > maximum)
-				maximum = n.getAreaFraction();
-		}
-		track.areafracMIN = minimum;
-		track.areafracMAX = maximum;		
-	}
+
 	
 	//creates data table for area changes (normalized to 1) for each track specified. 
 	public String showAreaDataInTable(Track track){
@@ -513,28 +423,39 @@ public class ViewDynamics {
 			int[] rgb = returnPhysicsLut();
 			plotcolor = new Color(rgb[0], rgb[1], rgb[2]);
 		}
+		int startframe = track.getFrameStart();
+		int endframe = track.getFrameEnd();
+		int framenum = endframe - startframe + 1;
+		IJ.log("Track:" + track.getNodes().get(0).getTrackID() +
+				" frames:" + framenum);
 		ArrayList<Node> nodes = track.getNodes();
-		Node n;
-		int sx, sy, drawframe;
+		int sx, sy,thisframe;
+		int nodecount = 0;
 		ImageProcessor ip;
+		Node n;
 		Polygon poly = null;
 		PolygonRoi proi = null;
-		for (int i = 1; i < nodes.size(); i++){
-			n = track.getNodes().get(i);
-			IJ.log("index:" + n.getId() + "- " + n.getX() + "," +n.getY());
-			poly = new Polygon();
-			for (int j = 0; j < i+1; j++){
-				sx = (int) nodes.get( j ).getX();
-				sy = (int) nodes.get( j ).getY();
-				poly.addPoint(sx, sy);
+//		for (int i = 1; i < nodes.size(); i++){
+		for (int i = 1; i < framenum + 1; i++){
+			thisframe = i + startframe;
+			ip = imp.getStack().getProcessor(thisframe);			
+			if (track.getFramelist().contains(thisframe)){
+				n = nodes.get(nodecount);
+				//IJ.log("index:" + n.getId() + "- " + n.getX() + "," +n.getY());
+				poly = new Polygon();
+				for (int j = 0; j < nodecount+1; j++){
+					sx = (int) nodes.get( j ).getX();
+					sy = (int) nodes.get( j ).getY();
+					poly.addPoint(sx, sy);
+				}
+				nodecount++;
+			
+			} 
+			if (poly != null){
 				if (poly.npoints > 1){
-					drawframe = nodes.get(j).getFrame();
-					ip = imp.getStack().getProcessor(drawframe + 1);
-					//ip.setColor(plotcolor);
-					//ip.drawPolygon(poly);
 					proi = new PolygonRoi(poly, Roi.POLYLINE);
 					proi.setStrokeColor(plotcolor);
-					ip.drawRoi(proi);
+					ip.drawRoi(proi);				
 				}
 			}
 		}
@@ -548,7 +469,8 @@ public class ViewDynamics {
 
 	
 	/**
-	 * An example LUT. 
+	 * Returns random RGB color array based on Physics LUT.
+	 * Used for coloring tracks.   
 	 * It might be better directly look for LUT file. 
 	 * @return
 	 */

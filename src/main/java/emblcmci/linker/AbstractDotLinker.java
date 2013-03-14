@@ -441,6 +441,12 @@ public abstract class AbstractDotLinker {
 						ic.screenYD(this.existing_particles[this.existing_particles.length-1].getX()), 5, 5);
 			}
 		}
+		public Particle[] getExisting_particles() {
+			return existing_particles;
+		}
+		public int getSerial_number() {
+			return serial_number;
+		}
 	}
 
 	/**
@@ -727,9 +733,7 @@ public abstract class AbstractDotLinker {
 		}
 	}
 
-	public Vector<Trajectory> getAll_traj() {
-		return all_traj;
-	}
+
 
 	/**
 	 * Generates <code>Trajectory</code> objects according to the infoamtion 
@@ -979,4 +983,7 @@ public abstract class AbstractDotLinker {
 		return (((a) * (c)) + (b));
 	}
 	
+	public Vector<Trajectory> getAll_traj() {
+		return all_traj;
+	}
 }

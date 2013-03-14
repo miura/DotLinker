@@ -7,8 +7,13 @@ import ij.measure.ResultsTable;
 import java.util.Iterator;
 import java.util.Vector;
 
-
-
+/**
+ * A simple DotLinker for use from scripts. 
+ * Coordinate data could be set via setData method. 
+ * @author Kota Miura <miura@embl.de>
+ * <a href="http://cmci.embl.de">CMCI, EMBL</a>
+ * @since 2013-03-12
+ */
 public class DotLinkerHeadless extends AbstractDotLinker {
 
 	private static final int TrajectoryThreshold = 0;

@@ -4,7 +4,12 @@ from ij.plugin.filter import MaximumFinder
 import jarray
 from emblcmci.linker.costfunctions import LinkCostsOnlyDistance
 from emblcmci.linker import ViewDynamics as VD
-
+'''
+A script for loading binary dot image stack, recover their coordinate, link position to 
+find out tracks (using DotLinker class) and then show tracks plotted on image stack. 
+Kota Miura
+2013-03-12
+'''
 def maxFinder(ip):
   polygon = MaximumFinder().getMaxima(ip, 1.0, False)
   npnts = len(polygon.xpoints)
