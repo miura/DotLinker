@@ -33,6 +33,13 @@ public class VecTrajectoryToTracks {
 				track.getNodes().add(n);
 			}	
 		}
+		// calculate some of track parameters. 
+		for (Track v : tracks.values()) {//iterate for tracks
+			if (v != null) {
+				v.detectFrameBounds();
+				v.calcMeanPositionBeginning();
+			}
+		}		
 		return tracks;	
 	}
 }

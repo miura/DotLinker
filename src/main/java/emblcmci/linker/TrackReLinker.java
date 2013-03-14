@@ -33,10 +33,33 @@ public class TrackReLinker {
 		this.tracks = v2t.runsimple(tracks);
 	}
 	
-	public HashMap<Integer, Track> relink(){
+	/**
+	 * find successive track that actually is continued and merge does two tracks. 
+	 * @return
+	 */
+	public HashMap<Integer, Track> relinkLargeGapsButSimilarPositions(){
 
 		return tracks;
 	}
 	
+	/**
+	 * fill tracks with continuous nodes by interplation of absent time points. 
+	 * @return
+	 */
+	public HashMap<Integer, Track> interpolateGaps(){
+		
+		return tracks;
+	}
+	
+	public HashMap<Integer, Track> getInterplatedTracks(){
+		
+		return tracks;
+	}
+	
+
+	public HashMap<Integer, Track> associateLineages(){
+
+		return tracks;
+	}	
 	
 }
