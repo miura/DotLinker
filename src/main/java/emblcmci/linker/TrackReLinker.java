@@ -1,11 +1,20 @@
 package emblcmci.linker;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import emblcmci.linker.AbstractDotLinker.Trajectory;
-
+import emblcmci.obj.Track;
+import emblcmci.obj.VecTrajectoryToTracks;
+/**
+ * Re-evaluat tracks to check  
+ * if it will be possible to merge some tracks as a single track. 
+ * If possible, then merge some tracks and return an updated set of tracks. 
+ * @author miura
+ *
+ */
 public class TrackReLinker {
-	Vector<Trajectory> Tracks;
+	HashMap<Integer, Track> tracks;
 	
 	// Maximum allowd distance between a track end point and a track start point.
 	// unit: pixels. 
@@ -20,13 +29,12 @@ public class TrackReLinker {
 	 */
 	public TrackReLinker(Vector<Trajectory> tracks) {
 		super();
-		Tracks = tracks;
+		VecTrajectoryToTracks v2t = new VecTrajectoryToTracks();
+		this.tracks = v2t.runsimple(tracks);
 	}
 	
-	public Vector<Trajectory> Relink(Vector<Trajectory> tracks){
-		for (Trajectory t1 : tracks){
-			
-		}
+	public HashMap<Integer, Track> relink(){
+
 		return tracks;
 	}
 	
