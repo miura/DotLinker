@@ -71,10 +71,16 @@ public class Track implements IBioObj{
 		this.frameEnd = frame;
 	}
 	public int getTrackID(){
-		return trackID;
+		return this.trackID;
 	}
 	public void setTrackID(int trackID){
 		this.trackID = trackID;
+	}
+	public int getCandidateNextTrackID() {
+		return candidateNextTrackID;
+	}
+	public void setCandidateNextTrackID(int candidateNextTrackID) {
+		this.candidateNextTrackID = candidateNextTrackID;
 	}
 	
 }

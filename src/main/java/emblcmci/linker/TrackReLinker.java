@@ -42,6 +42,11 @@ public class TrackReLinker extends Analyzer {
 	// unit: frames
 	int framegap_allowance = 2;
 	
+	/**
+	 * Maximum range of frame gap that allows to link gaps. 
+	 */
+	private final int ALLOWE_FRAME_DIFFERENCE = 60;
+	
 //	/**
 //	 * @param tracks
 //	 */
@@ -55,8 +60,16 @@ public class TrackReLinker extends Analyzer {
 	 */
 	@Override 
 	public void analyze(Track t) {
-		findLargeGapsButSimilarPositions(t, this.tracks);
-	}	
+		Integer estimatedNextId;
+		estimatedNextId = findLargeGapsButSimilarPositions(t, this.tracks);
+		if (estimatedNextId > -1)
+			t.setCandidateNextTrackID(estimatedNextId);
+		else
+			// no successive track. 
+			t.setCandidateNextTrackID(-1);
+		
+	}
+		
 
 	@Override 
 	public void analyze(Tracks ts) {
@@ -135,27 +148,33 @@ public class TrackReLinker extends Analyzer {
 	 */
 	public Integer findLargeGapsButSimilarPositions(Track t, Tracks ts){
 		double endstartdist;
+		int framedifference;
 		HashMap<Integer, Double> candidateList = new HashMap<Integer, Double>();
 		Integer minid = -1;
 		for (Integer candidateID : ts.keys()){
 			Track candidate = ts.get(candidateID);
-			if (candidate.getFrameStart() > t.getFrameEnd()) { //if the target track starts later than the current track
+			framedifference = candidate.getFrameStart() - t.getFrameEnd();
+			//select target track that starts later than the current track
+			if ((framedifference > 0) && (framedifference < ALLOWE_FRAME_DIFFERENCE )){
+				// select tracks within certain distance
 				endstartdist = endstartDistance(t, candidate);
 				if (endstartdist < distance_threshould)
 					candidateList.put(candidateID, endstartdist);
 			} 	
 		}
+		IJ.log("### Track: " + t.getTrackID());
 		if (candidateList.size() > 0){
-			IJ.log(t.getTrackID() + "---");
+			
 			Object obj = Collections.min(candidateList.values());
-			IJ.log("Minimum Distance" + (String) obj);
-			 minid = getKeyByValue(candidateList, (Double) obj);
-			IJ.log("track" + minid);
+			minid = getKeyByValue(candidateList, (Double) obj);
+			IJ.log("   Minimum Distance" + Double.toString((Double) obj));
+			IJ.log("   ...track" + minid);
+			IJ.log("   end frame: " + t.getFrameEnd());
+			IJ.log("   start frame: " + ts.get(minid).getFrameStart());
 			IJ.log("---");
 			for (Integer ids : candidateList.keySet())
 				IJ.log(ids + ": " + candidateList.get(ids));
-		} else 
-			IJ.log(t.getTrackID() + ": No Candidate Found");
+		} 
 		
 		return minid;
 	}

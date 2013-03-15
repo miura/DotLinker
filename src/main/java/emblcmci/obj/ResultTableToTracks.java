@@ -51,8 +51,8 @@ public class ResultTableToTracks {
 		// calculate some of track parameters. 
 		for (Track v : Tracks.values()) {//iterate for tracks
 			if (v != null) {
-				v.detectFrameBounds();
-				v.calcMeanPositionBeginning();
+//				v.detectFrameBounds();
+//				v.calcMeanPositionBeginning();
 				if (Areadata_Exists)
 				// calculate fraction of area to the first time point area
 					calcAreaFractionMinMax(v);

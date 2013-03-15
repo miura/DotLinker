@@ -35,6 +35,7 @@ public class VecTrajectoryToTracks {
 
 				if (tracks.get(n.getTrackID()) == null){
 					track =new Track(new ArrayList<Node>());
+					track.setTrackID(n.getTrackID()); // maybe this is bad because tracks will be merged later. 
 					tracks.put(n.getTrackID(), track);
 				} else
 					track = tracks.get(n.getTrackID());

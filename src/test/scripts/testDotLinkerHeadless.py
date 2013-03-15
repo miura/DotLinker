@@ -1,9 +1,10 @@
-from emblcmci.linker import DotLinkerHeadless as DLH
+from emblcmci.linker import DotLinkerHeadless as DLH, TrackReLinker
 from ij import IJ, ImagePlus
 from ij.plugin.filter import MaximumFinder
 import jarray
 from emblcmci.linker.costfunctions import LinkCostsOnlyDistance
 from emblcmci.linker import ViewDynamics as VD
+from emblcmci.obj import VecTrajectoryToTracks
 '''
 A script for loading binary dot image stack, recover their coordinate, link position to 
 find out tracks (using DotLinker class) and then show tracks plotted on image stack. 
@@ -59,8 +60,14 @@ dlh = DLH(imp, 2, 15) # linkrange, distance
 dlh.setData(jarray.array(fullxA, 'i'), jarray.array(fullyA, 'i'),  jarray.array(fulltA, 'i'))
 nearestneighbor = LinkCostsOnlyDistance()
 dlh.doLinking(nearestneighbor, False)
+# convert to Tracks object
+tracks = VecTrajectoryToTracks().runsimple(dlh.getAll_traj())
+tracks.accept(TrackReLinker())
+
+'''
+# plotting part
 vd = VD(imp)
 img2path = '/Volumes/D/Julia20130201-/NucleusSegmentationStudy/20130312/out_bernsen45.tif'
 outimp = IJ.openImage(img2path)
 vd.plotTracks(outimp)
-
+'''
