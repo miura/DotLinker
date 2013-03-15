@@ -17,6 +17,7 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.WindowManager;
+import ij.gui.Line;
 import ij.gui.Overlay;
 import ij.gui.PolygonRoi;
 import ij.gui.Roi;
@@ -37,6 +38,7 @@ import java.util.Iterator;
 import emblcmci.obj.Node;
 import emblcmci.obj.ResultTableToTracks;
 import emblcmci.obj.Track;
+import emblcmci.obj.Tracks;
 
 public class ViewDynamics {
 
@@ -94,22 +96,29 @@ public class ViewDynamics {
 	 * @TODO progressive drawing of tracks. 
 	 */
 	public void plotTracks(){
-		ResultsTable trt = getTrackTable("Tracks");
-		ResultTableToTracks rttracks = new ResultTableToTracks();
-		HashMap<Integer, Track> Tracks = rttracks.run(trt);
-		TrackPlotter(Tracks, imp);
+//		ResultsTable trt = getTrackTable("Tracks");
+//		ResultTableToTracks rttracks = new ResultTableToTracks();
+//		HashMap<Integer, Track> Tracks = rttracks.run(trt);
+//		TrackPlotter(Tracks, imp);
+		plotTracks(this.imp);
 	}	
 
 	/**
 	 * Does plotting to a specific ImagePlus object. 
-	 * 
+	 * @TODO Use Tracks class instead of the Hashmap directly. 
 	 * @param outimp
 	 */
 	public void plotTracks(ImagePlus outimp){
 		ResultsTable trt = getTrackTable("Tracks");
 		ResultTableToTracks rttracks = new ResultTableToTracks();
 		HashMap<Integer, Track> Tracks = rttracks.run(trt);
-		TrackPlotter(Tracks, outimp);
+		Tracks tracks = new Tracks(); //workaround
+		tracks.setTracks(Tracks); //workaround
+		TrackPlotter(tracks, outimp);
+	}		
+
+	public void plotTracks(Tracks tracks, ImagePlus outimp){
+		TrackPlotter(tracks, outimp);
 	}		
 	
 	/** 
@@ -152,7 +161,9 @@ public class ViewDynamics {
 		//if there is a pointROI, then search for the track closest to the ROI.
 		if (imp.getRoi() != null){
 			Roi pntroi = imp.getRoi();
-			defaultID = getTrackClosesttoPointROI(Tracks, pntroi);
+			Tracks tracks = new Tracks();
+			tracks.setTracks(Tracks);	//@TODO currently a work around, should change the argument of this method. 
+			defaultID = getTrackClosesttoPointROI(tracks, pntroi);
 			imp.killRoi();
 		}
 		int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", defaultID);
@@ -172,7 +183,7 @@ public class ViewDynamics {
 		imp.updateAndDraw();
 
 	}
-	public int getTrackClosesttoPointROI(HashMap<Integer, Track> Tracks, Roi pntroi){
+	public int getTrackClosesttoPointROI(Tracks tracks, Roi pntroi){
 		int closestTrackID = 1;
 		if (pntroi.getType() != Roi.POINT)
 			return closestTrackID;
@@ -180,7 +191,7 @@ public class ViewDynamics {
 		double ry = pntroi.getBounds().getCenterY();
 		double mindist = 10000;
 		double dist;
-		for (Track v : Tracks.values()){
+		for (Track v : tracks.values()){
 			dist = Math.sqrt(Math.pow((v.getNodes().get(0).getX() - rx), 2) + 	Math.pow((v.getNodes().get(0).getY() - ry), 2) );
 			if (dist < mindist) {
 				mindist = dist;
@@ -349,13 +360,13 @@ public class ViewDynamics {
 	
 	//--------------- Area Plottting tools down to here ---------------
 
-	public void TrackPlotter(HashMap<Integer, Track> Tracks, ImagePlus imp){
+	public void TrackPlotter(Tracks tracks, ImagePlus imp){
 
 		int defaultID = 1;
 		//if there is a pointROI, then search for the track closest to the ROI.
 		if (imp.getRoi() != null){
 			Roi pntroi = imp.getRoi();
-			defaultID = getTrackClosesttoPointROI(Tracks, pntroi);
+			defaultID = getTrackClosesttoPointROI(tracks, pntroi);
 			imp.killRoi();
 		}		
 		int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", defaultID);
@@ -363,7 +374,7 @@ public class ViewDynamics {
 		Track track;
 
 		if (ChosenTrackNumber != 0){
-			track = Tracks.get(ChosenTrackNumber);
+			track = tracks.get(ChosenTrackNumber);
 			if (track != null){
 				plotTrack(track, imp);
 			} else {
@@ -371,10 +382,12 @@ public class ViewDynamics {
 			}
 		} else {
 			multicolor  = true;
-			for (Object v : Tracks.values()) //iterate for tracks
-				if (v != null)
+			for (Object v : tracks.values()) //iterate for tracks
+				if (v != null){
 					//plotTrack((Track) v, imp);
 					plotProgressiveTrack((Track) v, imp);
+					plotLinkedGaps(tracks, (Track) v, imp);
+				}
 		}
 
 }
@@ -464,7 +477,41 @@ public class ViewDynamics {
 			imp.updateAndDraw();
 		else
 			imp.show();
-	}	
+	}
+	/**
+	 * for development purpose, 
+	 * check which tracks are linked
+	 */
+	public void plotLinkedGaps(Tracks tracks, Track t, ImagePlus imp){
+		Color plotcolor = new Color(255, 0, 0); //red
+		int sx, sy, ex, ey;
+		int nextID;
+		int drawstartframe, drawendframe;
+		Line linkline;
+		Node startnode, endnode;
+		if (t.getCandidateNextTrackID() > 0){
+			startnode = t.getEndNode();
+			nextID = t.getCandidateNextTrackID();
+			endnode = tracks.get(nextID).getStartNode();
+			
+			sx = (int) Math.round(startnode.getX());
+			sy = (int) Math.round(startnode.getY());
+			drawstartframe = startnode.getFrame();
+
+			ex = (int) Math.round(endnode.getX());
+			ey = (int) Math.round(endnode.getY());
+			drawendframe = endnode.getFrame();
+			linkline = new Line(sx, sy, ex, ey);
+			ImageProcessor ip;
+			for (int i = drawstartframe; i < drawendframe; i++){
+				ip = imp.getStack().getProcessor(i);
+				ip.setColor(plotcolor);
+				ip.setLineWidth(10);
+				ip.draw(linkline);
+			}
+			imp.updateAndDraw();
+		}
+	}
 
 
 	

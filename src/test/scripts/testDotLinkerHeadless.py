@@ -64,10 +64,9 @@ dlh.doLinking(nearestneighbor, False)
 tracks = VecTrajectoryToTracks().runsimple(dlh.getAll_traj())
 tracks.accept(TrackReLinker())
 
-'''
 # plotting part
 vd = VD(imp)
 img2path = '/Volumes/D/Julia20130201-/NucleusSegmentationStudy/20130312/out_bernsen45.tif'
 outimp = IJ.openImage(img2path)
-vd.plotTracks(outimp)
-'''
+#vd.plotTracks(outimp)
+vd.plotTracks(tracks, outimp)

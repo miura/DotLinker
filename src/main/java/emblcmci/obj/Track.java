@@ -83,4 +83,11 @@ public class Track implements IBioObj{
 		this.candidateNextTrackID = candidateNextTrackID;
 	}
 	
+	public Node getStartNode(){
+		return nodes.get(0);
+	}
+	public Node getEndNode(){
+		return nodes.get(nodes.size()-1);
+	}
+	
 }
