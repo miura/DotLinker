@@ -1,17 +1,25 @@
 package emblcmci.obj;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Vector;
 
 import emblcmci.linker.AbstractDotLinker.Particle;
 import emblcmci.linker.AbstractDotLinker.Trajectory;
-
+/**
+ * Converts "ParticleTracker" trajectories to emblcmci.obj.Tracks
+ * @author Kota Miura (miura@embl.de)
+ *
+ */
 public class VecTrajectoryToTracks {
 	
-	// x, y, frame, trackid, node id.
-	public HashMap<Integer, Track> runsimple(Vector<Trajectory> all_traj){
-		HashMap<Integer, Track> tracks = new HashMap<Integer, Track>();
+	/** converts only following elements:
+	 * x, y, frame, trackid, node id.
+	 * 
+	 * @param all_traj
+	 * @return
+	 */
+	public Tracks runsimple(Vector<Trajectory> all_traj){
+		Tracks tracks = new Tracks();
 		Node n;
 		Track track;
 		int idnum = 0;
@@ -33,13 +41,6 @@ public class VecTrajectoryToTracks {
 				track.getNodes().add(n);
 			}	
 		}
-		// calculate some of track parameters. 
-		for (Track v : tracks.values()) {//iterate for tracks
-			if (v != null) {
-				v.detectFrameBounds();
-				v.calcMeanPositionBeginning();
-			}
-		}		
 		return tracks;	
 	}
 }

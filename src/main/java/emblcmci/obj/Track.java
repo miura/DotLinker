@@ -1,14 +1,15 @@
 package emblcmci.obj;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import emblcmci.linker.Analyzer;
 
 /**
  * Track class represents a track, consisteing of an ArrayList of Nodes. 
  * 
- *
+ * @author Kota Miura
  */
-public class Track {
+public class Track implements IBioObj{
+	int trackID;
 	public double areafracMAX;
 	public double areafracMIN;
 	int frameStart;
@@ -18,73 +19,62 @@ public class Track {
 	ArrayList<Node> nodes;
 	
 	// parameters related to re-linking. 
-	final double sampleframenumber = 3;
 	double meanx_s;
 	double meany_s;
 	double meanx_e;
 	double meany_e;
-	
+	int candidateNextTrackID;
 	
 	public Track(ArrayList<Node> nodes){
 		this.nodes = nodes;
 	}
 	public ArrayList<Node> getNodes(){
 		return nodes;
-	}	
-	void detectFrameBounds(){
-		checkFrameList();
-		Object objmin = Collections.min(framelist);
-		frameStart = (Integer) objmin;
-		Object objmax = Collections.max(framelist);
-		frameEnd = (Integer) objmax;
 	}
 	
-	void checkFrameList(){
-		if (framelist.size() == 0)
-			for (Node n : nodes)
-				framelist.add(n.getFrame());		
-	}
-
 	/**
-	 * Calculate average positions of the track starting points and endpoints. 
+	 * modified Visitor pattern, to accept visits of Analyzer
 	 */
-	void calcMeanPositionBeginning(){
-		checkFrameList();
-		if (framelist.size() < sampleframenumber){
-			meanx_s = nodes.get(0).getX();
-			meany_s = nodes.get(0).getY();
-			meanx_e = nodes.get(nodes.size()-1).getX();
-			meany_e = nodes.get(nodes.size()-1).getY();
-			
-		} else {
-			meanx_s = 0;
-			meany_s = 0;
-			meanx_e = 0;
-			meany_e = 0;
-			int i, j;
-			for (i = 0; i < sampleframenumber; i++){
-				j = nodes.size()-1 - i; 
-				meanx_s += nodes.get(i).getX();
-				meany_s += nodes.get(i).getY();
-				meanx_e += nodes.get(j).getX();
-				meany_e += nodes.get(j).getY();
-			}
-			meanx_s /= sampleframenumber;
-			meany_s /= sampleframenumber;
-			meanx_e /= sampleframenumber;
-			meany_e /= sampleframenumber;			
-		}
-		
+	@Override
+	public void accept(Analyzer analyzer) {
+		analyzer.analyze(this);
 	}
 	
+	public void setTrackTerminalPositions(
+			double meanx_s2, double meany_s2, 
+			double meanx_e2, double meany_e2){
+		this.meanx_s = meanx_s2;
+		this.meany_s = meany_s2;
+		this.meanx_e = meanx_e2;
+		this.meany_e = meany_e2;		
+	}
 	
+	public CoordTwoD getTrackStartMeanPosition(){
+		return (new CoordTwoD(this.meanx_s, this.meany_s));
+	}
+	public CoordTwoD getTrackEndMeanPosition(){
+		return (new CoordTwoD(this.meanx_e, this.meany_e));
+	}
 	public ArrayList<Integer> getFramelist() {
 		return framelist;
 	}
 	public int getFrameStart() {
 		return frameStart;
 	}
+	public void setFrameStart(int frame){
+		this.frameStart = frame;
+	}
 	public int getFrameEnd() {
 		return frameEnd;
 	}
+	public void setFrameEnd(int frame){
+		this.frameEnd = frame;
+	}
+	public int getTrackID(){
+		return trackID;
+	}
+	public void setTrackID(int trackID){
+		this.trackID = trackID;
+	}
+	
 }
