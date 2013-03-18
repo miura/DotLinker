@@ -1,7 +1,7 @@
 package emblcmci.obj;
 
 import java.util.ArrayList;
-import emblcmci.linker.Analyzer;
+import emblcmci.linker.LinkAnalyzer;
 
 /**
  * Track class represents a track, consisteing of an ArrayList of Nodes. 
@@ -36,7 +36,7 @@ public class Track implements IBioObj{
 	 * modified Visitor pattern, to accept visits of Analyzer
 	 */
 	@Override
-	public void accept(Analyzer analyzer) {
+	public void accept(LinkAnalyzer analyzer) {
 		analyzer.analyze(this);
 	}
 	

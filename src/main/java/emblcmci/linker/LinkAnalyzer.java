@@ -9,7 +9,7 @@ import emblcmci.obj.Tracks;
  * @author miura
  *
  */
-public abstract class Analyzer {
+public abstract class LinkAnalyzer {
 	public abstract void analyze(Track t);
 	public abstract void analyze(Tracks ts);
 }

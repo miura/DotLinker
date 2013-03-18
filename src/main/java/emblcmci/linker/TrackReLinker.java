@@ -23,7 +23,7 @@ import emblcmci.obj.Tracks;
  * @author miura
  *
  */
-public class TrackReLinker extends Analyzer {
+public class TrackReLinker extends LinkAnalyzer {
 	Tracks tracks;
 	Tracks updatedTracks;
 	

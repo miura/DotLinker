@@ -1,6 +1,6 @@
 package emblcmci.obj;
 
-import emblcmci.linker.Analyzer;
+import emblcmci.linker.LinkAnalyzer;
 
 
 /**
@@ -9,5 +9,5 @@ import emblcmci.linker.Analyzer;
  *
  */
 public interface IBioObj {
-	public abstract void accept(Analyzer analyzer); 
+	public abstract void accept(LinkAnalyzer analyzer); 
 }

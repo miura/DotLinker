@@ -3,7 +3,7 @@ package emblcmci.obj;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import emblcmci.linker.Analyzer;
+import emblcmci.linker.LinkAnalyzer;
 
 /**
  * A data structure containing all tracks
@@ -28,7 +28,7 @@ public class Tracks implements IBioObj{
 	 * ... this will be the entry point for analysis of Tracks. 
 	 */
 	@Override
-	public void accept(Analyzer analyzer) {
+	public void accept(LinkAnalyzer analyzer) {
 		analyzer.analyze(this);
 	}
 	
