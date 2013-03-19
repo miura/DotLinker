@@ -1,8 +1,17 @@
 package emblcmci.seg;
 
+import java.util.List;
+import java.awt.Polygon;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
+import fiji.threshold.Auto_Local_Threshold;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
+import mmorpho.MorphoProcessor;
+import mmorpho.StructureElement;
 import mpicbg.ij.clahe.Flat;
 import ij.plugin.ImageCalculator;
 import ij.plugin.filter.MaximumFinder;
@@ -18,6 +27,10 @@ import ij.process.ImageProcessor;
 public class NucToDots {
 
 	private ImagePlus imp;
+	private int[] xcoordA;
+	private int[] ycoordA;
+	private int[] frameA;
+
 
 	public NucToDots(ImagePlus imp){
 		if (imp == null){
@@ -28,10 +41,12 @@ public class NucToDots {
 	}
 	public void stackCLAHE(ImagePlus imp){
 		int i;
-		
+		IJ.log("CLAHE running ...");
 		for (i = 0; i < imp.getStackSize(); i++){
 			imp.setSlice( i + 1 );
 			Flat clahe = new Flat();
+			// two times. 
+			clahe.run(imp, 49, 256, (float) 3.0, null, false);
 			clahe.run(imp, 49, 256, (float) 3.0, null, false);
 		}
 	}
@@ -43,7 +58,12 @@ public class NucToDots {
 		ImagePlus maxpntsimp = new ImagePlus("maxPnts", ip);
 		return maxpntsimp;
 	}
-
+	
+	public Polygon maxFinder(ImageProcessor ip){
+		  Polygon polygon = new MaximumFinder().getMaxima(ip, 1.0, false);
+		  //npnts = len(polygon.xpoints)
+		  return polygon;
+	}
 	/**
 	 * Convert to 8 bit -
 	 * Grays morphology -
@@ -51,16 +71,25 @@ public class NucToDots {
 	 * Fill holes -
 	 * Distance map conversion. 
 	 * @return
+	 *
 	 */
 	public ImagePlus preprocess(ImagePlus orgimp){
 		ImagePlus imp = orgimp.duplicate();
+		ImagePlus imp2;
 		IJ.run(imp, "8-bit", "");
 		//ImagePlus impdup = imp.duplicate();
-		IJ.run(imp, "Gray Morphology", "radius=1 type=circle operator=erode");
-		IJ.run(imp, "Auto Local Threshold", "method=Bernsen radius=45 parameter_1=0 parameter_2=0 white");
-		IJ.run(imp, "Fill Holes", "");
-		IJ.run(imp, "Distance Map", "");
-		return imp;
+		//IJ.run(imp, "Gray Morphology", "radius=1 type=circle operator=erode");
+		StructureElement se = new StructureElement(StructureElement.CIRCLE, 0, 1.0f, StructureElement.OFFSET0);
+		MorphoProcessor morph = new MorphoProcessor(se);
+		morph.erode(imp.getProcessor());
+		//IJ.run(imp, "Auto Local Threshold", "method=Bernsen radius=45 parameter_1=0 parameter_2=0 white");
+		//imp.duplicate().show();
+		Auto_Local_Threshold alt = new Auto_Local_Threshold();
+		imp2 = (ImagePlus) alt.exec(imp, "Bernsen", 45, 0, 0, true)[0];
+		//imp2.duplicate().show();
+		IJ.run(imp2, "Fill Holes", "");
+		IJ.run(imp2, "Distance Map", "");
+		return imp2;
 	}
 	/** Cosmetic method to calculate original image in 8 bit overlayed with voronoi separators. 
 	 *  currently commented out, but worth to leaveit heare for viewing the 
@@ -80,13 +109,52 @@ public class NucToDots {
 		return imp8bit;
 	}
 	
-	public ImagePlus run(){
-		IJ.log("CLAHE 1st run ...");
+	public void run(){
 		stackCLAHE(this.imp);
-		IJ.log("CLAHE 2nd run ...");
+		IJ.log("Preprocess frames ...");
+		ImageStack stk = new ImageStack(this.imp.getWidth(), this.imp.getHeight());
+		ImagePlus tempimp;
+		for (int i = 0; i < this.imp.getStackSize(); i++){
+			tempimp = preprocess(new ImagePlus("tt", this.imp.getStack().getProcessor(i+1)));
+			stk.addSlice(tempimp.getProcessor());
+		}
+		ImagePlus ppimp = new ImagePlus("prepoped", stk);
+		IJ.log("Estimating max points ...");
+		Polygon maxpolygon;
+		ArrayList<Polygon> ploygonlist = new ArrayList<Polygon>();
+		for (int i = 0; i < ppimp.getStackSize(); i++){
+			maxpolygon = maxFinder(ppimp.getStack().getProcessor(i+1));
+			ploygonlist.add(maxpolygon);
+		}
+		int totalpnts = 0;
+		for (Polygon p : ploygonlist){
+			totalpnts += p.npoints;
+		}
+		this.xcoordA = new int[totalpnts];
+		this.ycoordA = new int[totalpnts];
+		this.frameA = new int[totalpnts];
+		int framecount = 0;
+		int filledlength = 0;
+		for (Polygon p : ploygonlist){
+			System.arraycopy(p.xpoints, 0, xcoordA, filledlength, p.xpoints.length);
+			System.arraycopy(p.ypoints, 0, ycoordA, filledlength, p.ypoints.length);
+			for (int i = filledlength; i < filledlength + p.npoints; i++){
+				this.frameA[i] = framecount + 1;
+			}
+			framecount++;
+			filledlength += p.npoints;
+		}		
+	}
+	
+	/**
+	 * deprecated. returns max points stack. 
+	 * @return
+	 */
+	public ImagePlus runOLD(){
 		stackCLAHE(this.imp);
 		IJ.log("Estimating max points ...");
 		ImagePlus simp, maximp;
+		this.imp.show();
 		ImageStack stk = new ImageStack(this.imp.getWidth(), this.imp.getHeight());
 		for (int i = 0; i < this.imp.getStackSize(); i++){
 			simp = new ImagePlus("tt", this.imp.getStack().getProcessor(i+1));
@@ -100,7 +168,16 @@ public class NucToDots {
 		
 		return new ImagePlus("MaxP", stk);
 	}
-	
+	public int[] getXcoordA() {
+		return xcoordA;
+	}
+
+	public int[] getYcoordA() {
+		return ycoordA;
+	}
+	public int[] getFrameA() {
+		return frameA;
+	}
 	
 	
 	
