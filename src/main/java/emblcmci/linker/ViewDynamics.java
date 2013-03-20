@@ -36,9 +36,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import emblcmci.obj.Node;
-import emblcmci.obj.ResultTableToTracks;
 import emblcmci.obj.Track;
 import emblcmci.obj.Tracks;
+import emblcmci.obj.converters.ResultTableToTracks;
 
 public class ViewDynamics {
 

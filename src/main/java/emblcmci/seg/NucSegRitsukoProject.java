@@ -95,9 +95,28 @@ public class NucSegRitsukoProject{
 		}
 	}
 	
-	public ImageStack getPerNucleusBinStack(int roisize){
-		return getPerNucleusBinStack(this.imp, roisize, this.xposA, this.yposA, this.frameA);
+	/**
+	 * using field values
+	 * @param roisize
+	 * @return
+	 */
+	public void getPerNucleusBinImgProcessors(int roisize){
+		getPerNucleusBinImgProcessors(this.imp, roisize, this.xposA, this.yposA, this.frameA);
+
 	}
+	
+	/** For checking test results. 
+	 * 
+	 * @return
+	 */
+	
+	public ImageStack getBinStack(){
+		ImageStack stk = new ImageStack(this.roisize, this.roisize);
+		for (ImageProcessor ip : this.binList)
+			stk.addSlice(ip);
+		return stk;
+	}
+	
 	
 	/** creates a stack with individual nucleus per frame, binarized. 
 	 * 
@@ -108,18 +127,22 @@ public class NucSegRitsukoProject{
 	 * @param fA
 	 * @return
 	 */
-	public ImageStack getPerNucleusBinStack(ImagePlus imp, int roisize, int[] xA, int[] yA, int[] fA){
-		ImageStack stk = new ImageStack(roisize, roisize);
+	public void getPerNucleusBinImgProcessors(ImagePlus imp, int roisize, int[] xA, int[] yA, int[] fA){
+		this.roisize = roisize;
 		ImageProcessor ip, subip, binip;
 		Roi roi;
+		this.binList = new ArrayList<ImageProcessor>();
+		this.roiList = new ArrayList<Roi>();
+		this.ipList = new ArrayList<ImageProcessor>();
 		for (int i = 0; i < fA.length; i++) {
 			ip = imp.getStack().getProcessor(fA[i]);
 			roi = makeRoi(ip, xA[i], yA[i], roisize, roisize);
+			roiList.add(roi);
 			subip = extract(ip, roi);
+			ipList.add(subip);
 			binip = binarize(subip);
-			stk.addSlice(binip);
+			binList.add(binip);
 		}
-		return stk;
 	}
 
 	/**
@@ -223,6 +246,17 @@ public class NucSegRitsukoProject{
 			y = ip.getHeight() - hh;
 		r = new Roi( x , y , ww, hh);
 		return r;
+	}
+
+	public ArrayList<ImageProcessor> getIpList() {
+		return ipList;
+	}
+
+	public ArrayList<Roi> getRoiList() {
+		return roiList;
+	}
+	public ArrayList<ImageProcessor> getBinList() {
+		return binList;
 	}
 	
 

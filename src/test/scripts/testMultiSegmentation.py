@@ -3,6 +3,7 @@ from ij import IJ
 from emblcmci.seg import NucSegRitsukoProject as NRP
 from ij import ImageStack
 from ij import ImagePlus
+from emblcmci.seg import NucleusExtractor 
 '''
 a test code for segmenting multiple nucleus based on positions detected by MaxFinder. 
 '''
@@ -23,10 +24,22 @@ imp = IJ.openImage(imgpath)
 ntd = NucToDots(imp);
 ntd.run()
 
+subwwhh = 100 # size of sub image
 # from here is the extraction
+'''
 nrp = NRP()
-subwwhh = 100
-stk = nrp.getPerNucleusBinStack(imp, subwwhh, ntd.getXcoordA(), ntd.getYcoordA(), ntd.getFrameA())
+nrp.getPerNucleusBinImgProcessors(imp, subwwhh, ntd.getXcoordA(), ntd.getYcoordA(), ntd.getFrameA())
+stk = nrp.getBinStack();
+'''
+
+en = NucleusExtractor(imp, ntd.getXcoordA(), ntd.getYcoordA(), ntd.getFrameA())
+en.constructNodes(subwwhh)
+nodes = en.getNodes()
+stk = ImageStack(subwwhh, subwwhh)
+for n in nodes:
+    binip = n.getBinip()
+    stk.addSlice(binip)
+
 '''
 stk = ImageStack(subwwhh, subwwhh)
 for i, f in enumerate(ntd.getFrameA()):

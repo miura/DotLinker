@@ -1,5 +1,8 @@
 package emblcmci.obj;
 
+import ij.gui.Roi;
+import ij.process.ImageProcessor;
+
 /**
  * Node class represents a single cell (particle) in a single time point.
  * All cell parameters will be stored in this object
@@ -14,6 +17,16 @@ public class Node {
 	private int id;
 	double areafraction;	//fraction of area compared to the first time point in the trajectory
 
+	ImageProcessor orgip;	// binary image of the node
+	ImageProcessor binip;	// binary image of the node
+	Roi orgroi;				// roi in the original frame: for knowing the original coordinates and size. 
+
+	public Node(double x, double y, int frame){
+		this.x = x;
+		this.y = y;
+		this.frame = frame;
+	}
+	
 	public Node(double x, double y, int frame, int trackID, int id){
 		this.x = x;
 		this.y = y;
@@ -74,6 +87,30 @@ public class Node {
 	}
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public ImageProcessor getOrgip() {
+		return orgip;
+	}
+
+	public void setOrgip(ImageProcessor orgip) {
+		this.orgip = orgip;
+	}	
+	
+	public ImageProcessor getBinip() {
+		return binip;
+	}
+
+	public void setBinip(ImageProcessor binip) {
+		this.binip = binip;
+	}
+
+	public Roi getOrgroi() {
+		return orgroi;
+	}
+
+	public void setOrgroi(Roi orgroi) {
+		this.orgroi = orgroi;
 	}
 	 
 }

@@ -1,10 +1,8 @@
 package emblcmci.seg;
 
-import java.util.List;
 import java.awt.Polygon;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+
 
 import fiji.threshold.Auto_Local_Threshold;
 import ij.IJ;
@@ -17,7 +15,7 @@ import ij.plugin.ImageCalculator;
 import ij.plugin.filter.MaximumFinder;
 import ij.process.ImageProcessor;
 /**
- * Deriving nicely placed dots according to nucleus positions. 
+ * Deriving dots according to nucleus positions using MaxFinder function. 
  * original script: VoronoiSeries.py
  * 
  * @author Kota Miura

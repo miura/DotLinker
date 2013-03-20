@@ -4,8 +4,12 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.measure.ResultsTable;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
+
+import emblcmci.obj.Node;
+import emblcmci.obj.converters.NodesToCoordArrays;
 
 /**
  * A simple DotLinker for use from scripts. 
@@ -95,6 +99,14 @@ public class DotLinkerHeadless extends AbstractDotLinker {
 		this.xA = xA;
 		this.yA = yA;
 		this.timeA = fA;
+		return true;
+	}
+	
+	public boolean setData(ArrayList<Node> nodes){
+		NodesToCoordArrays ntoa = new NodesToCoordArrays(nodes);
+		this.xA = ntoa.getxA();
+		this.yA = ntoa.getyA();
+		this.timeA = ntoa.getfA();		
 		return true;
 	}
 
