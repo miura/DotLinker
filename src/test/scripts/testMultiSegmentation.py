@@ -24,7 +24,7 @@ imp = IJ.openImage(imgpath)
 ntd = NucToDots(imp);
 ntd.run()
 
-subwwhh = 100 # size of sub image
+subwwhh = 120 # size of sub image
 # from here is the extraction
 '''
 nrp = NRP()
@@ -34,6 +34,7 @@ stk = nrp.getBinStack();
 
 en = NucleusExtractor(imp, ntd.getXcoordA(), ntd.getYcoordA(), ntd.getFrameA())
 en.constructNodes(subwwhh)
+en.analyzeDotsandBinImages()
 nodes = en.getNodes()
 stk = ImageStack(subwwhh, subwwhh)
 for n in nodes:

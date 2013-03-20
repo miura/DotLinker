@@ -21,10 +21,11 @@ public class Node {
 	ImageProcessor binip;	// binary image of the node
 	Roi orgroi;				// roi in the original frame: for knowing the original coordinates and size. 
 
-	public Node(double x, double y, int frame){
+	public Node(double x, double y, int frame,  int id){
 		this.x = x;
 		this.y = y;
 		this.frame = frame;
+		this.setId(id);
 	}
 	
 	public Node(double x, double y, int frame, int trackID, int id){
