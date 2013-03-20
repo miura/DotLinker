@@ -1,4 +1,4 @@
-package emblcmci.obj;
+package emblcmci.obj.converters;
 
 import ij.IJ;
 import ij.measure.ResultsTable;
@@ -6,6 +6,9 @@ import ij.measure.ResultsTable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+
+import emblcmci.obj.Node;
+import emblcmci.obj.Track;
 
 /**
  * Converts data in table to HashMap of individual Track.

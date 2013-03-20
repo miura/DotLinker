@@ -1,10 +1,13 @@
-package emblcmci.obj;
+package emblcmci.obj.converters;
 
 import java.util.ArrayList;
 import java.util.Vector;
 
 import emblcmci.linker.AbstractDotLinker.Particle;
 import emblcmci.linker.AbstractDotLinker.Trajectory;
+import emblcmci.obj.Node;
+import emblcmci.obj.Track;
+import emblcmci.obj.Tracks;
 /**
  * Converts "ParticleTracker" trajectories to emblcmci.obj.Tracks
  * @author Kota Miura (miura@embl.de)
