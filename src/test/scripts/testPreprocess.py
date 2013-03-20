@@ -44,4 +44,7 @@ vd = VD(imp)
 #img2path = '/Volumes/D/Julia20130201-/NucleusSegmentationStudy/20130312/out_bernsen45.tif'
 #outimp = IJ.openImage(img2path)
 #vd.plotTracks(outimp)
-vd.plotTracks(tracks, imp)
+
+#vd.plotTracks(tracks, imp)
+vd.trackAllPlotter(tracks, imp)
+#vd.trackGapLinkPlotter(tracks, imp)

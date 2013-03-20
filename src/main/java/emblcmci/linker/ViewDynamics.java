@@ -114,11 +114,11 @@ public class ViewDynamics {
 		HashMap<Integer, Track> Tracks = rttracks.run(trt);
 		Tracks tracks = new Tracks(); //workaround
 		tracks.setTracks(Tracks); //workaround
-		TrackPlotter(tracks, outimp);
+		trackPlotter(tracks, outimp);
 	}		
 
 	public void plotTracks(Tracks tracks, ImagePlus outimp){
-		TrackPlotter(tracks, outimp);
+		trackPlotter(tracks, outimp);
 	}		
 	
 	/** 
@@ -360,7 +360,7 @@ public class ViewDynamics {
 	
 	//--------------- Area Plottting tools down to here ---------------
 
-	public void TrackPlotter(Tracks tracks, ImagePlus imp){
+	public void trackPlotter(Tracks tracks, ImagePlus imp){
 
 		int defaultID = 1;
 		//if there is a pointROI, then search for the track closest to the ROI.
@@ -380,19 +380,39 @@ public class ViewDynamics {
 			} else {
 				IJ.showMessageWithCancel("No Track", "no such track could be found");
 			}
-		} else {
+		} else 
+			trackAllPlotter(tracks, imp);
+	}
+
+	public void trackAllPlotter(Tracks tracks, ImagePlus imp){
 			multicolor  = true;
 			for (Object v : tracks.values()) //iterate for tracks
 				if (v != null){
 					//plotTrack((Track) v, imp);
 					plotProgressiveTrack((Track) v, imp);
-					plotLinkedGaps(tracks, (Track) v, imp);
 				}
-		}
+	}
 
-}
+	/** 
+	 * Used for testing track-track gap linking capabilities. 
+	 * 
+	 * @param tracks
+	 * @param imp
+	 */
+	public void trackGapLinkPlotter(Tracks tracks, ImagePlus imp){
+		multicolor  = true;
+		for (Object v : tracks.values()) //iterate for tracks
+			if (v != null)
+				plotLinkedGaps(tracks, (Track) v, imp);
+	}
 	
 	
+	
+	/**
+	 * simply plot tracks as a static full track above image. 
+	 * @param track
+	 * @param imp
+	 */
 	public void plotTrack(Track track, ImagePlus imp){
 		Color plotcolor = new Color(255, 0, 0); //red
 		if (multicolor) {
