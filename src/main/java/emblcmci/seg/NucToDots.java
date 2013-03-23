@@ -109,6 +109,10 @@ public class NucToDots {
 	
 	public void run(){
 		stackCLAHE(this.imp);
+		runmain();		
+	}
+	
+	public void runmain(){
 		IJ.log("Preprocess frames ...");
 		ImageStack stk = new ImageStack(this.imp.getWidth(), this.imp.getHeight());
 		ImagePlus tempimp;

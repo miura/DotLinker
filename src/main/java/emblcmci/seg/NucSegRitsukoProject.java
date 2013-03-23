@@ -15,6 +15,10 @@ import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 
 /**
+ * First do Gaussblurring with a large sigma value to estimate Otsu threshold value. 
+ * Second, do Gauss blurring with the original image with a small sigma value, and using the 
+ * threshold value estimated in the first blurring trial to segment the second image. 
+ * 
  * The macro below reimplemented as a class.
 20130319
 Kota Miura

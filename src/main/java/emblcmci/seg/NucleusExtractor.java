@@ -27,6 +27,7 @@ public class NucleusExtractor {
 	int[] xA, yA, fA;
 	private ImagePlus imp;
 	private ArrayList<Node> nodes;
+	final int MIN_NUCLUS_AREA = 1000;
 	
 	/**
 	 * 
@@ -76,9 +77,10 @@ public class NucleusExtractor {
 	
 	/** 
 	 * 1. Do particle analysis
-	 * 1.1. Eliminates edge touching nucleus.
-	 * 1.2. First loop Nodes: Check the size of the nucleus. 
-	 * 1.2.1. if its too small or none, then that Node should be eliminated.   
+	 * v 1.1. Eliminates edge touching nucleus.
+	 * v 1.2. First loop Nodes: Check the size of the nucleus. 
+	 * v 1.2.1. if its too small or none, then that Node should be eliminated.   
+	 * (maybe refine the position already?)
 	 * 1.3. Second loop Nodes: Count number of segmented nucleus.
 	 * 1.3.1 if there is more than one, search for other nodes that is within same ROi frame. 
 	 * 1.3.1.1 if there are multiple dots, average those dot positions. Select one Node.
@@ -88,33 +90,40 @@ public class NucleusExtractor {
 	 * 1.4.1 update Node coordinate. 
 	 * 1. Check if Dot coordinate is within segmented area. 
 	 */
+	@SuppressWarnings("unchecked")
 	public void analyzeDotsandBinImages(){
 		if (nodes == null)
 			IJ.log("should construct nodes first. Exits.");
 		//step 1: size filtering
-		ArrayList<Integer> removeIDlist = new ArrayList<Integer>(); 
-		ImageStack remove1stk = new ImageStack(nodes.get(0).getBinip().getWidth(), 
-				nodes.get(0).getBinip().getHeight());
+		//ImageStack remove1stk = new ImageStack(nodes.get(0).getBinip().getWidth(), 
+		//		nodes.get(0).getBinip().getHeight());
 		for (Node n : nodes){
-			ImagePlus out = firstAnalysis(n, 1000);
+			ImagePlus out = firstAnalysis(n, MIN_NUCLUS_AREA);
 			if ( out == null){			
 				//nodes.remove(n);
-				/* follwoing is for development. 
-				n.getBinip().setColor(126);
+//				is for development. 
+//				n.getBinip().setColor(126);
 				int roix = n.getOrgroi().getBounds().x;
 				int roiy = n.getOrgroi().getBounds().y;
-				n.getBinip().drawOval((int) n.getX()-roix-2, (int) n.getY() - roiy -2, 5, 5);
-				IJ.log("Node to be Removed:" + n.getId() + " c:" + roix + ", " + roiy);
-				remove1stk.addSlice(n.getBinip());
-				*/
-				removeIDlist.add(n.getId());
+//				n.getBinip().drawOval((int) n.getX()-roix-2, (int) n.getY() - roiy -2, 5, 5);
+//				IJ.log("Node to be Removed:" + n.getId() + " c:" + roix + ", " + roiy);
+//				remove1stk.addSlice(n.getBinip());
+				n.toRemove = true;
 			} else {
 				out.getProcessor().invertLut();
 				n.setBinip(out.getProcessor());
 			}
 		}
-		for (Integer i : removeIDlist)
-			nodes.remove(i);
+//		for (Integer i : removeIDlist){
+//			newnode.remove(i);
+		ArrayList<Node> newnodes = (ArrayList<Node>) nodes.clone();
+		for (Node n : nodes){
+			if (n.toRemove){
+				IJ.log("... size/edge filter: removed nuc " + n.getId());
+				newnodes.remove(n);
+			}
+		}
+		nodes = (ArrayList<Node>) newnodes.clone();
 		
 /* for checking removed		
  * 		if (remove1stk.getSize() > 0){
