@@ -5,6 +5,7 @@ import ij.IJ;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -76,35 +77,13 @@ public class TrackReLinker extends LinkAnalyzer {
 		this.tracks = ts;
 		for (Track t : ts.values()) {
 			// preparation: calculate some of track parameters.
-			detectFrameBounds(t);
 			calcMeanPositionBeginning(t);			
 		}
 		for (Track t : ts.values()) //iterate for tracks
-				t.accept(this);				
+				t.accept(this);
+		updateTracks(ts);
 	}
-	/**
-	 * preparation for evaluating tracks. 
-	 * Store start frame and end frame of a track in the Track object. 
-	 * @param t
-	 */
-	void detectFrameBounds(Track t){
-		int frameStart;
-		int frameEnd;
-		checkFrameList(t);
-		Object objmin = Collections.min(t.getFramelist());
-		frameStart = (Integer) objmin;
-		Object objmax = Collections.max(t.getFramelist());
-		frameEnd = (Integer) objmax;
-		t.setFrameStart(frameStart);
-		t.setFrameEnd(frameEnd);
-	}
-	
-	void checkFrameList(Track t){
-		if (t.getFramelist().size() == 0)
-			for (Node n : t.getNodes())
-				t.getFramelist().add(n.getFrame());		
-	}
-	
+
 	/**
 	 * Calculate average positions of the track starting points and endpoints. 
 	 */
@@ -114,7 +93,6 @@ public class TrackReLinker extends LinkAnalyzer {
 		double meany_s;
 		double meanx_e;
 		double meany_e;		
-		checkFrameList(t);
 		ArrayList<Node> nodes = t.getNodes();
 		if (t.getFramelist().size() < sampleNum){
 			meanx_s = nodes.get(0).getX();
@@ -222,7 +200,45 @@ public class TrackReLinker extends LinkAnalyzer {
 	    }
 	    return null;
 	}
-
+	
+	/** update tracks according to the merging candidate list. 
+	 * 
+	 * @param tracks
+	 * @param t
+	 * @param imp
+	 */
+	public void updateTracks(Tracks tracks){
+		Iterator<Track> iter = tracks.iterator();
+		while(iter.hasNext()){
+			Track currentT = iter.next();
+			if (currentT.getCandidateNextTrackID() > 0){
+				ArrayList<Integer> tlist = new ArrayList<Integer>();
+				tlist.add(currentT.getCandidateNextTrackID());
+				tlist = getTrackLists(tlist, tracks);
+				for (Integer id : tlist)
+					if (id > 0)
+						currentT.concatTracks(tracks.get(id));
+				IJ.log("Merged:" + tlist.toString());
+			}
+		}
+	}
+	
+	/**
+	 * recursively explore the "track threads" for listing tracks to merge. 
+	 * @TODO this could be globally optimized as well. 
+	 * 
+	 * @param tlist
+	 * @param tracks
+	 * @return
+	 */
+	public ArrayList<Integer> getTrackLists(ArrayList<Integer> tlist, Tracks tracks){
+		Track thistrack = tracks.get(tlist.get(tlist.size() - 1));
+		if (thistrack.getCandidateNextTrackID() > 0){
+			tlist.add(thistrack.getCandidateNextTrackID());
+			getTrackLists(tlist, tracks);
+		} 
+		return tlist;
+	}
 
 	
 }

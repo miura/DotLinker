@@ -1,6 +1,8 @@
 package emblcmci.obj;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
 import emblcmci.linker.LinkAnalyzer;
 
 /**
@@ -12,7 +14,7 @@ public class Track implements IBioObj{
 	int trackID;
 	int frameStart;
 	int frameEnd;
-	ArrayList<Integer> framelist = new ArrayList<Integer>();
+	ArrayList<Integer> framelist;// = new ArrayList<Integer>();
 	//HashMap<Integer, Node> nodes;
 	ArrayList<Node> nodes;
 	
@@ -23,8 +25,18 @@ public class Track implements IBioObj{
 	double meany_e;
 	int candidateNextTrackID;
 	
+	/**
+	 * If this track is a merged track, original tracks will be 
+	 * listed in this field parameter. 
+	 */
+	ArrayList<Integer> srcTracks;
+	
 	public Track(ArrayList<Node> nodes){
 		this.nodes = nodes;
+		if (this.nodes.size() > 0){
+			checkFrameList();
+			detectFrameBounds();
+		}
 	}
 	public ArrayList<Node> getNodes(){
 		return nodes;
@@ -47,12 +59,59 @@ public class Track implements IBioObj{
 		this.meany_e = meany_e2;		
 	}
 	
+	/**
+	 * unused. Merged track is a new instance. 
+	 * @param t2
+	 * @return
+	 */
 	public Track mergeTracks(Track t2){
 		ArrayList<Node> mergedNode = new ArrayList<Node>();
 		mergedNode.addAll(this.getNodes());
 		mergedNode.addAll(t2.getNodes());
-		Track mergedTrack = new Track(mergedNode);
+		Track mergedTrack = new Track(mergedNode);		
 		return mergedTrack;
+	}
+	/**
+	 * Concatenates a track to the end of the current track. 
+	 * @param t2
+	 * @return
+	 */
+	public boolean concatTracks(Track t2){
+		this.getNodes().addAll(t2.getNodes());
+		checkFrameList();
+		detectFrameBounds();
+		
+		// keep the merged track information. 
+		if (srcTracks == null)
+			srcTracks = new ArrayList<Integer>();
+		srcTracks.add(t2.getTrackID());
+		return true;
+	}	
+	
+	void checkFrameList(){
+		Track t = this;
+		//if (t.getFramelist().size() == 0)
+		if (framelist == null){
+			framelist = new ArrayList<Integer>();
+			for (Node n : t.getNodes())
+				framelist.add(n.getFrame());		
+
+		}
+	}
+	/**
+	 * preparation for evaluating tracks. 
+	 * Store start frame and end frame of a track in the Track object. 
+	 * @param t
+	 */
+	void detectFrameBounds(){
+		int frameStart;
+		int frameEnd;
+		Object objmin = Collections.min(this.getFramelist());
+		frameStart = (Integer) objmin;
+		Object objmax = Collections.max(this.getFramelist());
+		frameEnd = (Integer) objmax;
+		this.setFrameStart(frameStart);
+		this.setFrameEnd(frameEnd);
 	}
 	
 	public CoordTwoD getTrackStartMeanPosition(){

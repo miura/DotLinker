@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 import emblcmci.obj.Node;
 import emblcmci.obj.Track;
+import emblcmci.obj.Track2Dcells;
 
 /**
  * Converts data in table to HashMap of individual Track.
@@ -109,7 +110,7 @@ public class ResultTableToTracks {
 //		track.areafracMAX = maximum;		
 //	}
 	
-	public void calcAreaFractionMinMax(Track track){
+	public void calcAreaFractionMinMax(Track2Dcells track){
 		ArrayList<Double> af = new ArrayList<Double>();
 		for (Node n :  track.getNodes())
 			af.add(n.getAreaFraction());

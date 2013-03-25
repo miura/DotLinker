@@ -65,11 +65,11 @@ public class ViewDynamics {
 	public void plotAreaDynamics(){
 		ResultsTable trt = getTrackTable("Tracks");
 		ResultTableToTracks rttracks = new ResultTableToTracks();
-		HashMap<Integer, Track> Tracks = rttracks.run(trt);
+		HashMap<Integer, Track> tracks = rttracks.run(trt);
 		// get minimum and maximum fraction through all tracks
 		double areafracMax = 0;
 		double areafracMin =100;
-		for (Track v : Tracks.values()){ //iterate for tracks
+		for (Track2Dcells v : tracks.values()){ //iterate for tracks
 			if (v != null) {
 				if (v.areafracMIN < areafracMin) areafracMin = v.areafracMIN;
 				if (v.areafracMAX > areafracMax) areafracMax = v.areafracMAX;
@@ -82,7 +82,7 @@ public class ViewDynamics {
 			IJ.log("... areaFracMax Corrected to:" + areafracMax);
 		}
 			
-		AreaPlotter(Tracks, imp, areafracMin, areafracMax);		
+		AreaPlotter(tracks, imp, areafracMin, areafracMax);		
 		//addAreaColorScale(imp, areafracMin, areafracMax);
 	}
 	/**
