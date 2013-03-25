@@ -6,22 +6,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+
 import emblcmci.linker.LinkAnalyzer;
 
-/**
- * A data structure containing all tracks
- * @author miura
- *
- */
-
-public class Tracks extends AbstractTracks{
+public abstract class AbstractTracks implements ITracks{
 	HashMap<Integer, Track> tracks = new HashMap<Integer, Track>();
 	
 	public void setTracks(HashMap<Integer, Track> tracks){
 		this.tracks = tracks;
 	}
 	
-	public Tracks addTrack(int ID, Track t){
+	public AbstractTracks addTrack(int ID, Track t){
 		tracks.put(ID, t);
 		t.setTrackID(ID);
 		return this;
@@ -78,15 +73,11 @@ public class Tracks extends AbstractTracks{
 	}
 	
 	@Override
-	public Collection<?> values(){
-		return tracks.values();
-	}
+	abstract public Collection<?> values();
 
 	@Override	
-	public Track get(int trackID) {
-		// TODO Auto-generated method stub
-		return tracks.get(trackID);
-	}
+	abstract public Object get(int trackID);
+	
 	public int getID(Track t){
 		return t.getTrackID();
 	}

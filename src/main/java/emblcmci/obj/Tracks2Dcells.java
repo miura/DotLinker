@@ -2,17 +2,17 @@ package emblcmci.obj;
 
 import java.util.Collection;
 
-public class Tracks2Dcells extends Tracks {
+public class Tracks2Dcells extends AbstractTracks {
 
 	@Override
-	public Collection<Track> values(){
+	public Collection<?> values(){
 		return tracks.values();
 	}
 
 	@Override	
-	public Track get(int trackID) {
+	public Track2Dcells get(int trackID) {
 		// TODO Auto-generated method stub
-		return tracks.get(trackID);
+		return (Track2Dcells) tracks.get(trackID);
 	}
 	
 }

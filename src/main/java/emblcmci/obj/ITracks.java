@@ -2,10 +2,10 @@ package emblcmci.obj;
 
 import java.util.Collection;
 
-public interface ITracks extends IBioObj {
+public interface ITracks extends IBioObj{
 	
-	public Collection<Track> values();
+	public Collection<?> values();
 
-	public Track get(int trackID);
+	public Object get(int trackID);
 
 }
