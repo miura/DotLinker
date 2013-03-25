@@ -1,8 +1,7 @@
 package emblcmci.linker;
 
+import emblcmci.obj.AbstractTrack;
 import emblcmci.obj.AbstractTracks;
-import emblcmci.obj.Track;
-import emblcmci.obj.Tracks;
 
 /**
  * Visitor Pattern (abstract Visitor)
@@ -12,6 +11,6 @@ import emblcmci.obj.Tracks;
  *
  */
 public abstract class LinkAnalyzer {
-	public abstract void analyze(AbstractTracks abstractTracks);
-	public abstract void analyze(Tracks ts);
+	public abstract void analyze(AbstractTrack track);
+	public abstract void analyze(AbstractTracks ts);
 }

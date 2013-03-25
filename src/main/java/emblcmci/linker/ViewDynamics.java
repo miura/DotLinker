@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import emblcmci.obj.ITracks;
+import emblcmci.obj.AbstractTracks;
 import emblcmci.obj.Node;
 import emblcmci.obj.Track;
 import emblcmci.obj.Track2Dcells;
@@ -74,8 +74,8 @@ public class ViewDynamics {
 		double areafracMin =100;
 		for (Track2Dcells v : tracks.values()){ //iterate for tracks
 			if (v != null) {
-				if (v.areafracMIN < areafracMin) areafracMin = v.areafracMIN;
-				if (v.areafracMAX > areafracMax) areafracMax = v.areafracMAX;
+				if (v.getAreafracMIN() < areafracMin) v.setAreafracMIN( areafracMin );
+				if (v.getAreafracMAX() > areafracMax) v.setAreafracMAX( areafracMax );
 			}
 		}
 		IJ.log("Area Fraction Minimum: " + areafracMin);
@@ -108,15 +108,15 @@ public class ViewDynamics {
 
 	/**
 	 * Does plotting to a specific ImagePlus object. 
-	 * @TODO Use Tracks class instead of the Hashmap directly. 
+	 * @TODO done Use Tracks class instead of the Hashmap directly. 
 	 * @param outimp
 	 */
 	public void plotTracks(ImagePlus outimp){
 		ResultsTable trt = getTrackTable("Tracks");
 		ResultTableToTracks rttracks = new ResultTableToTracks();
-		HashMap<Integer, Track> Tracks = rttracks.run(trt);
-		Tracks tracks = new Tracks(); //workaround
-		tracks.setTracks(Tracks); //workaround
+		AbstractTracks Tracks = rttracks.run(trt);
+		Tracks tracks = new Tracks(); 
+		//tracks.setTracks(Tracks); //workaround
 		trackPlotter(tracks, outimp);
 	}		
 
@@ -170,7 +170,7 @@ public class ViewDynamics {
 			imp.killRoi();
 		}
 		int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", defaultID);
-		Track track;
+		Track2Dcells track;
 
 		if (ChosenTrackNumber != 0){
 			track = tracks.get(ChosenTrackNumber);
@@ -179,16 +179,16 @@ public class ViewDynamics {
 			else
 				IJ.showMessageWithCancel("No Track", "no such track could be found");
 		} else {
-			for (Object v : tracks.values()) //iterate for tracks
+			for (Track2Dcells v : tracks.values()) //iterate for tracks
 				if (v != null)
-					trackAreaColorCoder(imp, (Track) v, areafracMin, areafracMax);
+					trackAreaColorCoder(imp, v, areafracMin, areafracMax);
 		}
 		imp.updateAndDraw();
 
 	}
 
 	
-	public boolean trackAreaColorCoder(ImagePlus imp, Track track, double areafracMin, double areafracMax){
+	public boolean trackAreaColorCoder(ImagePlus imp, Track2Dcells track, double areafracMin, double areafracMax){
 		int areascale = 0; 
 		Iterator<Node> iter = track.getNodes().iterator();
 		Node n;
@@ -227,8 +227,8 @@ public class ViewDynamics {
 		double areafracMin =100;
 		for (Track2Dcells v : tracks.values()){ //iterate for tracks
 			if (v != null) {
-				if (v.areafracMIN < areafracMin) areafracMin = v.areafracMIN;
-				if (v.areafracMAX > areafracMax) areafracMax = v.areafracMAX;
+				if (v.getAreafracMIN() < areafracMin) v.setAreafracMIN( areafracMin );
+				if (v.getAreafracMAX() > areafracMax) v.setAreafracMAX( areafracMax );
 			}
 		}
 		IJ.log("Area Fraction Minimum: " + areafracMin);
@@ -353,7 +353,7 @@ public class ViewDynamics {
 		//if there is a pointROI, then search for the track closest to the ROI.
 		if (imp.getRoi() != null){
 			Roi pntroi = imp.getRoi();
-			defaultID = getTrackClosesttoPointROI(tracks, pntroi);
+			defaultID = tracks.getTrackClosesttoPointROI(pntroi);
 			imp.killRoi();
 		}		
 		int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", defaultID);

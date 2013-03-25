@@ -10,149 +10,145 @@ import emblcmci.linker.LinkAnalyzer;
  * 
  * @author Kota Miura
  */
-public class Track implements IBioObj{
-	int trackID;
-	int frameStart;
-	int frameEnd;
-	ArrayList<Integer> framelist;// = new ArrayList<Integer>();
-	//HashMap<Integer, Node> nodes;
-	ArrayList<Node> nodes;
-	
-	// parameters related to re-linking. 
-	double meanx_s;
-	double meany_s;
-	double meanx_e;
-	double meany_e;
-	int candidateNextTrackID;
-	
-	/**
-	 * If this track is a merged track, original tracks will be 
-	 * listed in this field parameter. 
-	 */
-	ArrayList<Integer> srcTracks;
+public class Track extends AbstractTrack{
+//	int trackID;
+//	int frameStart;
+//	int frameEnd;
+//	ArrayList<Integer> framelist;// = new ArrayList<Integer>();
+//	//HashMap<Integer, Node> nodes;
+//	ArrayList<Node> nodes;
+//	
+//	// parameters related to re-linking. 
+//	double meanx_s;
+//	double meany_s;
+//	double meanx_e;
+//	double meany_e;
+//	int candidateNextTrackID;
+//	
+//	/**
+//	 * If this track is a merged track, original tracks will be 
+//	 * listed in this field parameter. 
+//	 */
+//	ArrayList<Integer> srcTracks;
 	
 	public Track(ArrayList<Node> nodes){
-		this.nodes = nodes;
-		if (this.nodes.size() > 0){
-			checkFrameList();
-			detectFrameBounds();
-		}
+		super(nodes);
 	}
-	public ArrayList<Node> getNodes(){
-		return nodes;
-	}
-	
-	/**
-	 * modified Visitor pattern, to accept visits of Analyzer
-	 */
-	@Override
-	public void accept(LinkAnalyzer analyzer) {
-		analyzer.analyze(this);
-	}
-	
-	public void setTrackTerminalPositions(
-			double meanx_s2, double meany_s2, 
-			double meanx_e2, double meany_e2){
-		this.meanx_s = meanx_s2;
-		this.meany_s = meany_s2;
-		this.meanx_e = meanx_e2;
-		this.meany_e = meany_e2;		
-	}
-	
-	/**
-	 * unused. Merged track is a new instance. 
-	 * @param t2
-	 * @return
-	 */
-	public Track mergeTracks(Track t2){
-		ArrayList<Node> mergedNode = new ArrayList<Node>();
-		mergedNode.addAll(this.getNodes());
-		mergedNode.addAll(t2.getNodes());
-		Track mergedTrack = new Track(mergedNode);		
-		return mergedTrack;
-	}
-	/**
-	 * Concatenates a track to the end of the current track. 
-	 * @param t2
-	 * @return
-	 */
-	public boolean concatTracks(Track t2){
-		this.getNodes().addAll(t2.getNodes());
-		checkFrameList();
-		detectFrameBounds();
-		
-		// keep the merged track information. 
-		if (srcTracks == null)
-			srcTracks = new ArrayList<Integer>();
-		srcTracks.add(t2.getTrackID());
-		return true;
-	}	
-	
-	void checkFrameList(){
-		Track t = this;
-		//if (t.getFramelist().size() == 0)
-		if (framelist == null){
-			framelist = new ArrayList<Integer>();
-			for (Node n : t.getNodes())
-				framelist.add(n.getFrame());		
-
-		}
-	}
-	/**
-	 * preparation for evaluating tracks. 
-	 * Store start frame and end frame of a track in the Track object. 
-	 * @param t
-	 */
-	void detectFrameBounds(){
-		int frameStart;
-		int frameEnd;
-		Object objmin = Collections.min(this.getFramelist());
-		frameStart = (Integer) objmin;
-		Object objmax = Collections.max(this.getFramelist());
-		frameEnd = (Integer) objmax;
-		this.setFrameStart(frameStart);
-		this.setFrameEnd(frameEnd);
-	}
-	
-	public CoordTwoD getTrackStartMeanPosition(){
-		return (new CoordTwoD(this.meanx_s, this.meany_s));
-	}
-	public CoordTwoD getTrackEndMeanPosition(){
-		return (new CoordTwoD(this.meanx_e, this.meany_e));
-	}
-	public ArrayList<Integer> getFramelist() {
-		return framelist;
-	}
-	public int getFrameStart() {
-		return frameStart;
-	}
-	public void setFrameStart(int frame){
-		this.frameStart = frame;
-	}
-	public int getFrameEnd() {
-		return frameEnd;
-	}
-	public void setFrameEnd(int frame){
-		this.frameEnd = frame;
-	}
-	public int getTrackID(){
-		return this.trackID;
-	}
-	public void setTrackID(int trackID){
-		this.trackID = trackID;
-	}
-	public int getCandidateNextTrackID() {
-		return candidateNextTrackID;
-	}
-	public void setCandidateNextTrackID(int candidateNextTrackID) {
-		this.candidateNextTrackID = candidateNextTrackID;
-	}
-	
-	public Node getStartNode(){
-		return nodes.get(0);
-	}
-	public Node getEndNode(){
-		return nodes.get(nodes.size()-1);
-	}
+//	public ArrayList<Node> getNodes(){
+//		return nodes;
+//	}
+//	
+//	/**
+//	 * modified Visitor pattern, to accept visits of Analyzer
+//	 */
+//	@Override
+//	public void accept(LinkAnalyzer analyzer) {
+//		analyzer.analyze(this);
+//	}
+//	
+//	public void setTrackTerminalPositions(
+//			double meanx_s2, double meany_s2, 
+//			double meanx_e2, double meany_e2){
+//		this.meanx_s = meanx_s2;
+//		this.meany_s = meany_s2;
+//		this.meanx_e = meanx_e2;
+//		this.meany_e = meany_e2;		
+//	}
+//	
+//	/**
+//	 * unused. Merged track is a new instance. 
+//	 * @param t2
+//	 * @return
+//	 */
+//	public Track mergeTracks(Track t2){
+//		ArrayList<Node> mergedNode = new ArrayList<Node>();
+//		mergedNode.addAll(this.getNodes());
+//		mergedNode.addAll(t2.getNodes());
+//		Track mergedTrack = new Track(mergedNode);		
+//		return mergedTrack;
+//	}
+//	/**
+//	 * Concatenates a track to the end of the current track. 
+//	 * @param t2
+//	 * @return
+//	 */
+//	public boolean concatTracks(Track t2){
+//		this.getNodes().addAll(t2.getNodes());
+//		checkFrameList();
+//		detectFrameBounds();
+//		
+//		// keep the merged track information. 
+//		if (srcTracks == null)
+//			srcTracks = new ArrayList<Integer>();
+//		srcTracks.add(t2.getTrackID());
+//		return true;
+//	}	
+//	
+//	void checkFrameList(){
+//		Track t = this;
+//		//if (t.getFramelist().size() == 0)
+//		if (framelist == null){
+//			framelist = new ArrayList<Integer>();
+//			for (Node n : t.getNodes())
+//				framelist.add(n.getFrame());		
+//
+//		}
+//	}
+//	/**
+//	 * preparation for evaluating tracks. 
+//	 * Store start frame and end frame of a track in the Track object. 
+//	 * @param t
+//	 */
+//	void detectFrameBounds(){
+//		int frameStart;
+//		int frameEnd;
+//		Object objmin = Collections.min(this.getFramelist());
+//		frameStart = (Integer) objmin;
+//		Object objmax = Collections.max(this.getFramelist());
+//		frameEnd = (Integer) objmax;
+//		this.setFrameStart(frameStart);
+//		this.setFrameEnd(frameEnd);
+//	}
+//	
+//	public CoordTwoD getTrackStartMeanPosition(){
+//		return (new CoordTwoD(this.meanx_s, this.meany_s));
+//	}
+//	public CoordTwoD getTrackEndMeanPosition(){
+//		return (new CoordTwoD(this.meanx_e, this.meany_e));
+//	}
+//	public ArrayList<Integer> getFramelist() {
+//		return framelist;
+//	}
+//	public int getFrameStart() {
+//		return frameStart;
+//	}
+//	public void setFrameStart(int frame){
+//		this.frameStart = frame;
+//	}
+//	public int getFrameEnd() {
+//		return frameEnd;
+//	}
+//	public void setFrameEnd(int frame){
+//		this.frameEnd = frame;
+//	}
+//	public int getTrackID(){
+//		return this.trackID;
+//	}
+//	public void setTrackID(int trackID){
+//		this.trackID = trackID;
+//	}
+//	public int getCandidateNextTrackID() {
+//		return candidateNextTrackID;
+//	}
+//	public void setCandidateNextTrackID(int candidateNextTrackID) {
+//		this.candidateNextTrackID = candidateNextTrackID;
+//	}
+//	
+//	public Node getStartNode(){
+//		return nodes.get(0);
+//	}
+//	public Node getEndNode(){
+//		return nodes.get(nodes.size()-1);
+//	}
 	
 }

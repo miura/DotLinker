@@ -5,11 +5,11 @@ import ij.measure.ResultsTable;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 
 import emblcmci.obj.Node;
 import emblcmci.obj.Track;
 import emblcmci.obj.Track2Dcells;
+import emblcmci.obj.Tracks;
 import emblcmci.obj.Tracks2Dcells;
 
 /**
@@ -22,7 +22,7 @@ import emblcmci.obj.Tracks2Dcells;
 
 public class ResultTableToTracks {
 
-	public HashMap<Integer, Track> run(ResultsTable trt){
+	public Tracks run(ResultsTable trt){
 		//boolean Areadata_Exists = false;
 		if (trt == null){
 			IJ.error("no track data available");
@@ -34,7 +34,7 @@ public class ResultTableToTracks {
 //			return null;
 //		}
 		
-		HashMap<Integer, Track> tracks = new HashMap<Integer, Track>();
+		Tracks tracks = new Tracks();
 		Track track;
 		Node node;		
 		for (int i = 0; i < rowlength; i++){
@@ -73,20 +73,20 @@ public class ResultTableToTracks {
 					node = generateNodeWithArea(trt, i);
 				if (tracks.get(node.getTrackID()) == null){
 					track =new Track2Dcells(new ArrayList<Node>());
-					tracks.put(node.getTrackID(), (Track2Dcells) track);
+					tracks.put(node.getTrackID(), track);
 				} else
-					track = (Track2Dcells) tracks.get(node.getTrackID());
+					track = tracks.get(node.getTrackID());
 				track.getNodes().add(node);
 
 			}
 			// calculate some of track parameters. 
-			for (Track v : tracks.values()) {//iterate for tracks
+			for (Track2Dcells v : tracks.values()) {//iterate for tracks
 				if (v != null) {
 					//				v.detectFrameBounds();
 					//				v.calcMeanPositionBeginning();
 					if (Areadata_Exists)
 						// calculate fraction of area to the first time point area
-						calcAreaFractionMinMax((Track2Dcells) v);
+						calcAreaFractionMinMax(v);
 					//calcAreaFraction(v); // commented out, since this value is now calculated in DotLinker
 				}
 			}
@@ -145,8 +145,8 @@ public class ResultTableToTracks {
 			af.add(n.getAreaFraction());
 		Object minobj = Collections.min(af);
 		Object maxobj = Collections.max(af);
-		track.areafracMIN = (Double) minobj;
-		track.areafracMAX = (Double) maxobj;		
+		track.setAreafracMIN( (Double) minobj);
+		track.setAreafracMAX( (Double) maxobj);		
 	}
 	
 

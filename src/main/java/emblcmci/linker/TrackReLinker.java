@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import emblcmci.obj.AbstractTrack;
+import emblcmci.obj.AbstractTracks;
 import emblcmci.obj.CoordTwoD;
 import emblcmci.obj.Node;
 import emblcmci.obj.Track;
@@ -25,7 +27,7 @@ import emblcmci.obj.Tracks;
  *
  */
 public class TrackReLinker extends LinkAnalyzer {
-	Tracks tracks;
+	AbstractTracks tracks;
 	Tracks updatedTracks;
 	
 	/**
@@ -60,7 +62,7 @@ public class TrackReLinker extends LinkAnalyzer {
 	 * 
 	 */
 	@Override 
-	public void analyze(Track t) {
+	public void analyze(AbstractTrack t) {
 		Integer estimatedNextId;
 		estimatedNextId = findLargeGapsButSimilarPositions(t, this.tracks);
 		if (estimatedNextId > -1)
@@ -73,13 +75,13 @@ public class TrackReLinker extends LinkAnalyzer {
 		
 
 	@Override 
-	public void analyze(Tracks ts) {
+	public void analyze(AbstractTracks ts) {
 		this.tracks = ts;
-		for (Track t : ts.values()) {
+		for (AbstractTrack t : ts.values()) {
 			// preparation: calculate some of track parameters.
-			calcMeanPositionBeginning(t);			
+			calcMeanPositionBeginning( t );			
 		}
-		for (Track t : ts.values()) //iterate for tracks
+		for (AbstractTrack t : ts.values()) //iterate for tracks
 				t.accept(this);
 		updateTracks(ts);
 	}
@@ -87,7 +89,7 @@ public class TrackReLinker extends LinkAnalyzer {
 	/**
 	 * Calculate average positions of the track starting points and endpoints. 
 	 */
-	void calcMeanPositionBeginning(Track t){
+	void calcMeanPositionBeginning(AbstractTrack t){
 		int sampleNum = TERMINAL_SAMPLING_FRAME_NUMBER;
 		double meanx_s;
 		double meany_s;
@@ -124,13 +126,13 @@ public class TrackReLinker extends LinkAnalyzer {
 	 * find successive track that actually is continued and merge does two tracks. 
 	 * @return trackID number of the next track that should be linkable. 
 	 */
-	public Integer findLargeGapsButSimilarPositions(Track t, Tracks ts){
+	public Integer findLargeGapsButSimilarPositions(AbstractTrack t, AbstractTracks ts){
 		double endstartdist;
 		int framedifference;
 		HashMap<Integer, Double> candidateList = new HashMap<Integer, Double>();
 		Integer minid = -1;
 		for (Integer candidateID : ts.keys()){
-			Track candidate = ts.get(candidateID);
+			AbstractTrack candidate = ts.get(candidateID);
 			framedifference = candidate.getFrameStart() - t.getFrameEnd();
 			//select target track that starts later than the current track
 			if ((framedifference > 0) && (framedifference < ALLOWE_FRAME_DIFFERENCE )){
@@ -163,7 +165,7 @@ public class TrackReLinker extends LinkAnalyzer {
 	 * @param candidate
 	 * @return
 	 */
-	double endstartDistance(Track t, Track candidate){
+	double endstartDistance(AbstractTrack t, AbstractTrack candidate){
 		CoordTwoD e = t.getTrackEndMeanPosition();
 		CoordTwoD s = candidate.getTrackStartMeanPosition();
 		return dist(e.x, e.y, s.x, s.y);
@@ -176,18 +178,18 @@ public class TrackReLinker extends LinkAnalyzer {
 	 * fill tracks with continuous nodes by interplation of absent time points. 
 	 * @return
 	 */
-	public Tracks interpolateGaps(){
+	public AbstractTracks interpolateGaps(){
 		
 		return tracks;
 	}
 	
-	public Tracks getInterplatedTracks(){
+	public AbstractTracks getInterplatedTracks(){
 		
 		return tracks;
 	}
 	
 
-	public Tracks associateLineages(){
+	public AbstractTracks associateLineages(){
 
 		return tracks;
 	}
@@ -203,21 +205,21 @@ public class TrackReLinker extends LinkAnalyzer {
 	
 	/** update tracks according to the merging candidate list. 
 	 * 
-	 * @param tracks
+	 * @param ts
 	 * @param t
 	 * @param imp
 	 */
-	public void updateTracks(Tracks tracks){
-		Iterator<Track> iter = tracks.iterator();
+	public void updateTracks(AbstractTracks ts){
+		Iterator<AbstractTrack> iter = ts.iterator();
 		while(iter.hasNext()){
-			Track currentT = iter.next();
+			AbstractTrack currentT = iter.next();
 			if (currentT.getCandidateNextTrackID() > 0){
 				ArrayList<Integer> tlist = new ArrayList<Integer>();
 				tlist.add(currentT.getCandidateNextTrackID());
-				tlist = getTrackLists(tlist, tracks);
+				tlist = getTrackLists(tlist, ts);
 				for (Integer id : tlist)
 					if (id > 0)
-						currentT.concatTracks(tracks.get(id));
+						currentT.concatTracks(ts.get(id));
 				IJ.log("Merged:" + tlist.toString());
 			}
 		}
@@ -231,8 +233,8 @@ public class TrackReLinker extends LinkAnalyzer {
 	 * @param tracks
 	 * @return
 	 */
-	public ArrayList<Integer> getTrackLists(ArrayList<Integer> tlist, Tracks tracks){
-		Track thistrack = tracks.get(tlist.get(tlist.size() - 1));
+	public ArrayList<Integer> getTrackLists(ArrayList<Integer> tlist, AbstractTracks tracks){
+		AbstractTrack thistrack = tracks.get(tlist.get(tlist.size() - 1));
 		if (thistrack.getCandidateNextTrackID() > 0){
 			tlist.add(thistrack.getCandidateNextTrackID());
 			getTrackLists(tlist, tracks);

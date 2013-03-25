@@ -11,10 +11,26 @@ import java.util.ArrayList;
  * @author Kota Miura
  * refactored: 20130325
  */
-public class Track2Dcells extends Track {
-	public double areafracMAX;
-	public double areafracMIN;
+public class Track2Dcells extends AbstractTrack {
+	Double areafracMAX;
+	Double areafracMIN;
 	
+	public Double getAreafracMAX() {
+		return areafracMAX;
+	}
+
+	public void setAreafracMAX(Double areafracMAX) {
+		this.areafracMAX = areafracMAX;
+	}
+
+	public Double getAreafracMIN() {
+		return areafracMIN;
+	}
+
+	public void setAreafracMIN(Double areafracMIN) {
+		this.areafracMIN = areafracMIN;
+	}
+
 	public Track2Dcells(ArrayList<Node> nodes) {
 		super(nodes);
 	}
