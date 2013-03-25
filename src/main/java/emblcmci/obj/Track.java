@@ -47,8 +47,12 @@ public class Track implements IBioObj{
 		this.meany_e = meany_e2;		
 	}
 	
-	public void concatTrack(Track t2){
-		
+	public Track mergeTracks(Track t2){
+		ArrayList<Node> mergedNode = new ArrayList<Node>();
+		mergedNode.addAll(this.getNodes());
+		mergedNode.addAll(t2.getNodes());
+		Track mergedTrack = new Track(mergedNode);
+		return mergedTrack;
 	}
 	
 	public CoordTwoD getTrackStartMeanPosition(){

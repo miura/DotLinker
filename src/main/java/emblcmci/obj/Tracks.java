@@ -1,6 +1,7 @@
 package emblcmci.obj;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import emblcmci.linker.LinkAnalyzer;
@@ -23,6 +24,22 @@ public class Tracks implements IBioObj{
 		t.setTrackID(ID);
 		return this;
 	}
+	
+	public boolean removeTrack(int ID){
+		tracks.remove(ID);
+		return true;
+	}
+	
+	public boolean mergeTracks(int ID1, int ID2){
+		Integer maxid = Collections.max(tracks.keySet());
+		Integer mergedid = maxid + 1;
+		Track mergedTrack = tracks.get(ID1).mergeTracks(tracks.get(ID2));
+		this.tracks.put(mergedid, mergedTrack);
+		this.tracks.remove(ID1);
+		this.tracks.remove(ID2);
+		return true;
+	}
+	
 	/** 
 	 * visitor acceptance (now for analyzer as a visitor)
 	 * ... this will be the entry point for analysis of Tracks. 
