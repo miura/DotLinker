@@ -35,9 +35,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import emblcmci.obj.ITracks;
 import emblcmci.obj.Node;
 import emblcmci.obj.Track;
+import emblcmci.obj.Track2Dcells;
 import emblcmci.obj.Tracks;
+import emblcmci.obj.Tracks2Dcells;
 import emblcmci.obj.converters.ResultTableToTracks;
 
 public class ViewDynamics {
@@ -65,7 +68,7 @@ public class ViewDynamics {
 	public void plotAreaDynamics(){
 		ResultsTable trt = getTrackTable("Tracks");
 		ResultTableToTracks rttracks = new ResultTableToTracks();
-		HashMap<Integer, Track> tracks = rttracks.run(trt);
+		Tracks2Dcells tracks = rttracks.runWithArea(trt);
 		// get minimum and maximum fraction through all tracks
 		double areafracMax = 0;
 		double areafracMin =100;
@@ -154,52 +157,36 @@ public class ViewDynamics {
 	 * @param areafracMin: maximum of all the area fraction value in Tracks. 
 	 * @param areafracMax: minimum of all the area fraction value in Tracks. 
 	 */
-	public void AreaPlotter(HashMap<Integer, Track> Tracks, ImagePlus imp,
+	public void AreaPlotter(Tracks2Dcells tracks, ImagePlus imp,
 			double areafracMin, double areafracMax){
 
 		int defaultID = 1;
 		//if there is a pointROI, then search for the track closest to the ROI.
 		if (imp.getRoi() != null){
 			Roi pntroi = imp.getRoi();
-			Tracks tracks = new Tracks();
-			tracks.setTracks(Tracks);	//@TODO currently a work around, should change the argument of this method. 
-			defaultID = getTrackClosesttoPointROI(tracks, pntroi);
+			//Tracks2Dcells track = new Tracks2Dcells();
+			//tracks.setTracks(tracks);	//@TODO currently a work around, should change the argument of this method. 
+			defaultID = tracks.getTrackClosesttoPointROI(pntroi);
 			imp.killRoi();
 		}
 		int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", defaultID);
 		Track track;
 
 		if (ChosenTrackNumber != 0){
-			track = Tracks.get(ChosenTrackNumber);
+			track = tracks.get(ChosenTrackNumber);
 			if (track != null)
 				trackAreaColorCoder(imp, track, areafracMin, areafracMax);
 			else
 				IJ.showMessageWithCancel("No Track", "no such track could be found");
 		} else {
-			for (Object v : Tracks.values()) //iterate for tracks
+			for (Object v : tracks.values()) //iterate for tracks
 				if (v != null)
 					trackAreaColorCoder(imp, (Track) v, areafracMin, areafracMax);
 		}
 		imp.updateAndDraw();
 
 	}
-	public int getTrackClosesttoPointROI(Tracks tracks, Roi pntroi){
-		int closestTrackID = 1;
-		if (pntroi.getType() != Roi.POINT)
-			return closestTrackID;
-		double rx = pntroi.getBounds().getCenterX();
-		double ry = pntroi.getBounds().getCenterY();
-		double mindist = 10000;
-		double dist;
-		for (Track v : tracks.values()){
-			dist = Math.sqrt(Math.pow((v.getNodes().get(0).getX() - rx), 2) + 	Math.pow((v.getNodes().get(0).getY() - ry), 2) );
-			if (dist < mindist) {
-				mindist = dist;
-				closestTrackID = v.getNodes().get(0).getTrackID();
-			}
-		}	
-		return closestTrackID;
-	}
+
 	
 	public boolean trackAreaColorCoder(ImagePlus imp, Track track, double areafracMin, double areafracMax){
 		int areascale = 0; 
@@ -232,13 +219,13 @@ public class ViewDynamics {
 	public void addAreaColorScale(){
 		ResultsTable trt = getTrackTable("Tracks");
 		ResultTableToTracks rttracks = new ResultTableToTracks();
-		HashMap<Integer, Track> Tracks = rttracks.run(trt);
+		Tracks2Dcells tracks = rttracks.runWithArea(trt);
 		
 		// get minimum and maximum fraction through all tracks
 		// this part is common to the others
 		double areafracMax = 0;
 		double areafracMin =100;
-		for (Track v : Tracks.values()){ //iterate for tracks
+		for (Track2Dcells v : tracks.values()){ //iterate for tracks
 			if (v != null) {
 				if (v.areafracMIN < areafracMin) areafracMin = v.areafracMIN;
 				if (v.areafracMAX > areafracMax) areafracMax = v.areafracMAX;

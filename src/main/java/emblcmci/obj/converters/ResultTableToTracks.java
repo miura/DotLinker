@@ -10,6 +10,7 @@ import java.util.HashMap;
 import emblcmci.obj.Node;
 import emblcmci.obj.Track;
 import emblcmci.obj.Track2Dcells;
+import emblcmci.obj.Tracks2Dcells;
 
 /**
  * Converts data in table to HashMap of individual Track.
@@ -22,49 +23,77 @@ import emblcmci.obj.Track2Dcells;
 public class ResultTableToTracks {
 
 	public HashMap<Integer, Track> run(ResultsTable trt){
-		boolean Areadata_Exists = false;
+		//boolean Areadata_Exists = false;
 		if (trt == null){
 			IJ.error("no track data available");
 			return null;
 		}
 		int rowlength = trt.getColumn(0).length;
-		if (rowlength < 10){		//this 10 is just meaning too few data number. 
-			IJ.error("... it seems that there are very few data available in the table");
-			return null;
-		}
-		if (trt.getColumnHeadings().contains("Area") && trt.getColumnHeadings().contains("AreaFraction"))
-			Areadata_Exists = true;
+//		if (rowlength < 10){		//this 10 is just meaning too few data number. 
+//			IJ.error("... it seems that there are very few data available in the table");
+//			return null;
+//		}
 		
-		HashMap<Integer, Track> Tracks = new HashMap<Integer, Track>();
+		HashMap<Integer, Track> tracks = new HashMap<Integer, Track>();
 		Track track;
 		Node node;		
 		for (int i = 0; i < rowlength; i++){
-			if (Areadata_Exists)
-				node = generateNodeWithArea(trt, i);
-			else
-				node = generateNode(trt, i);	
-
-			if (Tracks.get(node.getTrackID()) == null){
+			node = generateNode(trt, i);	
+			if (tracks.get(node.getTrackID()) == null){
 				track =new Track(new ArrayList<Node>());
-				Tracks.put(node.getTrackID(), track);
+				tracks.put(node.getTrackID(), track);
 			} else
-				track = Tracks.get(node.getTrackID());
+				track = tracks.get(node.getTrackID());
 			track.getNodes().add(node);
 		
 		}
-		// calculate some of track parameters. 
-		for (Track v : Tracks.values()) {//iterate for tracks
-			if (v != null) {
-//				v.detectFrameBounds();
-//				v.calcMeanPositionBeginning();
-				if (Areadata_Exists)
-				// calculate fraction of area to the first time point area
-					calcAreaFractionMinMax(v);
-				//calcAreaFraction(v); // commented out, since this value is now calculated in DotLinker
-			}
-		}
-		return Tracks;
+		return tracks;
 	}
+	
+	public Tracks2Dcells runWithArea(ResultsTable trt){
+		boolean Areadata_Exists = false;
+		if (trt == null){
+			IJ.error("no track data available");
+			return null;
+		}
+		if (trt.getColumnHeadings().contains("Area") && 
+				trt.getColumnHeadings().contains("AreaFraction")){
+			Areadata_Exists = true;
+		} 
+		if (Areadata_Exists){
+			int rowlength = trt.getColumn(0).length;
+			if (rowlength < 10){		//this 10 is just meaning too few data number. 
+				IJ.error("... it seems that there are very few data available in the table");
+				return null;
+			}
+			Tracks2Dcells tracks = new Tracks2Dcells();
+			Track2Dcells track;
+			Node node;		
+			for (int i = 0; i < rowlength; i++){
+					node = generateNodeWithArea(trt, i);
+				if (tracks.get(node.getTrackID()) == null){
+					track =new Track2Dcells(new ArrayList<Node>());
+					tracks.put(node.getTrackID(), (Track2Dcells) track);
+				} else
+					track = (Track2Dcells) tracks.get(node.getTrackID());
+				track.getNodes().add(node);
+
+			}
+			// calculate some of track parameters. 
+			for (Track v : tracks.values()) {//iterate for tracks
+				if (v != null) {
+					//				v.detectFrameBounds();
+					//				v.calcMeanPositionBeginning();
+					if (Areadata_Exists)
+						// calculate fraction of area to the first time point area
+						calcAreaFractionMinMax((Track2Dcells) v);
+					//calcAreaFraction(v); // commented out, since this value is now calculated in DotLinker
+				}
+			}
+			return tracks;
+		} else
+			return null;
+	}	
 
 	Node generateNode(ResultsTable trt, int i){
 		Node node = new Node(

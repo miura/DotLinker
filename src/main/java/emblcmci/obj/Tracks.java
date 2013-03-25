@@ -1,5 +1,7 @@
 package emblcmci.obj;
 
+import ij.gui.Roi;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,7 +14,7 @@ import emblcmci.linker.LinkAnalyzer;
  *
  */
 
-public class Tracks implements IBioObj{
+public class Tracks implements ITracks{
 	HashMap<Integer, Track> tracks = new HashMap<Integer, Track>();
 	
 	public void setTracks(HashMap<Integer, Track> tracks){
@@ -39,7 +41,24 @@ public class Tracks implements IBioObj{
 		this.tracks.remove(ID2);
 		return true;
 	}
-	
+
+	public int getTrackClosesttoPointROI(Roi pntroi){
+		int closestTrackID = 1;
+		if (pntroi.getType() != Roi.POINT)
+			return closestTrackID;
+		double rx = pntroi.getBounds().getCenterX();
+		double ry = pntroi.getBounds().getCenterY();
+		double mindist = 10000;
+		double dist;
+		for (Track v : this.tracks.values()){
+			dist = Math.sqrt(Math.pow((v.getNodes().get(0).getX() - rx), 2) + 	Math.pow((v.getNodes().get(0).getY() - ry), 2) );
+			if (dist < mindist) {
+				mindist = dist;
+				closestTrackID = v.getNodes().get(0).getTrackID();
+			}
+		}	
+		return closestTrackID;
+	}	
 	
 	/** 
 	 * visitor acceptance (now for analyzer as a visitor)
@@ -58,10 +77,12 @@ public class Tracks implements IBioObj{
 		return tracks.keySet();
 	}
 	
+	@Override
 	public Collection<Track> values(){
 		return tracks.values();
 	}
 
+	@Override	
 	public Track get(int trackID) {
 		// TODO Auto-generated method stub
 		return tracks.get(trackID);
