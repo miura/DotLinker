@@ -10,8 +10,6 @@ import emblcmci.linker.LinkAnalyzer;
  */
 public class Track implements IBioObj{
 	int trackID;
-	public double areafracMAX;
-	public double areafracMIN;
 	int frameStart;
 	int frameEnd;
 	ArrayList<Integer> framelist = new ArrayList<Integer>();
@@ -47,6 +45,10 @@ public class Track implements IBioObj{
 		this.meany_s = meany_s2;
 		this.meanx_e = meanx_e2;
 		this.meany_e = meany_e2;		
+	}
+	
+	public void concatTrack(Track t2){
+		
 	}
 	
 	public CoordTwoD getTrackStartMeanPosition(){
