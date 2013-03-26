@@ -9,6 +9,7 @@ import ij.process.ImageProcessor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import util.FindConnectedRegions;
 import util.FindConnectedRegions.Results;
@@ -53,7 +54,7 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	 * @param roisize determines the size of the subimage pixel size. 
 	 * @return
 	 */
-	public ArrayList<Node> constructNodes(int roisize){
+	public void constructNodes(int roisize){
 		NucSegRitsukoProject nrp = new NucSegRitsukoProject();
 		nrp.getPerNucleusBinImgProcessors(imp, roisize, xA, yA, fA);
 		ArrayList<ImageProcessor> ipList = nrp.getIpList();
@@ -68,7 +69,6 @@ public class NucleusExtractor extends ParticleAnalyzer {
 			n.setBinip(binList.get(i));
 			nodes.add(n);	
 		}
-		return null;	
 	}
 
 
@@ -100,38 +100,52 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	public void analyzeDotsandBinImages(){
 		if (nodes == null)
 			IJ.log("should construct nodes first. Exits.");
+		
 		//step 1: size filtering
-		//ImageStack remove1stk = new ImageStack(nodes.get(0).getBinip().getWidth(), 
-		//		nodes.get(0).getBinip().getHeight());
+		IJ.log("... now nodes count: " + nodes.size());
+		IJ.log("... working on size and edge-filtering");
 		for (Node n : nodes){
 			ImagePlus out = firstAnalysis(n, MIN_NUCLUS_AREA);
 			if ( out == null){			
-				//nodes.remove(n);
-//				is for development. 
-//				n.getBinip().setColor(126);
-				int roix = ROI_2_INTA.getDim4(n.getOrgroi())[0];
-				int roiy = ROI_2_INTA.getDim4(n.getOrgroi())[1];
-//				n.getBinip().drawOval((int) n.getX()-roix-2, (int) n.getY() - roiy -2, 5, 5);
-//				IJ.log("Node to be Removed:" + n.getId() + " c:" + roix + ", " + roiy);
-//				remove1stk.addSlice(n.getBinip());
-				n.toRemove = false;
+				n.toRemove = true;
 			} else {
 				out.getProcessor().invertLut();
-				n.setBinip(out.getProcessor());
+				int[] roiA = ROI_2_INTA.getDim2(n.getOrgroi());
+				int ox = (int) n.getX() - roiA[0];
+				int oy = (int) n.getY() - roiA[1];
+				
+				//n.setBinip(out.getProcessor());
+				int pixval = out.getProcessor().getPixel(ox, oy);
+				if (pixval > 0){
+					n.toRemove = false;
+					n.setBinip(out.getProcessor());
+				} else
+					n.toRemove = true;
 			}
 		}
-//		for (Integer i : removeIDlist){
-//			newnode.remove(i);
-		ArrayList<Node> newnodes = (ArrayList<Node>) nodes.clone();
-		for (Node n : nodes){
-			if (n.toRemove){
-				IJ.log("... size/edge filter: removed nuc " + n.getId());
-				newnodes.remove(n);
-			}
+//		Iterator<Node> it = nodes.iterator();
+//		while(it.hasNext()){
+//			if ( it.next().toRemove);
+//				it.remove();
+//		}
+		for (Iterator<Node> it = nodes.iterator(); it.hasNext();){
+			if (it.next().toRemove)
+				it.remove();
 		}
-		nodes = (ArrayList<Node>) newnodes.clone();
+			
+//		//TODO
+//		ArrayList<Node> newnodes = (ArrayList<Node>) nodes.clone();
+//		for (Node n : nodes){
+//			if (n.toRemove){
+//				IJ.log("... size/edge filter: removed nuc " + n.getId());
+//				newnodes.remove(n);
+//			}
+//		}
+//		nodes = (ArrayList<Node>) newnodes.clone();
 		
 		// 2nd screen & meging, check for overlapped dots / nuc.
+		IJ.log("... now nodes count: " + nodes.size());
+		IJ.log("... working on second screening");
 		int regioncount = 0;
 		ArrayList<Node> nodes2 = (ArrayList<Node>) nodes.clone();
 		ArrayList<Node> newnodes2 = new ArrayList<Node>();
@@ -165,6 +179,7 @@ public class NucleusExtractor extends ParticleAnalyzer {
 			if (nodes.remove(n))
 				IJ.log("... node" + n.getId() + " removed for node merge");
 		}
+		IJ.log("... now nodes count: " + nodes.size());
 	}
 	Node getfromID(Integer id){
 		for (Node n : nodes)
@@ -224,10 +239,9 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	ImagePlus firstAnalysis(Node n, int minimumarea){
 		int MAXSIZE = 10000;
 		int MINSIZE = minimumarea;
-		ParticleAnalyzer p = null;
 		int options = firstAnalysisOptions();
 		ResultsTable rt = new ResultsTable();
-		p = new ParticleAnalyzer(options, AREA, rt, MINSIZE, MAXSIZE);
+		ParticleAnalyzer p = new ParticleAnalyzer(options, AREA, rt, MINSIZE, MAXSIZE);
 		p.setHideOutputImage(true);
 		p.analyze(new ImagePlus("t", n.getBinip()));
 		if (rt.getCounter() < 1){
@@ -253,7 +267,7 @@ public class NucleusExtractor extends ParticleAnalyzer {
 		//ParticleAnalyzer p = new ParticleAnalyzer();
 		int options = 
 				SHOW_MASKS + 
-				//p.EXCLUDE_EDGE_PARTICLES +
+				//EXCLUDE_EDGE_PARTICLES +
 				INCLUDE_HOLES +
 				CLEAR_WORKSHEET;
 		int measures = 

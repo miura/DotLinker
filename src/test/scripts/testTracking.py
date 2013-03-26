@@ -23,7 +23,7 @@ ntd.runmain() # for imp that is already stackCLAHEed.
 #        print i
 
 
-print "Extracting Nucleus, Evaluations ..."
+print "Extracting Nucleus ..."
 subwwhh = 110  # this must be guessed in the pre-run, by doing particle analysis and get the approximate sizes. 
 en = NucleusExtractor(imp, ntd.getXcoordA(), ntd.getYcoordA(), ntd.getFrameA())
 en.constructNodes(subwwhh)
@@ -31,13 +31,14 @@ print 'node length before filtering: ' + str(en.getNodes().size())
 en.analyzeDotsandBinImages()
 print 'node length after filtering: ' + str(en.getNodes().size()) 
 
-
 nodes = en.getNodes()
+
 stk = ImageStack(subwwhh, subwwhh)
 for n in nodes:
     binip = n.getBinip()
     stk.addSlice(binip)
-#ImagePlus("tt", stk).show()
+ImagePlus("tt", stk).show()
+
 
 IJ.log('Linking ...')
 dlh = DLH(imp, 2, 15) # linkrange, distance
