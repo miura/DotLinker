@@ -1,0 +1,64 @@
+package emblcmci.obj.converters;
+
+import ij.IJ;
+import ij.measure.ResultsTable;
+
+import emblcmci.obj.AbstractTrack;
+import emblcmci.obj.AbstractTracks;
+import emblcmci.obj.Node;
+
+public abstract class AbstractResultsTableToTracks {
+	
+	protected ResultsTable trt;
+	protected AbstractTracks tracks;
+
+	public AbstractResultsTableToTracks(ResultsTable trt){
+		this.trt = trt;
+	}
+	
+	public AbstractTracks run(){
+		//boolean Areadata_Exists = false;
+		if (trt == null){
+			IJ.error("no track data available");
+			return null;
+		}
+		int rowlength = trt.getColumn(0).length;
+		if (checkHeaders() && checkHeaderLength(rowlength)){
+			tracks = createTracks();
+			AbstractTrack track;
+			Node node;		
+			for (int i = 0; i < rowlength; i++){
+				node = generateNode(i);	
+				if (tracks.get(node.getTrackID()) == null){
+					//track =new Track(new ArrayList<Node>());
+					track =createTrack();
+					tracks.put(node.getTrackID(), track);
+				} else
+					track = tracks.get(node.getTrackID());
+				track.getNodes().add(node);
+
+			}
+			
+			calcTrackParameters();
+			
+			return tracks;
+		} else {
+			IJ.log("Result table does not contain required header/s");
+			return null;
+		}
+	}
+	
+	abstract Node generateNode(Integer i);
+	
+	abstract AbstractTracks createTracks();
+	
+	abstract AbstractTrack createTrack();
+	
+	abstract boolean checkHeaders();
+	
+	abstract boolean checkHeaderLength(int rowlength);
+	
+	abstract void calcTrackParameters();
+	
+	
+}
