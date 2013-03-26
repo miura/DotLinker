@@ -49,7 +49,6 @@ public abstract class AbstractVecTrajectoryToTracks {
 		}
 		for (AbstractTrack t : tracks.values()){
 		    t.checkFrameList();
-		    t.detectFrameBounds();
 		}
 	}
 	public abstract AbstractTrack createTrack();

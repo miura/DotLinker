@@ -183,7 +183,7 @@ public abstract class AbstractViewDynamics {
 		int nodecount = 0;
 		ImageProcessor ip;
 		Node n;
-		Polygon poly = null;
+		Polygon poly = new Polygon();
 		PolygonRoi proi = null;
 //		for (int i = 1; i < nodes.size(); i++){
 		for (int i = 1; i < framenum + 1; i++){
@@ -191,23 +191,23 @@ public abstract class AbstractViewDynamics {
 			ip = imp.getStack().getProcessor(thisframe);			
 			if (track.getFramelist().contains(thisframe)){
 				n = nodes.get(nodecount);
-				//IJ.log("index:" + n.getId() + "- " + n.getX() + "," +n.getY());
-				poly = new Polygon();
-				for (int j = 0; j < nodecount+1; j++){
-					sx = (int) nodes.get( j ).getX();
-					sy = (int) nodes.get( j ).getY();
+				//poly = new Polygon();
+				//for (int j = 0; j < nodecount+1; j++){
+					//sx = (int) nodes.get( j ).getX();
+					//sy = (int) nodes.get( j ).getY();
+					sx = (int) n.getX();
+					sy = (int) n.getY();
 					poly.addPoint(sx, sy);
-				}
-				nodecount++;
-			
+				//}
+				nodecount = nodes.indexOf(n) + 1;
 			} 
-			if (poly != null){
+//			if (poly != null){
 				if (poly.npoints > 1){
 					proi = new PolygonRoi(poly, Roi.POLYLINE);
 					proi.setStrokeColor(plotcolor);
 					ip.drawRoi(proi);				
 				}
-			}
+//			}
 		}
 
 		if (imp.isVisible())

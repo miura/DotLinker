@@ -30,7 +30,6 @@ public abstract class AbstractTrack implements IBioObj{
 		this.nodes = nodes;
 		if (this.nodes.size() > 0){
 			checkFrameList();
-			detectFrameBounds();
 		}
 	}
 	public ArrayList<Node> getNodes(){
@@ -73,8 +72,6 @@ public abstract class AbstractTrack implements IBioObj{
 	 */
 	public boolean concatTracks(AbstractTrack t2){
 		this.getNodes().addAll(t2.getNodes());
-		checkFrameList();
-		detectFrameBounds();
 		
 		// keep the merged track information. 
 		if (srcTracks == null)
@@ -86,12 +83,14 @@ public abstract class AbstractTrack implements IBioObj{
 	public void checkFrameList(){
 		AbstractTrack t = this;
 		//if (t.getFramelist().size() == 0)
-		if (framelist == null){
+		if (framelist == null)
 			framelist = new ArrayList<Integer>();
+		if (t.getNodes().size() != t.getFramelist().size()){
+			framelist.clear();
 			for (Node n : t.getNodes())
-				framelist.add(n.getFrame());		
-
+				framelist.add(n.getFrame());
 		}
+		detectFrameBounds();
 	}
 	/**
 	 * preparation for evaluating tracks. 

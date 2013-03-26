@@ -13,7 +13,6 @@ import emblcmci.obj.AbstractTrack;
 import emblcmci.obj.AbstractTracks;
 import emblcmci.obj.CoordTwoD;
 import emblcmci.obj.Node;
-import emblcmci.obj.Track;
 import emblcmci.obj.Tracks;
 
 /**
@@ -224,7 +223,11 @@ public class TrackReLinker extends LinkAnalyzer {
 						currentT.concatTracks(ts.get(id));
 						removedlist.add(id);
 					}
-				IJ.log(Integer.toString(currentT.getTrackID()) + " Merged with:" + tlist.toString());
+				currentT.checkFrameList();
+				IJ.log(Integer.toString(currentT.getTrackID()) + " Merged with:" + 
+					tlist.toString() 
+					+ " Nodes: " + currentT.getNodes().size() 
+					+ " framespan:" + ( currentT.getFrameEnd() - currentT.getFrameStart() + 1));
 			}
 		}
 		for (Integer id : removedlist)
