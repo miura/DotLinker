@@ -5,19 +5,7 @@ import java.util.HashMap;
 
 import emblcmci.linker.LinkAnalyzer;
 
-public class Tracks2Dcells extends AbstractTracks {
-	HashMap<Integer, Track2Dcells> tracks = new HashMap<Integer, Track2Dcells>();	
-
-	@Override
-	public Collection<Track2Dcells> values(){
-		return tracks.values();
-	}
-
-	@Override	
-	public Track2Dcells get(int trackID) {
-		// TODO Auto-generated method stub
-		return (Track2Dcells) tracks.get(trackID);
-	}
+public class Tracks2Dcells extends AbstractTracks {	
 	
 	/** 
 	 * visitor acceptance (now for analyzer as a visitor)
@@ -27,5 +15,6 @@ public class Tracks2Dcells extends AbstractTracks {
 	public void accept(LinkAnalyzer analyzer) {
 		analyzer.analyze(this);
 	}
+
 	
 }
