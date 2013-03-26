@@ -1,7 +1,6 @@
 package emblcmci.obj.converters;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 import ij.measure.ResultsTable;
@@ -12,13 +11,14 @@ import emblcmci.obj.Track2Dcells;
 import emblcmci.obj.Tracks2Dcells;
 
 /**
- * Converts data in Results Table to HashMap of individual Track.
- * Each track is a class with Node objects stroed as an AraryList.
+ * Converts data in Results Table to Tracks instance holding multiple Track instances.
+ * Each Track is a class with Node objects stroed as an AraryList.
  * 
  * Implementation: + Area version, 
  * requires xy coordinates, frame number, TrackID & Area Info (see the code)
- * 
- * @param trt
+ * ... initially coded for Tina, for Drosophila epidermis multicellular tracking. 
+ *   
+ * @param trt: ImageJ results table instance. 
  * @return
  */
 

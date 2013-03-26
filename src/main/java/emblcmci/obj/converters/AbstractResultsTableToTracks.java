@@ -7,6 +7,12 @@ import emblcmci.obj.AbstractTrack;
 import emblcmci.obj.AbstractTracks;
 import emblcmci.obj.Node;
 
+/**
+ * Abstract class for loads data from ImageJ Results Table and generates Tracks instance. 
+ * 
+ * @author Kota Miura
+ *
+ */
 public abstract class AbstractResultsTableToTracks {
 	
 	protected ResultsTable trt;

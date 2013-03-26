@@ -1,6 +1,5 @@
 package emblcmci.obj.converters;
 
-import ij.IJ;
 import ij.measure.ResultsTable;
 
 import java.util.ArrayList;
@@ -12,12 +11,12 @@ import emblcmci.obj.Track;
 import emblcmci.obj.Tracks;
 
 /**
- * Converts data in Results Table to HashMap of individual Track.
- * Each track is a class with Node objects stroed as an AraryList.
+ * Converts data in Results Table to Tracks instance holding multiple Track instances.
+ * Each Track is a class with Node objects stroed as an AraryList.
  * 
  * Implementation: simple version, only requires xy coordinates, frame number and TrackID.
  * 
- * @param trt
+ * @param trt: ImageJ results table instance. 
  * @return
  */
 

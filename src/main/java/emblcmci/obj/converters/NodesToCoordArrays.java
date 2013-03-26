@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import emblcmci.obj.Node;
 
-/** COnverting emblcmci.obj.Node ArrayList to int[] arrays.
+/** Converting emblcmci.obj.Node ArrayList to int[] arrays.
  * 
  * @author miura
  *
