@@ -16,15 +16,15 @@ public abstract class AbstractResultsTableToTracks {
 		this.trt = trt;
 	}
 	
-	public AbstractTracks run(){
+	public void run(){
 		//boolean Areadata_Exists = false;
 		if (trt == null){
 			IJ.error("no track data available");
-			return null;
+			return;
 		}
 		int rowlength = trt.getColumn(0).length;
 		if (checkHeaders() && checkHeaderLength(rowlength)){
-			tracks = createTracks();
+			AbstractTracks tracks = createTracks();
 			AbstractTrack track;
 			Node node;		
 			for (int i = 0; i < rowlength; i++){
@@ -40,11 +40,11 @@ public abstract class AbstractResultsTableToTracks {
 			}
 			
 			calcTrackParameters();
-			
-			return tracks;
+			this.tracks = tracks;
+			//return tracks;
 		} else {
 			IJ.log("Result table does not contain required header/s");
-			return null;
+			return;
 		}
 	}
 	
@@ -59,6 +59,5 @@ public abstract class AbstractResultsTableToTracks {
 	abstract boolean checkHeaderLength(int rowlength);
 	
 	abstract void calcTrackParameters();
-	
 	
 }
