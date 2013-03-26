@@ -54,10 +54,6 @@ for t in tracks.values():
 
 tracks.accept(TrackReLinker())
 
-vd = VD(imp)
-vd.trackAllPlotter(tracks, imp)
-
-
 # plotting part
 vd = VD(imp)
 #img2path = '/Volumes/D/Julia20130201-/NucleusSegmentationStudy/20130312/out_bernsen45.tif'

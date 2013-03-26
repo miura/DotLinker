@@ -211,18 +211,25 @@ public class TrackReLinker extends LinkAnalyzer {
 	 */
 	public void updateTracks(AbstractTracks ts){
 		Iterator<AbstractTrack> iter = ts.iterator();
+		ArrayList<Integer> removedlist = new ArrayList<Integer>();
 		while(iter.hasNext()){
 			AbstractTrack currentT = iter.next();
-			if (currentT.getCandidateNextTrackID() > 0){
+			if ((currentT.getCandidateNextTrackID() > 0) &&
+			(!removedlist.contains(currentT.getTrackID()))) {
 				ArrayList<Integer> tlist = new ArrayList<Integer>();
 				tlist.add(currentT.getCandidateNextTrackID());
 				tlist = getTrackLists(tlist, ts);
 				for (Integer id : tlist)
-					if (id > 0)
+					if (id > 0) {
 						currentT.concatTracks(ts.get(id));
-				IJ.log("Merged:" + tlist.toString());
+						removedlist.add(id);
+					}
+				IJ.log(Integer.toString(currentT.getTrackID()) + " Merged with:" + tlist.toString());
 			}
 		}
+		for (Integer id : removedlist)
+			ts.removeTrack(id);
+		IJ.log("Merged and removed:" + removedlist.toString());
 	}
 	
 	/**
