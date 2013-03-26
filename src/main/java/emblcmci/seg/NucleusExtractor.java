@@ -8,6 +8,7 @@ import ij.plugin.filter.ParticleAnalyzer;
 import ij.process.ImageProcessor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import util.FindConnectedRegions;
 import util.FindConnectedRegions.Results;
@@ -85,14 +86,15 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	 * v 1.2. First loop Nodes: Check the size of the nucleus. 
 	 * v 1.2.1. if its too small or none, then that Node should be eliminated.   
 	 * (maybe refine the position already?)
-	 * 1.3. Second loop Nodes: Count number of segmented nucleus.
-	 * 1.3.1 if there is more than one, search for other nodes that is within same ROi frame. 
-	 * 1.3.1.1 if there are multiple dots, average those dot positions. Select one Node.
-	 * 1.4 redo the tracking and linking.
-	 * 1.3. Redo Analyze particle. 
-	 * 1.4. Store morphological parameters 
-	 * 1.4.1 update Node coordinate. 
-	 * 1. Check if Dot coordinate is within segmented area. 
+	 * -- 1.3. Second loop Nodes: Count number of segmented nucleus.
+	 * v 2.1 if there is more than one, search for other nodes that is within same ROi frame. 
+	 * v 2.1.1 if there are multiple dots, average only two-dots-coupled-ones as a Node.
+	 * v 2.1.2  remove one of the two nodes. 
+ 	 * 3. redo the tracking and linking.
+	 * 4. Do Analyze particle. 
+	 * 5. Store morphological parameters 
+	 * 6. update Node coordinate. 
+	 * 7. Check if Dot coordinate is within segmented area. 
 	 */
 	@SuppressWarnings("unchecked")
 	public void analyzeDotsandBinImages(){
@@ -129,43 +131,88 @@ public class NucleusExtractor extends ParticleAnalyzer {
 		}
 		nodes = (ArrayList<Node>) newnodes.clone();
 		
-		// 2nd analysis, check for overlapped dots / nuc.
-		ImageProcessor conip; //connected region map
+		// 2nd screen & meging, check for overlapped dots / nuc.
 		int regioncount = 0;
 		ArrayList<Node> nodes2 = (ArrayList<Node>) nodes.clone();
 		ArrayList<Node> newnodes2 = new ArrayList<Node>();
-		Roi r;
-		int nx, ny;
-		int n1pix, n2pix;
+		HashMap<Node, ArrayList<Integer>> mergemap = new HashMap<Node, ArrayList<Integer>>();
 		for (Node n : nodes){
 			ArrayList<Integer> mergelist = new ArrayList<Integer>();
-			conip = connextedRegions(n.getBinip());
-			regioncount = (int) conip.getStatistics().max;
-			r = n.getOrgroi();
-			int[] ps = ROI_2_INTA.getDim2(r);
+//			conip = connextedRegions(n.getBinip());
+//			regioncount = (int) conip.getStatistics().max;
 			for (Node n2 : nodes2){
-				if (n.getFrame() == n2.getFrame()){
-					if ( n.getId() != n2.getId() ){
-						if (r.contains( (int) n2.getX(), (int) n2.getY())){
-							nx = ((int) n2.getX()) - ps[0]; // subtract offset in X
-							ny = ((int) n2.getY()) - ps[1]; // subtract offset in XY
-							n2pix = conip.getPixel(nx, ny);
-							nx = ((int) n.getX()) - ps[0]; // subtract offset in X
-							ny = ((int) n.getY()) - ps[1]; // subtract offset in XY
-							n1pix = conip.getPixel(nx, ny);			
-							if (n1pix == n2pix){ // two dots are in the same nucleus. Average positions
-								mergelist.add(n2.getId());
-							}
-						}
-					}
-				}
+				if (checkCoHabitance(n, n2))
+					mergelist.add(n2.getId());
 			}
 			if (mergelist.size() > 0){
 				IJ.log("Node " + n.getId() + " averages with " + mergelist.toString());
+				if (mergelist.size() == 1)
+					mergemap.put(n, mergelist);
 			}
 		}
+		ArrayList<Node> removenodes = new ArrayList<Node>();
+		for (Node n : mergemap.keySet()){
+			if (!removenodes.contains(n)){
+				Node n2 = getfromID(mergemap.get(n).get(0));
+				double nx = (n.getX() + n2.getX()) /2;
+				double ny = (n.getY() + n2.getY()) /2;
+				n.setX( Math.round(nx));
+				n.setY( Math.round(ny));
+				removenodes.add(n2);
+			}
+		}
+		for (Node n: removenodes){
+			if (nodes.remove(n))
+				IJ.log("... node" + n.getId() + " removed for node merge");
+		}
+	}
+	Node getfromID(Integer id){
+		for (Node n : nodes)
+			if (n.getId() == id)
+				return n;
+		return null;
+	}
+	
+	/**
+	 * Takes two Nodes and check if they are on a same nucleus. 
+	 * @return
+	 */
+	boolean checkCoHabitance(Node n1, Node n2){
+		if (n1.getFrame() != n2.getFrame())
+			return false;
+		if ( n1.getId() == n2.getId() )
+			return false;
+		Roi r1 = n1.getOrgroi();
+		if (!r1.contains( (int) n2.getX(), (int) n2.getY()))
+			return false;
+		Roi r2 = n2.getOrgroi();
+		if (!r2.contains( (int) n1.getX(), (int) n1.getY()))
+			return false;
+		int n1x, n1y, n2x, n2y;
+		int n1pix, n2pix;
+		int[] ps1 = ROI_2_INTA.getDim2(r1);
+		n1x = ((int) n1.getX()) - ps1[0]; // subtract offset in X
+		n1y = ((int) n1.getY()) - ps1[1]; // subtract offset in XY
+		n2x = ((int) n2.getX()) - ps1[0]; // subtract offset in X
+		n2y = ((int) n2.getY()) - ps1[1]; // subtract offset in XY
+		ImageProcessor conip = connextedRegions(n1.getBinip());
+		n1pix = conip.getPixel(n1x, n1y);				
+		n2pix = conip.getPixel(n2x, n2y);
+		if (n1pix != n2pix)
+			return false;
 		
-		
+		int[] ps2 = ROI_2_INTA.getDim2(r2);
+		n1x = ((int) n1.getX()) - ps2[0]; // subtract offset in X
+		n1y = ((int) n1.getY()) - ps2[1]; // subtract offset in XY
+		n2x = ((int) n2.getX()) - ps2[0]; // subtract offset in X
+		n2y = ((int) n2.getY()) - ps2[1]; // subtract offset in XY
+		conip = connextedRegions(n2.getBinip());
+		n1pix = conip.getPixel(n1x, n1y);				
+		n2pix = conip.getPixel(n2x, n2y);		
+		if (n1pix != n2pix)
+			return false;
+		else 
+			return true;
 	}
 	
 	/**

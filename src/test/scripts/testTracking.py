@@ -30,6 +30,8 @@ en.constructNodes(subwwhh)
 print 'node length before filtering: ' + str(en.getNodes().size()) 
 en.analyzeDotsandBinImages()
 print 'node length after filtering: ' + str(en.getNodes().size()) 
+
+
 nodes = en.getNodes()
 stk = ImageStack(subwwhh, subwwhh)
 for n in nodes:
@@ -59,6 +61,7 @@ vd = VD(imp)
 #img2path = '/Volumes/D/Julia20130201-/NucleusSegmentationStudy/20130312/out_bernsen45.tif'
 #outimp = IJ.openImage(img2path)
 #vd.plotTracks(outimp)
+
 
 #vd.plotTracks(tracks, imp)
 vd.trackAllPlotter(tracks, imp)
