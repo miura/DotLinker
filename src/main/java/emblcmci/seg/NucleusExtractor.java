@@ -2,13 +2,15 @@ package emblcmci.seg;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.ImageStack;
 import ij.gui.Roi;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.ParticleAnalyzer;
 import ij.process.ImageProcessor;
 
 import java.util.ArrayList;
+
+import util.FindConnectedRegions;
+import util.FindConnectedRegions.Results;
 
 import emblcmci.obj.Node;
 
@@ -23,11 +25,13 @@ import emblcmci.obj.Node;
  * 201303201-
  *  *
  */
-public class NucleusExtractor {
+public class NucleusExtractor extends ParticleAnalyzer {
 	int[] xA, yA, fA;
 	private ImagePlus imp;
 	private ArrayList<Node> nodes;
 	final int MIN_NUCLUS_AREA = 1000;
+	
+	public static final RoiToIntA ROI_2_INTA = new RoiToIntA();
 	
 	/**
 	 * 
@@ -103,12 +107,12 @@ public class NucleusExtractor {
 				//nodes.remove(n);
 //				is for development. 
 //				n.getBinip().setColor(126);
-				int roix = n.getOrgroi().getBounds().x;
-				int roiy = n.getOrgroi().getBounds().y;
+				int roix = ROI_2_INTA.getDim4(n.getOrgroi())[0];
+				int roiy = ROI_2_INTA.getDim4(n.getOrgroi())[1];
 //				n.getBinip().drawOval((int) n.getX()-roix-2, (int) n.getY() - roiy -2, 5, 5);
 //				IJ.log("Node to be Removed:" + n.getId() + " c:" + roix + ", " + roiy);
 //				remove1stk.addSlice(n.getBinip());
-				n.toRemove = true;
+				n.toRemove = false;
 			} else {
 				out.getProcessor().invertLut();
 				n.setBinip(out.getProcessor());
@@ -125,19 +129,58 @@ public class NucleusExtractor {
 		}
 		nodes = (ArrayList<Node>) newnodes.clone();
 		
-/* for checking removed		
- * 		if (remove1stk.getSize() > 0){
-			(new ImagePlus("removed", remove1stk)).show();
+		// 2nd analysis, check for overlapped dots / nuc.
+		ImageProcessor conip; //connected region map
+		int regioncount = 0;
+		ArrayList<Node> nodes2 = (ArrayList<Node>) nodes.clone();
+		ArrayList<Node> newnodes2 = new ArrayList<Node>();
+		Roi r;
+		int nx, ny;
+		int n1pix, n2pix;
+		for (Node n : nodes){
+			ArrayList<Integer> mergelist = new ArrayList<Integer>();
+			conip = connextedRegions(n.getBinip());
+			regioncount = (int) conip.getStatistics().max;
+			r = n.getOrgroi();
+			int[] ps = ROI_2_INTA.getDim2(r);
+			for (Node n2 : nodes2){
+				if (n.getFrame() == n2.getFrame()){
+					if ( n.getId() != n2.getId() ){
+						if (r.contains( (int) n2.getX(), (int) n2.getY())){
+							nx = ((int) n2.getX()) - ps[0]; // subtract offset in X
+							ny = ((int) n2.getY()) - ps[1]; // subtract offset in XY
+							n2pix = conip.getPixel(nx, ny);
+							nx = ((int) n.getX()) - ps[0]; // subtract offset in X
+							ny = ((int) n.getY()) - ps[1]; // subtract offset in XY
+							n1pix = conip.getPixel(nx, ny);			
+							if (n1pix == n2pix){ // two dots are in the same nucleus. Average positions
+								mergelist.add(n2.getId());
+							}
+						}
+					}
+				}
+			}
+			if (mergelist.size() > 0){
+				IJ.log("Node " + n.getId() + " averages with " + mergelist.toString());
+			}
 		}
-*/	}
+		
+		
+	}
 	
+	/**
+	 *  Eliminates dots very small segmented signal. 
+	 * @param n
+	 * @param minimumarea: threshold area. 
+	 * @return binary image of the nucleus.
+	 */
 	ImagePlus firstAnalysis(Node n, int minimumarea){
 		int MAXSIZE = 10000;
 		int MINSIZE = minimumarea;
 		ParticleAnalyzer p = null;
 		int options = firstAnalysisOptions();
 		ResultsTable rt = new ResultsTable();
-		p = new ParticleAnalyzer(options, p.AREA, rt, MINSIZE, MAXSIZE);
+		p = new ParticleAnalyzer(options, AREA, rt, MINSIZE, MAXSIZE);
 		p.setHideOutputImage(true);
 		p.analyze(new ImagePlus("t", n.getBinip()));
 		if (rt.getCounter() < 1){
@@ -148,10 +191,10 @@ public class NucleusExtractor {
 
 	int firstAnalysisOptions(){
 		int options = 
-				ParticleAnalyzer.SHOW_MASKS + 
-				ParticleAnalyzer.EXCLUDE_EDGE_PARTICLES +
-				ParticleAnalyzer.INCLUDE_HOLES +
-				ParticleAnalyzer.CLEAR_WORKSHEET;
+				SHOW_MASKS + 
+				EXCLUDE_EDGE_PARTICLES +
+				INCLUDE_HOLES +
+				CLEAR_WORKSHEET;
 		return options;
 	}
 		
@@ -160,16 +203,16 @@ public class NucleusExtractor {
 	ImagePlus firstSubAnalysis(ImageProcessor ip, int minimumarea){
 		int MAXSIZE = 10000;
 		int MINSIZE = minimumarea;
-		ParticleAnalyzer p = new ParticleAnalyzer();
+		//ParticleAnalyzer p = new ParticleAnalyzer();
 		int options = 
-				p.SHOW_MASKS + 
+				SHOW_MASKS + 
 				//p.EXCLUDE_EDGE_PARTICLES +
-				p.INCLUDE_HOLES +
-				p.CLEAR_WORKSHEET;
+				INCLUDE_HOLES +
+				CLEAR_WORKSHEET;
 		int measures = 
-				p.AREA;
+				AREA;
 		ResultsTable rt = new ResultsTable();
-		p = new ParticleAnalyzer(options, measures, rt, MINSIZE, MAXSIZE);
+		ParticleAnalyzer p = new ParticleAnalyzer(options, measures, rt, MINSIZE, MAXSIZE);
 		p.setHideOutputImage(true);
 		p.analyze(new ImagePlus("t", ip));
 		if (rt.getCounter() < 1){
@@ -178,6 +221,50 @@ public class NucleusExtractor {
 			return p.getOutputImage();
 	}
 	
+	/**
+	 * 
+	 * @param segimp: degmented binary image
+	 * @return connected regions mapped by ID. 
+	 */
+	ImageProcessor connextedRegions(ImageProcessor segip){
+
+//		ij.ImagePlus imagePlus, 
+//		boolean diagonal, 
+//		boolean imagePerRegion, 
+//		boolean imageAllRegions, 
+//		boolean showResults, 
+//		boolean mustHaveSameValue, 
+//		boolean startFromPointROI, 
+//		boolean autoSubtract, 
+//		double valuesOverDouble, 
+//		double minimumPointsInRegionDouble, 
+//		int stopAfterNumberOfRegions, 
+//		boolean noUI
+
+		FindConnectedRegions fcr = new FindConnectedRegions();
+		Results fcrresults = fcr.run(new ImagePlus("seg", segip), true, false, true, false, false, false, false, 100, 600, 10, true);
+		ImagePlus allregionimp =  fcrresults.allRegions;
+		return allregionimp.getProcessor();
+	}
+	
+	private static class RoiToIntA {
+		public int[] getDim4(Roi roi){
+			int[] a = {
+					roi.getBounds().x, 
+					roi.getBounds().y,
+					roi.getBounds().width,
+					roi.getBounds().height
+			};
+			return a;
+		}
+		public int[] getDim2(Roi roi){
+			int[] a = {
+					roi.getBounds().x, 
+					roi.getBounds().y
+			};
+			return a;
+		}
+	}
 
 
 }
