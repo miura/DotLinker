@@ -27,15 +27,16 @@ print "Extracting Nucleus, Evaluations ..."
 subwwhh = 110  # this must be guessed in the pre-run, by doing particle analysis and get the approximate sizes. 
 en = NucleusExtractor(imp, ntd.getXcoordA(), ntd.getYcoordA(), ntd.getFrameA())
 en.constructNodes(subwwhh)
-#print 'node length before filtering: ' + str(en.getNodes().size()) 
+print 'node length before filtering: ' + str(en.getNodes().size()) 
 en.analyzeDotsandBinImages()
-#print 'node length after filtering: ' + str(en.getNodes().size()) 
+print 'node length after filtering: ' + str(en.getNodes().size()) 
 nodes = en.getNodes()
 stk = ImageStack(subwwhh, subwwhh)
 for n in nodes:
     binip = n.getBinip()
     stk.addSlice(binip)
-        
+#ImagePlus("tt", stk).show()
+
 IJ.log('Linking ...')
 dlh = DLH(imp, 2, 15) # linkrange, distance
 #dlh.setData(ntd.getXcoordA(), ntd.getYcoordA(),  ntd.getFrameA())
@@ -44,8 +45,18 @@ nearestneighbor = LinkCostsOnlyDistance()
 dlh.doLinking(nearestneighbor, False)
 
 # convert to Tracks object
-tracks = VecTrajectoryToTracks().runsimple(dlh.getAll_traj())
+vttt = VecTrajectoryToTracks()
+vttt.run(dlh.getAll_traj())
+tracks = vttt.getTracks()
+print "tracks", str(tracks.size())
+for t in tracks.values():
+    print t.getTrackID(), t.getNodes().get(0).getX(), t.getNodes().size(), t.getFrameStart()
+
 tracks.accept(TrackReLinker())
+
+vd = VD(imp)
+vd.trackAllPlotter(tracks, imp)
+
 
 # plotting part
 vd = VD(imp)

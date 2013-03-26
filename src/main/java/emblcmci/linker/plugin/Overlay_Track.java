@@ -1,6 +1,7 @@
 package emblcmci.linker.plugin;
 
 import emblcmci.linker.ViewDynamics;
+import emblcmci.linker.ViewDynamicsArea;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.plugin.PlugIn;
@@ -32,7 +33,7 @@ public class Overlay_Track implements PlugIn {
 	    	IJ.error("no image to plot");
 	    	return;
 	    }
-	    ViewDynamics vdyna = new ViewDynamics(imp);
+	    ViewDynamicsArea vdyna = new ViewDynamicsArea(imp);
 	    if (arg.equals("track"))
 	    	vdyna.plotTracks();
 	    

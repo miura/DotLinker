@@ -131,7 +131,7 @@ public class TrackReLinker extends LinkAnalyzer {
 		int framedifference;
 		HashMap<Integer, Double> candidateList = new HashMap<Integer, Double>();
 		Integer minid = -1;
-		for (Integer candidateID : ts.keys()){
+		for (Integer candidateID : ts.keySet()){
 			AbstractTrack candidate = ts.get(candidateID);
 			framedifference = candidate.getFrameStart() - t.getFrameEnd();
 			//select target track that starts later than the current track

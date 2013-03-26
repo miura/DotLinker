@@ -3,6 +3,7 @@ package emblcmci.obj;
 import ij.gui.Roi;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import emblcmci.linker.LinkAnalyzer;
 
@@ -48,6 +49,11 @@ public abstract class AbstractTracks extends HashMap<Integer, AbstractTrack> imp
 			}
 		}	
 		return closestTrackID;
+	}
+
+	public Iterator<AbstractTrack> iterator() {
+		// TODO Auto-generated method stub
+		return this.values().iterator();
 	}	
 
 }

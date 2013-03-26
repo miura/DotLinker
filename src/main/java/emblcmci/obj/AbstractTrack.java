@@ -83,7 +83,7 @@ public abstract class AbstractTrack implements IBioObj{
 		return true;
 	}	
 	
-	void checkFrameList(){
+	public void checkFrameList(){
 		AbstractTrack t = this;
 		//if (t.getFramelist().size() == 0)
 		if (framelist == null){
@@ -98,7 +98,7 @@ public abstract class AbstractTrack implements IBioObj{
 	 * Store start frame and end frame of a track in the Track object. 
 	 * @param t
 	 */
-	void detectFrameBounds(){
+	public void detectFrameBounds(){
 		int frameStart;
 		int frameEnd;
 		Object objmin = Collections.min(this.getFramelist());

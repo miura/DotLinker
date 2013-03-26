@@ -12,15 +12,30 @@ import emblcmci.obj.Tracks;
  *
  */
 public class VecTrajectoryToTracks extends AbstractVecTrajectoryToTracks{
+	
+	public VecTrajectoryToTracks() {
+		super();
+	}
+
+//	@Override
+//	public AbstractTracks createTracks() {
+//		return new Tracks();
+//	}
 
 	@Override
-	public AbstractTracks createTracks() {
-		return new Tracks();
+	public AbstractTrack createTrack() {
+		return new Track(new ArrayList<Node>());
 	}
 
 	@Override
-	public AbstractTrack createTrack(ArrayList<Node> nodes) {
-		return new Track(nodes);
+	public AbstractTracks getTracks() {
+		return this.tracks;
 	}
+
+	@Override
+	public void setTracks() {
+		this.tracks = new Tracks();
+	}
+
 	
 }

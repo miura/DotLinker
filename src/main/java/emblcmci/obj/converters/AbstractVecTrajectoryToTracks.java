@@ -1,6 +1,5 @@
 package emblcmci.obj.converters;
 
-import java.util.ArrayList;
 import java.util.Vector;
 
 import emblcmci.linker.AbstractDotLinker.Particle;
@@ -12,6 +11,11 @@ import emblcmci.obj.Node;
 public abstract class AbstractVecTrajectoryToTracks {
 
 	
+	protected AbstractTracks tracks;
+	
+	public AbstractVecTrajectoryToTracks(){
+		setTracks();
+	}
 	/** converts 
 	 * conversion is for only following elements:
 	 * x, y, frame, trackid, node id.
@@ -19,12 +23,11 @@ public abstract class AbstractVecTrajectoryToTracks {
 	 * @param all_traj
 	 * @return
 	 */
-	public AbstractTracks run(Vector<Trajectory> all_traj){
+	public void run(Vector<Trajectory> all_traj){
 //		AbstractTracks tracks = new Tracks();
-		AbstractTracks tracks = createTracks();
 		Node n;
-		AbstractTrack track;
 		int idnum = 0;
+		AbstractTrack track;
 		for (Trajectory traj : all_traj){
 			Particle[] ptcls = traj.getExisting_particles();
 			for (int i = 0; i < ptcls.length; i++){
@@ -36,18 +39,23 @@ public abstract class AbstractVecTrajectoryToTracks {
 						traj.getSerial_number(), idnum++);	
 
 				if (tracks.get(n.getTrackID()) == null){
-					track = createTrack(new ArrayList<Node>());
+					track = createTrack();
 					track.setTrackID(n.getTrackID()); // maybe this is bad because tracks will be merged later. 
 					tracks.put(n.getTrackID(), track);
 				} else
-					track = (AbstractTrack) tracks.get(n.getTrackID());
+					track = tracks.get(n.getTrackID());
 				track.getNodes().add(n);
 			}	
 		}
-		return tracks;	
+		for (AbstractTrack t : tracks.values()){
+		    t.checkFrameList();
+		    t.detectFrameBounds();
+		}
 	}
-	public abstract AbstractTracks createTracks();
+	public abstract AbstractTrack createTrack();
 	
-	public abstract AbstractTrack createTrack(ArrayList<Node> nodes);
+	public abstract void setTracks();
+	
+	public abstract AbstractTracks getTracks();
 	
 }
