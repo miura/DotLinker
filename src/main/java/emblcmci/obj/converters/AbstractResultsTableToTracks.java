@@ -48,6 +48,9 @@ public abstract class AbstractResultsTableToTracks {
 		}
 	}
 	
+	public AbstractTracks getTracks(){
+		return tracks;
+	}
 	abstract Node generateNode(Integer i);
 	
 	abstract AbstractTracks createTracks();

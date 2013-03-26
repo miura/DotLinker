@@ -8,7 +8,7 @@ import emblcmci.linker.LinkAnalyzer;
 
 public abstract class AbstractTracks extends HashMap<Integer, AbstractTrack> implements IBioObj {
 
-	public AbstractTracks addTrack(int ID, AbstractTrack t){
+	public  <V extends AbstractTrack> AbstractTracks addTrack(int ID, AbstractTrack t){
 		put(ID, t);
 		t.setTrackID(ID);
 		return this;

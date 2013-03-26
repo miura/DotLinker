@@ -81,7 +81,8 @@ public abstract class AbstractViewDynamics {
 	public void plotTracks(ImagePlus outimp){
 		ResultsTable trt = getTrackTable("Tracks");
 		AbstractResultsTableToTracks rttracks = convertResultsTable(trt);
-		AbstractTracks tracks = rttracks.run();
+		rttracks.run();
+		AbstractTracks tracks = rttracks.getTracks();
 		trackPlotter(tracks, outimp);
 	}
 	
