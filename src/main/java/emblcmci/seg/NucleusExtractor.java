@@ -103,7 +103,7 @@ public class NucleusExtractor extends ParticleAnalyzer {
 		
 		//step 1: size filtering
 		IJ.log("... now nodes count: " + nodes.size());
-		IJ.log("... working on size and edge-filtering");
+		IJ.log("... working on size and excluding nucleus at image edge.");
 		for (Node n : nodes){
 			ImagePlus out = firstAnalysis(n, MIN_NUCLUS_AREA);
 			if ( out == null){			
@@ -145,10 +145,9 @@ public class NucleusExtractor extends ParticleAnalyzer {
 		
 		// 2nd screen & meging, check for overlapped dots / nuc.
 		IJ.log("... now nodes count: " + nodes.size());
-		IJ.log("... working on second screening");
-		int regioncount = 0;
+		IJ.log("... working on second screening, merging multiple dos per nucleus");
+		//int regioncount = 0;
 		ArrayList<Node> nodes2 = (ArrayList<Node>) nodes.clone();
-		ArrayList<Node> newnodes2 = new ArrayList<Node>();
 		HashMap<Node, ArrayList<Integer>> mergemap = new HashMap<Node, ArrayList<Integer>>();
 		for (Node n : nodes){
 			ArrayList<Integer> mergelist = new ArrayList<Integer>();
@@ -159,29 +158,35 @@ public class NucleusExtractor extends ParticleAnalyzer {
 					mergelist.add(n2.getId());
 			}
 			if (mergelist.size() > 0){
-				IJ.log("Node " + n.getId() + " averages with " + mergelist.toString());
-				if (mergelist.size() == 1)
+				//IJ.log("Node " + n.getId() + " averages with " + mergelist.toString());
+				if ((0 < mergelist.size() ) && ( mergelist.size() < 5))
 					mergemap.put(n, mergelist);
 			}
 		}
 		ArrayList<Node> removenodes = new ArrayList<Node>();
 		for (Node n : mergemap.keySet()){
 			if (!removenodes.contains(n)){
-				Node n2 = getfromID(mergemap.get(n).get(0));
-				double nx = (n.getX() + n2.getX()) /2;
-				double ny = (n.getY() + n2.getY()) /2;
-				n.setX( Math.round(nx));
-				n.setY( Math.round(ny));
-				removenodes.add(n2);
+				double nx = n.getX();
+				double ny = n.getY();
+				for (Integer id : mergemap.get(n)){
+					Node n2 = getNodefromID(id);
+					nx += n2.getX();
+					ny += n2.getY();
+					removenodes.add(n2);
+				}
+				int size = mergemap.get(n).size() + 1;
+				// update node coordinate
+				n.setX( Math.round( nx / size));
+				n.setY( Math.round(ny) / size);			
 			}
 		}
 		for (Node n: removenodes){
-			if (nodes.remove(n))
-				IJ.log("... node" + n.getId() + " removed for node merge");
+			if (nodes.remove(n));
+				//IJ.log("... node" + n.getId() + " removed for node merge");
 		}
 		IJ.log("... now nodes count: " + nodes.size());
 	}
-	Node getfromID(Integer id){
+	Node getNodefromID(Integer id){
 		for (Node n : nodes)
 			if (n.getId() == id)
 				return n;

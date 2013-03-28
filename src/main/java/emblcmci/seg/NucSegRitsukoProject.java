@@ -122,31 +122,37 @@ public class NucSegRitsukoProject{
 	}
 	
 	
-	/** creates a stack with individual nucleus per frame, binarized. 
+	/** creates Arrays of images with individual nucleus per frame, binarized. 
 	 * 
-	 * @param imp
-	 * @param roisize
-	 * @param xA
-	 * @param yA
-	 * @param fA
-	 * @return
+	 * @param imp: source stack
+	 * @param roisize: widht and heigh of the roi. 
+	 * @param xA: dot position x coordinate
+	 * @param yA: dot position y coordinate
+	 * @param fA: frame numbste, starting from 1. 
+	 * 
 	 */
 	public void getPerNucleusBinImgProcessors(ImagePlus imp, int roisize, int[] xA, int[] yA, int[] fA){
+		IJ.log("... subimages being accumulated and segmenting nucleus.");
 		this.roisize = roisize;
 		ImageProcessor ip, subip, binip;
 		Roi roi;
-		this.binList = new ArrayList<ImageProcessor>();
-		this.roiList = new ArrayList<Roi>();
-		this.ipList = new ArrayList<ImageProcessor>();
+		ArrayList<ImageProcessor> 	binList = new ArrayList<ImageProcessor>();
+		ArrayList<Roi> 				roiList = new ArrayList<Roi>();
+		ArrayList<ImageProcessor> 	ipList = new ArrayList<ImageProcessor>();
 		for (int i = 0; i < fA.length; i++) {
 			ip = imp.getStack().getProcessor(fA[i]);
 			roi = makeRoi(ip, xA[i], yA[i], roisize, roisize);
 			roiList.add(roi);
-			subip = extract(ip, roi);
+			//subip = extract(ip, roi);
+			ip.setRoi(roi);
+			subip = ip.crop();
 			ipList.add(subip);
 			binip = binarize(subip);
 			binList.add(binip);
 		}
+		this.binList = binList;
+		this.roiList = roiList;
+		this.ipList = ipList;
 	}
 
 	/**

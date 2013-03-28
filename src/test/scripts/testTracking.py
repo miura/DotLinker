@@ -12,7 +12,7 @@ a test code for preprocessing nucleus image to derive maxima
 and then get track
 '''
 
-#imgpath = '/Users/miura/Dropbox/people/julia/NucSegmentStudy/l5c1_350_CLAHE.tif'
+imgpath = '/Users/miura/Dropbox/people/julia/NucSegmentStudy/l5c1_350_CLAHE.tif'
 #imgpath = '/Users/miura/Dropbox/people/julia/NucSegmentStudy/L1CH2_maxp_300-374sampleframe.tif'
 imgpath = '/Users/miura/Dropbox/people/julia/NucSegmentStudy/l5c1_CLAHE.tif'
 imp = IJ.openImage(imgpath)
@@ -33,12 +33,13 @@ print 'node length after filtering: ' + str(en.getNodes().size())
 
 nodes = en.getNodes()
 
+'''
 stk = ImageStack(subwwhh, subwwhh)
 for n in nodes:
     binip = n.getBinip()
     stk.addSlice(binip)
 ImagePlus("tt", stk).show()
-
+'''
 
 IJ.log('Linking ...')
 dlh = DLH(imp, 2, 15) # linkrange, distance
