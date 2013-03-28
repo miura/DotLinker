@@ -63,32 +63,42 @@ public class NucToDots {
 		  return polygon;
 	}
 	/**
+	 * preprocessCore +
+	 * Distance map conversion. 
+	 * @return imp: processed ImagePlus
+	 *
+	 */
+	public ImagePlus preprocess(ImagePlus orgimp){
+		ImagePlus imp2 = preprocessCore(orgimp);
+		IJ.run(imp2, "Distance Map", "");
+		return imp2;
+	}
+
+	/** 
 	 * Convert to 8 bit -
 	 * Grays morphology -
 	 * Auto Local threshold -
 	 * Fill holes -
-	 * Distance map conversion. 
-	 * @return
+	 * 
+	 * @return imp: processed ImagePlus
 	 *
 	 */
-	public ImagePlus preprocess(ImagePlus orgimp){
+	public ImagePlus preprocessCore(ImagePlus orgimp){
 		ImagePlus imp = orgimp.duplicate();
 		ImagePlus imp2;
 		IJ.run(imp, "8-bit", "");
-		//ImagePlus impdup = imp.duplicate();
-		//IJ.run(imp, "Gray Morphology", "radius=1 type=circle operator=erode");
 		StructureElement se = new StructureElement(StructureElement.CIRCLE, 0, 1.0f, StructureElement.OFFSET0);
 		MorphoProcessor morph = new MorphoProcessor(se);
 		morph.erode(imp.getProcessor());
-		//IJ.run(imp, "Auto Local Threshold", "method=Bernsen radius=45 parameter_1=0 parameter_2=0 white");
-		//imp.duplicate().show();
+		//"method=Bernsen radius=45 parameter_1=0 parameter_2=0 white"
 		Auto_Local_Threshold alt = new Auto_Local_Threshold();
 		imp2 = (ImagePlus) alt.exec(imp, "Bernsen", 45, 0, 0, true)[0];
 		//imp2.duplicate().show();
 		IJ.run(imp2, "Fill Holes", "");
-		IJ.run(imp2, "Distance Map", "");
+		imp = null;
 		return imp2;
 	}
+	
 	/** Cosmetic method to calculate original image in 8 bit overlayed with voronoi separators. 
 	 *  currently commented out, but worth to leaveit heare for viewing the 
 	 * @param imp8bit (this does not exists in the currentl work flow in run method)
@@ -107,20 +117,33 @@ public class NucToDots {
 		return imp8bit;
 	}
 	
+
+	
+	/**
+	 * Preprocessing of stack. 
+	 * @param stackimp
+	 * @return
+	 */
+	public ImagePlus preprocessCoreStack(ImagePlus stackimp){
+		IJ.log("Preprocess frames ...");
+		ImageStack stk = new ImageStack(stackimp.getWidth(), stackimp.getHeight());
+		ImagePlus tempimp;
+		for (int i = 0; i < stackimp.getStackSize(); i++){
+			tempimp = preprocessCore(new ImagePlus("tt", stackimp.getStack().getProcessor(i+1)));
+			stk.addSlice(tempimp.getProcessor());
+		}
+		ImagePlus ppimp = new ImagePlus("prepoped", stk);		
+		return ppimp;
+	}
+	
 	public void run(){
 		stackCLAHE(this.imp);
 		runmain();		
 	}
 	
 	public void runmain(){
-		IJ.log("Preprocess frames ...");
-		ImageStack stk = new ImageStack(this.imp.getWidth(), this.imp.getHeight());
-		ImagePlus tempimp;
-		for (int i = 0; i < this.imp.getStackSize(); i++){
-			tempimp = preprocess(new ImagePlus("tt", this.imp.getStack().getProcessor(i+1)));
-			stk.addSlice(tempimp.getProcessor());
-		}
-		ImagePlus ppimp = new ImagePlus("prepoped", stk);
+		ImagePlus ppimp = preprocessCoreStack(this.imp);
+		IJ.run(ppimp, "Distance Map", "stack");
 		IJ.log("Estimating max points ...");
 		Polygon maxpolygon;
 		ArrayList<Polygon> ploygonlist = new ArrayList<Polygon>();

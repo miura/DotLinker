@@ -2,14 +2,17 @@ package emblcmci.seg;
 
 import java.util.ArrayList;
 
+import emblcmci.obj.Node;
 import fiji.threshold.Auto_Threshold;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.gui.Roi;
+import ij.measure.ResultsTable;
 import ij.plugin.filter.Binary;
 import ij.plugin.filter.EDM;
 import ij.plugin.filter.GaussianBlur;
+import ij.plugin.filter.ParticleAnalyzer;
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
@@ -122,7 +125,8 @@ public class NucSegRitsukoProject{
 	}
 	
 	
-	/** creates Arrays of images with individual nucleus per frame, binarized. 
+	/** creates Arrays of images with individual nucleus per frame, binarized.
+	 * position key is based on the parameters, with fixed ROI size.  
 	 * 
 	 * @param imp: source stack
 	 * @param roisize: widht and heigh of the roi. 
@@ -262,12 +266,26 @@ public class NucSegRitsukoProject{
 		int x, y;
 		x = xpos - ww/2;
 		y = ypos - hh/2;
+		r = makeRoi(
+				ip.getWidth(),ip.getHeight(),
+				x, y, ww, hh);
+		return r;
+	}
+	
+	public Roi makeRoi(
+			int ipw,
+			int iph,
+			int x, 
+			int y, 
+			int ww, 
+			int hh){
+		Roi r;
 		if (x < 0) x = 0;
-		if ( (x + ww) > ip.getWidth() - 1)
-			x = ip.getWidth() - ww;
+		if ( (x + ww) > ipw - 1)
+			x = ipw - ww;
 		if (y < 0) y = 0;
-		if ( (y + hh) > ip.getHeight() - 1)
-			y = ip.getHeight() - hh;
+		if ( (y + hh) > iph - 1)
+			y = iph - hh;
 		r = new Roi( x , y , ww, hh);
 		return r;
 	}

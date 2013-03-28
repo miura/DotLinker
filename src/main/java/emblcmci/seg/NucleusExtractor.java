@@ -5,6 +5,7 @@ import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.ParticleAnalyzer;
+import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
 import java.util.ArrayList;
@@ -54,14 +55,14 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	 * @param roisize determines the size of the subimage pixel size. 
 	 * @return
 	 */
-	public void constructNodes(int roisize){
+	public void constructNodesByDots(int roisize){
 		NucSegRitsukoProject nrp = new NucSegRitsukoProject();
 		nrp.getPerNucleusBinImgProcessors(imp, roisize, xA, yA, fA);
 		ArrayList<ImageProcessor> ipList = nrp.getIpList();
 		ArrayList<Roi> roiList = nrp.getRoiList();
 		ArrayList<ImageProcessor> binList = nrp.getBinList();
 		
-		nodes = new ArrayList<Node>();
+		ArrayList<Node> nodes = new ArrayList<Node>();
 		for (int i = 0; i < fA.length; i++){
 			Node n = new Node(xA[i], yA[i], fA[i], i);
 			n.setOrgroi(roiList.get(i));
@@ -69,6 +70,7 @@ public class NucleusExtractor extends ParticleAnalyzer {
 			n.setBinip(binList.get(i));
 			nodes.add(n);	
 		}
+		this.nodes = nodes;
 	}
 
 
@@ -76,6 +78,166 @@ public class NucleusExtractor extends ParticleAnalyzer {
 		this.xA = xA;
 		this.yA = yA;
 		this.fA = fA;
+	}
+	// second strategy, simple particle analysis based. 
+	
+	public void constructNodesByPA(){
+		ImagePlus imp = this.imp;
+		ArrayList<Node> ns = getPerNucleusBinImgProcessors(imp);
+		reassignNodes(ns);
+		this.nodes = ns;
+	}
+	/**
+	 * Position and bounding ROI is estimated by Particle Analysis.
+	 * alternative method to the 
+	 * getPerNucleusBinImgProcessors(ImagePlus imp, int roisize, int[] xA, int[] yA, int[] fA),
+	 * 
+	 * does not depend on the initilal estimation by MaxFinder. 
+	 * @param imp
+	 */
+	public ArrayList<Node> getPerNucleusBinImgProcessors(ImagePlus imp){
+		IJ.log("... subimages being accumulated and segmenting nucleus.");
+		ImageProcessor ip, subip, binip;
+		NucSegRitsukoProject nrp = new NucSegRitsukoProject();
+		Roi roi;
+		ArrayList<Node> ns = getNodesFromFrame(imp);
+		for (Node n : ns) {
+			ip = imp.getStack().getProcessor(n.getFrame());
+			roi = n.getOrgroi();
+			ip.setRoi(roi);
+			subip = ip.crop();
+			n.setOrgip(subip);
+			binip = nrp.binarize(subip);
+			n.setBinip(binip);
+		}
+		return ns;
+	}
+	/** initialize Nodes based on particle analysis. 
+	 * 
+	 * @param imp
+	 * @return
+	 */
+	public ArrayList<Node> getNodesFromFrame(ImagePlus imp){
+		int MAXSIZE = 10000;
+		int MINSIZE = 100;
+		int options = pAnalysisnalysisOptions();
+		ResultsTable rt = new ResultsTable();
+		ParticleAnalyzer p = 
+				new ParticleAnalyzer(options, pMeasOptions(), rt, MINSIZE, MAXSIZE);
+		p.setHideOutputImage(true);
+		p.analyze(imp);
+		ImagePlus map = p.getOutputImage();
+		int ind_x = rt.getColumnIndex("X");
+		int ind_y = rt.getColumnIndex("Y");
+		int ind_bx = rt.getColumnIndex("BX");
+		int ind_by = rt.getColumnIndex("BY");		
+		int ind_bw = rt.getColumnIndex("BW");		
+		int ind_bh = rt.getColumnIndex("BH");
+		int ind_f =  rt.getColumnIndex("Slice");
+
+		double[] xA = rt.getColumnAsDoubles(ind_x);
+		double[] yA = rt.getColumnAsDoubles(ind_y);
+		double[] bxA = rt.getColumnAsDoubles(ind_bx);
+		double[] byA = rt.getColumnAsDoubles(ind_by);
+		double[] bwA = rt.getColumnAsDoubles(ind_bw);
+		double[] bhA = rt.getColumnAsDoubles(ind_bh);
+		double[] fA = rt.getColumnAsDoubles(ind_f);
+		
+		int offset = 5; // enlarge margins of bounding rectangle by 5 pixels
+		Roi r;
+		ArrayList<Node> ns = new ArrayList<Node>();
+		for (int i = 0; i < fA.length; i++){
+			Node n = new Node(xA[i], yA[i], (int) fA[i], i);
+			r = makeRoi(imp.getWidth(),imp.getHeight(),
+				(int) bxA[i] - offset, 
+				(int) byA[i] - offset, 
+				(int) bwA[i] + 2 * offset, 
+				(int) bhA[i] + 2 * offset);
+			n.setOrgroi(r);
+			ns.add(n);
+		}
+		return ns;
+	}
+	int pAnalysisnalysisOptions(){
+		int options = 
+				SHOW_ROI_MASKS + 
+				EXCLUDE_EDGE_PARTICLES +
+				INCLUDE_HOLES +
+				CLEAR_WORKSHEET;
+		return options;
+	}
+	int pMeasOptions(){
+		int options = 
+				CENTROID + 
+				RECT +
+				STACK_POSITION;
+		return options;
+	}
+	public Roi makeRoi(
+			int ipw,
+			int iph,
+			int x, 
+			int y, 
+			int ww, 
+			int hh){
+		Roi r;
+		if (x < 0) x = 0;
+		if ( (x + ww) > ipw - 1)
+			x = ipw - ww;
+		if (y < 0) y = 0;
+		if ( (y + hh) > iph - 1)
+			y = iph - hh;
+		r = new Roi( x , y , ww, hh);
+		return r;
+	}
+	
+	/**
+	 * go through nodes, and if there is any single node with two nucleus, 
+	 * (due to watershed), separate it to multiple Nodes and add them to the nodes. 
+	 * 
+	 * @param ns
+	 */
+	void reassignNodes(ArrayList<Node> ns){
+		ImageProcessor binip;
+		ArrayList<Node> removelist = new ArrayList<Node>();
+		for (Node n : ns){
+			binip = n.getBinip();
+			int MAXSIZE = 10000;
+			int MINSIZE = 100;
+			int options = pAnalysisnalysisOptions();
+			ResultsTable rt = new ResultsTable();
+			ParticleAnalyzer p = 
+					new ParticleAnalyzer(options, pMeasOptions(), rt, MINSIZE, MAXSIZE);
+			p.setHideOutputImage(true);
+			p.analyze(new ImagePlus("n", binip));
+			ImagePlus map = p.getOutputImage();
+			if (rt.getCounter() > 1){
+				int ind_x = rt.getColumnIndex("X");
+				int ind_y = rt.getColumnIndex("Y");
+				double[] xA = rt.getColumnAsDoubles(ind_x);
+				double[] yA = rt.getColumnAsDoubles(ind_y);
+				for (int i = 0; i < xA.length; i++){
+					short[] pix = (short[]) map.getProcessor().getPixels();
+					byte[] newpix = new byte[pix.length];
+					for (int j = 0; j < pix.length; j++){
+						if (pix[j] == (short) i+1)
+							newpix[j] = (byte) 255;
+						else
+							newpix[j] = (byte) 0;
+					}
+					Node newn = new Node(xA[i], yA[i], n.getFrame(), ns.size() + 1);
+					newn.setOrgroi(n.getOrgroi());
+					ByteProcessor bp = new ByteProcessor(n.getBinip().getWidth(), 
+							n.getBinip().getHeight(), newpix);
+					newn.setBinip(bp);
+					ns.add(newn);
+				}
+				removelist.add(n);
+			}
+		}
+		for (Node n : removelist){
+			ns.remove(n);
+		}
 	}
 	
 	// from here down will be dot and nucleus evaluation using binary image.
