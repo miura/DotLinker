@@ -180,11 +180,11 @@ public class NucSegRitsukoProject{
 		//originally, fill holes + 2 times erosion, 2 times dilation
 		postProcessing(ip3);
 		//watershed
-		watershed(ip3);
+		ImageProcessor ip4 = watershedWithEval(ip3);
 		
 		//IJ.log("Lower Threshold: " + Integer.toString(lowth));
 		ip2 = null;
-		return ip3;
+		return ip4;
 	}
 	
 	void postProcessing(ImageProcessor ip){
@@ -199,14 +199,28 @@ public class NucSegRitsukoProject{
 		binner.run(ip);	
 	}
 	void watershed(ImageProcessor ip){
-		EDM edm = new EDM();
         if (!ip.isBinary()) {
             IJ.log("8-bit binary image (0 and 255) required.");
             return;
         }
+		EDM edm = new EDM();
         edm.setup("watershed", null);
         edm.run(ip);
 	}
+	
+	/** evaluates ip if this binary image is appropriate for watershed. 
+	 * if yes, then do watershed. If not, original image is returned. 
+	 * 20130327
+	 * @param ip
+	 * @return
+	 */
+	ImageProcessor watershedWithEval(ImageProcessor ip){
+		double threshold = 0.15; // ratio watershed trace / perimeter
+		WaterShedEvaluation wse = new WaterShedEvaluation(threshold);
+		ImageProcessor ipout = wse.test2WatershedFast(ip);
+		return ipout;
+	}
+	
 	
 	public ImageProcessor extract(ImagePlus imp, Roi roi){
 		return extract(imp.getProcessor(), roi);
