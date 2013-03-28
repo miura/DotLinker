@@ -36,6 +36,10 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	
 	public static final RoiToIntA ROI_2_INTA = new RoiToIntA();
 	
+	public NucleusExtractor(ImagePlus imp){
+		this.imp = imp;
+	}
+	
 	/**
 	 * 
 	 */
@@ -84,6 +88,7 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	public void constructNodesByPA(){
 		ImagePlus imp = this.imp;
 		ArrayList<Node> ns = getPerNucleusBinImgProcessors(imp);
+		IJ.log("Nodes count after creation" + ns.size());
 		reassignNodes(ns);
 		this.nodes = ns;
 	}
@@ -120,19 +125,21 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	public ArrayList<Node> getNodesFromFrame(ImagePlus imp){
 		int MAXSIZE = 10000;
 		int MINSIZE = 100;
-		int options = pAnalysisnalysisOptions();
+		int options = pAnalysisnalysisOptions1();
 		ResultsTable rt = new ResultsTable();
-		ParticleAnalyzer p = 
+		ParticleAnalyzer p =
 				new ParticleAnalyzer(options, pMeasOptions(), rt, MINSIZE, MAXSIZE);
 		p.setHideOutputImage(true);
-		p.analyze(imp);
-		ImagePlus map = p.getOutputImage();
+		for (int i = 0; i < imp.getStackSize(); i++){
+			imp.setSliceWithoutUpdate(i+1);
+			p.analyze(imp);
+		}
 		int ind_x = rt.getColumnIndex("X");
 		int ind_y = rt.getColumnIndex("Y");
 		int ind_bx = rt.getColumnIndex("BX");
 		int ind_by = rt.getColumnIndex("BY");		
-		int ind_bw = rt.getColumnIndex("BW");		
-		int ind_bh = rt.getColumnIndex("BH");
+		int ind_bw = rt.getColumnIndex("Width");		
+		int ind_bh = rt.getColumnIndex("Height");
 		int ind_f =  rt.getColumnIndex("Slice");
 
 		double[] xA = rt.getColumnAsDoubles(ind_x);
@@ -158,7 +165,16 @@ public class NucleusExtractor extends ParticleAnalyzer {
 		}
 		return ns;
 	}
-	int pAnalysisnalysisOptions(){
+	// for the initial node extraction
+	int pAnalysisnalysisOptions1(){
+		int options = 
+				SHOW_NONE + 
+				EXCLUDE_EDGE_PARTICLES +
+				INCLUDE_HOLES;
+		return options;
+	}
+	// for reassignments
+	int pAnalysisnalysisOptions2(){
 		int options = 
 				SHOW_ROI_MASKS + 
 				EXCLUDE_EDGE_PARTICLES +
@@ -200,15 +216,16 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	void reassignNodes(ArrayList<Node> ns){
 		ImageProcessor binip;
 		ArrayList<Node> removelist = new ArrayList<Node>();
+		ArrayList<Node> addlist = new ArrayList<Node>();
+		int MAXSIZE = 10000;
+		int MINSIZE = 100;
+		int options = pAnalysisnalysisOptions2();
+		ResultsTable rt = new ResultsTable();		
+		ParticleAnalyzer p = 
+				new ParticleAnalyzer(options, pMeasOptions(), rt, MINSIZE, MAXSIZE);
+		p.setHideOutputImage(true);
 		for (Node n : ns){
 			binip = n.getBinip();
-			int MAXSIZE = 10000;
-			int MINSIZE = 100;
-			int options = pAnalysisnalysisOptions();
-			ResultsTable rt = new ResultsTable();
-			ParticleAnalyzer p = 
-					new ParticleAnalyzer(options, pMeasOptions(), rt, MINSIZE, MAXSIZE);
-			p.setHideOutputImage(true);
 			p.analyze(new ImagePlus("n", binip));
 			ImagePlus map = p.getOutputImage();
 			if (rt.getCounter() > 1){
@@ -230,13 +247,16 @@ public class NucleusExtractor extends ParticleAnalyzer {
 					ByteProcessor bp = new ByteProcessor(n.getBinip().getWidth(), 
 							n.getBinip().getHeight(), newpix);
 					newn.setBinip(bp);
-					ns.add(newn);
+					addlist.add(newn);
 				}
 				removelist.add(n);
 			}
 		}
 		for (Node n : removelist){
 			ns.remove(n);
+		}
+		for (Node n : addlist){
+			ns.add(n);
 		}
 	}
 	
