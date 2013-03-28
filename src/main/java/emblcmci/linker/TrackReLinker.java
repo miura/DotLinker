@@ -128,7 +128,9 @@ public class TrackReLinker extends LinkAnalyzer {
 	public Integer findLargeGapsButSimilarPositions(AbstractTrack t, AbstractTracks ts){
 		double endstartdist;
 		int framedifference;
-		HashMap<Integer, Double> candidateList = new HashMap<Integer, Double>();
+		//HashMap<Integer, Double> candidateList = new HashMap<Integer, Double>();
+		HashMap<Integer, Integer> candidateList = new HashMap<Integer, Integer>();
+
 		Integer minid = -1;
 		for (Integer candidateID : ts.keySet()){
 			AbstractTrack candidate = ts.get(candidateID);
@@ -138,15 +140,20 @@ public class TrackReLinker extends LinkAnalyzer {
 				// select tracks within certain distance
 				endstartdist = endstartDistance(t, candidate);
 				if (endstartdist < distance_threshould)
-					candidateList.put(candidateID, endstartdist);
+					candidateList.put(candidateID, candidate.getFramelist().size()); // new idea
+					//candidateList.put(candidateID, endstartdist);
+					
 			} 	
 		}
 		IJ.log("### Track: " + t.getTrackID());
 		if (candidateList.size() > 0){
 			
-			Object obj = Collections.min(candidateList.values());
-			minid = getKeyByValue(candidateList, (Double) obj);
-			IJ.log("   Minimum Distance" + Double.toString((Double) obj));
+			//Object obj = Collections.min(candidateList.values());
+			Object obj = Collections.max(candidateList.values());
+			//minid = getKeyByValue(candidateList, (Double) obj);
+			minid = getKeyByValue(candidateList, (Integer) obj);
+			//IJ.log("   Minimum Distance" + Double.toString((Double) obj));
+			IJ.log("   longest track in the surrounding" + Double.toString((Integer) obj));			
 			IJ.log("   ...track" + minid);
 			IJ.log("   end frame: " + t.getFrameEnd());
 			IJ.log("   start frame: " + ts.get(minid).getFrameStart());

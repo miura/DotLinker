@@ -42,7 +42,7 @@ ImagePlus("tt", stk).show()
 '''
 
 IJ.log('Linking ...')
-dlh = DLH(imp, 2, 15) # linkrange, distance
+dlh = DLH(imp, 3, 15) # linkrange, distance
 #dlh.setData(ntd.getXcoordA(), ntd.getYcoordA(),  ntd.getFrameA())
 dlh.setData(nodes) # a new way, 20130321
 nearestneighbor = LinkCostsOnlyDistance()

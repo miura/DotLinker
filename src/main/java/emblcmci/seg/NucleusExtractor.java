@@ -185,7 +185,16 @@ public class NucleusExtractor extends ParticleAnalyzer {
 				//IJ.log("... node" + n.getId() + " removed for node merge");
 		}
 		IJ.log("... now nodes count: " + nodes.size());
+		
+		//third adjustment, based on nucleus shape, adjust the position to 
+		//centroid.
+		for (Node n : nodes)
+			setDotToCentroid(n);
+		
 	}
+	
+	
+	
 	Node getNodefromID(Integer id){
 		for (Node n : nodes)
 			if (n.getId() == id)
@@ -286,6 +295,39 @@ public class NucleusExtractor extends ParticleAnalyzer {
 		} else 
 			return p.getOutputImage();
 	}
+	
+	/**
+	 * adjust the Node coordinate to nucleus centroid. 
+	 * @param n
+	 */
+	void setDotToCentroid(Node n){
+		int MAXSIZE = 10000;
+		int MINSIZE = 100;
+		int options = secondAnalysisOptions();
+		ResultsTable rt = new ResultsTable();
+		ParticleAnalyzer p = 
+				new ParticleAnalyzer(options, CENTROID, rt, MINSIZE, MAXSIZE);
+		p.setHideOutputImage(true);
+		p.analyze(new ImagePlus("t", n.getBinip()));
+		int[] roia = ROI_2_INTA.getDim2(n.getOrgroi());
+		ImagePlus map = p.getOutputImage();
+		int pixval = map.getProcessor().getPixel((int) n.getX(), (int) n.getY());
+		if (pixval > 0){
+			double cx = (int) rt.getValue("X", pixval - 1);
+			double cy = (int) rt.getValue("Y", pixval - 1);
+			n.setX(roia[0] + cx);
+			n.setY(roia[1] + cy);
+		}
+	}
+	int secondAnalysisOptions(){
+		int options = 
+				SHOW_ROI_MASKS + 
+				EXCLUDE_EDGE_PARTICLES +
+				INCLUDE_HOLES +
+				CLEAR_WORKSHEET;
+		return options;
+	}
+
 	
 	/**
 	 * 
