@@ -85,9 +85,9 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	}
 	// second strategy, simple particle analysis based. 
 	
-	public void constructNodesByPA(){
+	public void constructNodesByPA(ImagePlus binimp){
 		ImagePlus imp = this.imp;
-		ArrayList<Node> ns = getPerNucleusBinImgProcessors(imp);
+		ArrayList<Node> ns = getPerNucleusBinImgProcessors(imp, binimp);
 		IJ.log("Nodes count after creation" + ns.size());
 		reassignNodes(ns);
 		this.nodes = ns;
@@ -98,14 +98,15 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	 * getPerNucleusBinImgProcessors(ImagePlus imp, int roisize, int[] xA, int[] yA, int[] fA),
 	 * 
 	 * does not depend on the initilal estimation by MaxFinder. 
-	 * @param imp
+	 * @param imp: original stack
+	 * @param binimp: binarized stack. This could be rough, as more detailed corrections will be made.  
 	 */
-	public ArrayList<Node> getPerNucleusBinImgProcessors(ImagePlus imp){
+	public ArrayList<Node> getPerNucleusBinImgProcessors(ImagePlus imp, ImagePlus binimp){
 		IJ.log("... subimages being accumulated and segmenting nucleus.");
 		ImageProcessor ip, subip, binip;
 		NucSegRitsukoProject nrp = new NucSegRitsukoProject();
 		Roi roi;
-		ArrayList<Node> ns = getNodesFromFrame(imp);
+		ArrayList<Node> ns = getNodesFromFrame(binimp);
 		for (Node n : ns) {
 			ip = imp.getStack().getProcessor(n.getFrame());
 			roi = n.getOrgroi();
@@ -124,7 +125,7 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	 */
 	public ArrayList<Node> getNodesFromFrame(ImagePlus imp){
 		int MAXSIZE = 10000;
-		int MINSIZE = 100;
+		int MINSIZE = 1000;
 		int options = pAnalysisnalysisOptions1();
 		ResultsTable rt = new ResultsTable();
 		ParticleAnalyzer p =
@@ -150,7 +151,7 @@ public class NucleusExtractor extends ParticleAnalyzer {
 		double[] bhA = rt.getColumnAsDoubles(ind_bh);
 		double[] fA = rt.getColumnAsDoubles(ind_f);
 		
-		int offset = 5; // enlarge margins of bounding rectangle by 5 pixels
+		int offset = 10; // enlarge margins of bounding rectangle by 5 pixels
 		Roi r;
 		ArrayList<Node> ns = new ArrayList<Node>();
 		for (int i = 0; i < fA.length; i++){
@@ -213,21 +214,25 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	 * 
 	 * @param ns
 	 */
-	void reassignNodes(ArrayList<Node> ns){
+	public void reassignNodes(ArrayList<Node> ns){
 		ImageProcessor binip;
 		ArrayList<Node> removelist = new ArrayList<Node>();
 		ArrayList<Node> addlist = new ArrayList<Node>();
 		int MAXSIZE = 10000;
-		int MINSIZE = 100;
+		int MINSIZE = 1000;
 		int options = pAnalysisnalysisOptions2();
-		ResultsTable rt = new ResultsTable();		
-		ParticleAnalyzer p = 
-				new ParticleAnalyzer(options, pMeasOptions(), rt, MINSIZE, MAXSIZE);
-		p.setHideOutputImage(true);
+		int addcounter = 0;
 		for (Node n : ns){
-			binip = n.getBinip();
-			p.analyze(new ImagePlus("n", binip));
+			IJ.log("node id:" + n.getId() );
+			n.getBinip().resetRoi();
+			ImagePlus binimp = new ImagePlus("n", n.getBinip());
+			ResultsTable rt = new ResultsTable();		
+			ParticleAnalyzer p = 
+					new ParticleAnalyzer(options, pMeasOptions(), rt, MINSIZE, MAXSIZE);
+			p.setHideOutputImage(true);
+			p.analyze(binimp);
 			ImagePlus map = p.getOutputImage();
+			//IJ.log("node id:" + n.getId() + " meas count" + rt.getCounter());
 			if (rt.getCounter() > 1){
 				int ind_x = rt.getColumnIndex("X");
 				int ind_y = rt.getColumnIndex("Y");
@@ -242,7 +247,7 @@ public class NucleusExtractor extends ParticleAnalyzer {
 						else
 							newpix[j] = (byte) 0;
 					}
-					Node newn = new Node(xA[i], yA[i], n.getFrame(), ns.size() + 1);
+					Node newn = new Node(xA[i], yA[i], n.getFrame(), ns.size() + addlist.size() + 1);
 					newn.setOrgroi(n.getOrgroi());
 					ByteProcessor bp = new ByteProcessor(n.getBinip().getWidth(), 
 							n.getBinip().getHeight(), newpix);
@@ -254,9 +259,13 @@ public class NucleusExtractor extends ParticleAnalyzer {
 		}
 		for (Node n : removelist){
 			ns.remove(n);
+			IJ.log("node removed id:" + n.getId());
+			new ImagePlus("remove"+Integer.toString(n.getId()), n.getBinip()).show();
 		}
 		for (Node n : addlist){
 			ns.add(n);
+			IJ.log("node added id:" + n.getId());
+			new ImagePlus("add"+Integer.toString(n.getId()), n.getBinip()).show();
 		}
 	}
 	

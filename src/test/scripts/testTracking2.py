@@ -24,16 +24,28 @@ imp2 = ntd.preprocessCoreStack(imp) # for imp that is already stackCLAHEed.
 #        print i
 
 imp2.show()
-'''
+
 print "Extracting Nucleus ..."
-subwwhh = 110  # this must be guessed in the pre-run, by doing particle analysis and get the approximate sizes. 
-en = NucleusExtractor(imp2)
-en.constructNodesByPA()
+#subwwhh = 110  # this must be guessed in the pre-run, by doing particle analysis and get the approximate sizes. 
+en = NucleusExtractor(imp)
+#en.constructNodesByPA(imp2)
+ns = en.getPerNucleusBinImgProcessors(imp, imp2)
+
+# for i in range(10):
+#     ImagePlus(str(i), ns.get(i).getBinip()).show()
+    #print "x", ns.get(i).getOrgroi().getBounds().x, "y", ns.get(i).getOrgroi().getBounds().y
+    #print "w", ns.get(i).getOrgroi().getBounds().width, "h", ns.get(i).getOrgroi().getBounds().height
+en.reassignNodes(ns);
+
+'''
+
 #print 'node length before filtering: ' + str(en.getNodes().size()) 
 #en.analyzeDotsandBinImages()
-print 'node length after filtering: ' + str(en.getNodes().size()) 
+#print 'node length after filtering: ' + str(en.getNodes().size()) 
 
 nodes = en.getNodes()
+print "Nodes count:", nodes.size()
+
 
 
 #stk = ImageStack(subwwhh, subwwhh)
@@ -41,7 +53,6 @@ nodes = en.getNodes()
 #    binip = n.getBinip()
 #    stk.addSlice(binip)
 #ImagePlus("tt", stk).show()
-
 
 IJ.log('Linking ...')
 dlh = DLH(imp, 3, 15) # linkrange, distance
@@ -70,4 +81,5 @@ vd = VD(imp)
 #vd.plotTracks(tracks, imp)
 vd.trackAllPlotter(tracks, imp)
 #vd.trackGapLinkPlotter(tracks, imp)
+
 '''

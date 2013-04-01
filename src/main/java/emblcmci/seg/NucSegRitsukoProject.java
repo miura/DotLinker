@@ -219,7 +219,7 @@ public class NucSegRitsukoProject{
 	 * @return
 	 */
 	ImageProcessor watershedWithEval(ImageProcessor ip){
-		double threshold = 0.15; // ratio watershed trace / perimeter
+		double threshold = 0.25; // ratio watershed trace / perimeter
 		WaterShedEvaluation wse = new WaterShedEvaluation(threshold);
 		ImageProcessor ipout = wse.test2WatershedFast(ip);
 		return ipout;
