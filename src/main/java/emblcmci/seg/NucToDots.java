@@ -42,10 +42,10 @@ public class NucToDots {
 		IJ.log("CLAHE running ...");
 		for (i = 0; i < imp.getStackSize(); i++){
 			imp.setSlice( i + 1 );
-			Flat clahe = new Flat();
+			//Flat clahe = new Flat();
 			// two times. 
-			clahe.run(imp, 49, 256, (float) 3.0, null, false);
-			clahe.run(imp, 49, 256, (float) 3.0, null, false);
+			Flat.getFastInstance().run(imp, 49, 256, (float) 3.0, null, false);
+			Flat.getFastInstance().run(imp, 49, 256, (float) 3.0, null, false);
 		}
 	}
 	public ImagePlus maxPoints(ImagePlus orgimp){
