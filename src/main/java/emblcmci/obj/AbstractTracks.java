@@ -2,21 +2,31 @@ package emblcmci.obj;
 
 import ij.gui.Roi;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import emblcmci.linker.LinkAnalyzer;
 
-public abstract class AbstractTracks extends HashMap<Integer, AbstractTrack> implements IBioObj {
+public abstract class AbstractTracks<Integer, V extends AbstractTrack> implements IBioObj {
 
-	public  <V extends AbstractTrack> AbstractTracks addTrack(int ID, AbstractTrack t){
-		put(ID, t);
-		t.setTrackID(ID);
-		return this;
+//	public  <V extends AbstractTrack> AbstractTracks addTrack(int ID, AbstractTrack V){
+//		put(ID, V);
+//		V.setTrackID(ID);
+//		return this;
+//	}
+	HashMap<Integer, V> map = new HashMap<Integer, V>();
+	
+	
+	public  void addTrack(Integer ID, V v){
+		map.put(ID, v);
+		v.setTrackID((java.lang.Integer) ID);
 	}
+
+	public abstract <V> Collection<V> getTracks();
 	
 	public boolean removeTrack(int ID){
-		remove(ID);
+		map.remove(ID);
 		return true;
 	}
 
@@ -41,7 +51,7 @@ public abstract class AbstractTracks extends HashMap<Integer, AbstractTrack> imp
 		double ry = pntroi.getBounds().getCenterY();
 		double mindist = 10000;
 		double dist;
-		for (AbstractTrack v : values()){
+		for (AbstractTrack v : map.values()){
 			dist = Math.sqrt(Math.pow((v.getNodes().get(0).getX() - rx), 2) + 	Math.pow((v.getNodes().get(0).getY() - ry), 2) );
 			if (dist < mindist) {
 				mindist = dist;
@@ -51,9 +61,9 @@ public abstract class AbstractTracks extends HashMap<Integer, AbstractTrack> imp
 		return closestTrackID;
 	}
 
-	public Iterator<AbstractTrack> iterator() {
+	public Iterator<V> iterator() {
 		// TODO Auto-generated method stub
-		return this.values().iterator();
+		return map.values().iterator();
 	}	
 
 }
