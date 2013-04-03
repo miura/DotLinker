@@ -23,7 +23,11 @@ public class DotLinkerHeadless extends AbstractDotLinker {
 	private static final int TrajectoryThreshold = 0;
 	int[] xA;
 	int[] yA;
+	/**
+	 * frame number, starts from 1
+	 */
 	int[] timeA;
+	private int[] idA;
 	
 	public DotLinkerHeadless() {
 	}	
@@ -88,7 +92,7 @@ public class DotLinkerHeadless extends AbstractDotLinker {
 		// fill in the Myframe object
 		for (int i = 0 ; i< timeA.length; i++){
 //			Particle particle = new Particle(xA[i], yA[i], zA[i], (int) (timeA[i] - 1), i);
-			Particle particle = new Particle(xA[i], yA[i], (int) (timeA[i] - 1), i);
+			Particle particle = new Particle(xA[i], yA[i], (int) (timeA[i] - 1), idA[i]);
 			
 			frameA[particle.frame].particles.add(particle);
 		}
@@ -104,6 +108,7 @@ public class DotLinkerHeadless extends AbstractDotLinker {
 	
 	public boolean setData(ArrayList<Node> nodes){
 		NodesToCoordArrays ntoa = new NodesToCoordArrays(nodes);
+		this.idA = ntoa.getidA();
 		this.xA = ntoa.getxA();
 		this.yA = ntoa.getyA();
 		this.timeA = ntoa.getfA();		

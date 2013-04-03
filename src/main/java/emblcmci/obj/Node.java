@@ -12,6 +12,9 @@ public class Node {
 	double x;
 	double y;
 	int area;
+	/**
+	 * frame number starts from 0
+	 */
 	int frame;		
 	int trackID;
 	private int id;
@@ -61,6 +64,9 @@ public class Node {
 		this.y = y;
 	}
 
+	public void setTrackID(int trackid){
+		this.trackID = trackid; 
+	}
 	public int getTrackID(){
 		return trackID;
 	}

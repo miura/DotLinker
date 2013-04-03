@@ -6,6 +6,7 @@ import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import emblcmci.linker.plotter.TrackLabeling;
 import emblcmci.obj.AbstractTrack;
 import emblcmci.obj.AbstractTracks;
 import emblcmci.obj.Node;
@@ -121,6 +122,7 @@ public abstract class AbstractViewDynamics {
 			for (AbstractTrack v : tracks.values()) //iterate for tracks
 				if (v != null){
 					//plotTrack((Track) v, imp);
+					TrackLabeling.doAlable(imp, v);
 					plotProgressiveTrack(v, imp);
 				}
 	}
@@ -166,6 +168,11 @@ public abstract class AbstractViewDynamics {
 			imp.show();
 	}
 	
+	/**
+	 * frame starts form 1
+	 * @param track
+	 * @param imp
+	 */
 	public void plotProgressiveTrack(AbstractTrack track, ImagePlus imp){
 		Color plotcolor = new Color(255, 0, 0); //red
 		if (multicolor) {
@@ -186,7 +193,7 @@ public abstract class AbstractViewDynamics {
 		Polygon poly = new Polygon();
 		PolygonRoi proi = null;
 //		for (int i = 1; i < nodes.size(); i++){
-		for (int i = 1; i < framenum + 1; i++){
+		for (int i = 0; i < framenum; i++){
 			thisframe = i + startframe;
 			ip = imp.getStack().getProcessor(thisframe);			
 			if (track.getFramelist().contains(thisframe)){

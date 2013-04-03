@@ -38,7 +38,7 @@ public class TrackReLinker extends LinkAnalyzer {
 	/** Maximum allowd distance between a track end point and a track start point.
 	/* unit: pixels. 
 	 */
-	int distance_threshould = 20;
+	int distance_threshould = 10;
 	
 	// allowed number of missing frames between tracks for interpolation. 
 	// unit: frames
@@ -47,7 +47,7 @@ public class TrackReLinker extends LinkAnalyzer {
 	/**
 	 * Maximum range of frame gap that allows to link gaps. 
 	 */
-	private final int ALLOWE_FRAME_DIFFERENCE = 60;
+	private final int ALLOWE_FRAME_DIFFERENCE = 5;
 	
 //	/**
 //	 * @param tracks

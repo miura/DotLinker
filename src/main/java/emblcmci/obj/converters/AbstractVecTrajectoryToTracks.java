@@ -1,5 +1,6 @@
 package emblcmci.obj.converters;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import emblcmci.linker.AbstractDotLinker.Particle;
@@ -22,6 +23,7 @@ public abstract class AbstractVecTrajectoryToTracks {
 	public AbstractVecTrajectoryToTracks(){
 		setTracks();
 	}
+
 	/** converts 
 	 * conversion is for only following elements:
 	 * x, y, frame, trackid, node id.

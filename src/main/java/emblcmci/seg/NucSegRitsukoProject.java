@@ -88,13 +88,13 @@ public class NucSegRitsukoProject{
 		this.roisize = roisize;
 	}
 	
-	public void runSingleFrame(){
+	public void runSingleFrame(double wsthreshold){
 		if ((xposA != null) && (yposA != null)) {
 			extractPositions(this.imp, this.xposA, this.yposA, this.roisize, this.roisize);
 			if (this.ipList.size() > 0){
 				binList = new ArrayList<ImageProcessor>();
 				for (ImageProcessor subip : this.ipList)
-					binList.add(binarize(subip));
+					binList.add(binarize(subip, wsthreshold));
 				IJ.log("Extracted Nucleus ImageProcessors: " + Integer.toString(binList.size()));
 			} else {
 				IJ.log("no sub image extraction was possible");
@@ -107,8 +107,11 @@ public class NucSegRitsukoProject{
 	 * @param roisize
 	 * @return
 	 */
-	public void getPerNucleusBinImgProcessors(int roisize){
-		getPerNucleusBinImgProcessors(this.imp, roisize, this.xposA, this.yposA, this.frameA);
+	public void getPerNucleusBinImgProcessors(int roisize, double wsthreshold){
+		getPerNucleusBinImgProcessors(
+				this.imp, roisize, 
+				this.xposA, this.yposA, this.frameA,
+				wsthreshold);
 
 	}
 	
@@ -135,7 +138,11 @@ public class NucSegRitsukoProject{
 	 * @param fA: frame numbste, starting from 1. 
 	 * 
 	 */
-	public void getPerNucleusBinImgProcessors(ImagePlus imp, int roisize, int[] xA, int[] yA, int[] fA){
+	public void getPerNucleusBinImgProcessors(
+			ImagePlus imp, 
+			int roisize, 
+			int[] xA, int[] yA, int[] fA,
+			double wsthreshold){
 		IJ.log("... subimages being accumulated and segmenting nucleus.");
 		this.roisize = roisize;
 		ImageProcessor ip, subip, binip;
@@ -151,7 +158,7 @@ public class NucSegRitsukoProject{
 			ip.setRoi(roi);
 			subip = ip.crop();
 			ipList.add(subip);
-			binip = binarize(subip);
+			binip = binarize(subip, wsthreshold);
 			binList.add(binip);
 		}
 		this.binList = binList;
@@ -166,7 +173,7 @@ public class NucSegRitsukoProject{
 	 * @param subip a small subset image with supposedly single nucleus. 
 	 * @return binarized ImageProcessor
 	 */
-	public ImageProcessor binarize(ImageProcessor subip){
+	public ImageProcessor binarize(ImageProcessor subip, double wsthreshold){
 		ImageProcessor ip2, ip3;
 		ip2 = subip.duplicate();
 		ip3 = subip.duplicate();
@@ -184,7 +191,7 @@ public class NucSegRitsukoProject{
 		//originally, fill holes + 2 times erosion, 2 times dilation
 		postProcessing(ip3);
 		//watershed
-		ImageProcessor ip4 = watershedWithEval(ip3);
+		ImageProcessor ip4 = watershedWithEval(ip3, wsthreshold);
 		
 		//IJ.log("Lower Threshold: " + Integer.toString(lowth));
 		ip2 = null;
@@ -216,10 +223,11 @@ public class NucSegRitsukoProject{
 	 * if yes, then do watershed. If not, original image is returned. 
 	 * 20130327
 	 * @param ip
+	 * @param threshold: ratio watershed trace / perimeter
 	 * @return
 	 */
-	ImageProcessor watershedWithEval(ImageProcessor ip){
-		double threshold = 0.25; // ratio watershed trace / perimeter
+	ImageProcessor watershedWithEval(ImageProcessor ip, double threshold){
+		//double threshold = 0.25; // ratio watershed trace / perimeter
 		WaterShedEvaluation wse = new WaterShedEvaluation(threshold);
 		ImageProcessor ipout = wse.test2WatershedFast(ip);
 		return ipout;

@@ -29,6 +29,11 @@ import emblcmci.obj.Node;
  *  *
  */
 public class NucleusExtractor extends ParticleAnalyzer {
+	/**
+	 * dot coordinates initialized as arrays. 
+	 * fA is the frame number within image stack, starts from 1. 
+	 * 
+	 */
 	int[] xA, yA, fA;
 	private ImagePlus imp;
 	private ArrayList<Node> nodes;
@@ -57,11 +62,12 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	 * segmentation from original sub image and initialization of Nodes. 
 	 * 
 	 * @param roisize determines the size of the subimage pixel size. 
+	 * @param wsthreshold slit line/perimeter ratio for wvaluating watershed results.  
 	 * @return
 	 */
-	public void constructNodesByDots(int roisize){
+	public void constructNodesByDots(int roisize, double wsthreshold){
 		NucSegRitsukoProject nrp = new NucSegRitsukoProject();
-		nrp.getPerNucleusBinImgProcessors(imp, roisize, xA, yA, fA);
+		nrp.getPerNucleusBinImgProcessors(imp, roisize, xA, yA, fA, wsthreshold);
 		ArrayList<ImageProcessor> ipList = nrp.getIpList();
 		ArrayList<Roi> roiList = nrp.getRoiList();
 		ArrayList<ImageProcessor> binList = nrp.getBinList();
@@ -85,9 +91,9 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	}
 	// second strategy, simple particle analysis based. 
 	
-	public void constructNodesByPA(ImagePlus binimp){
+	public void constructNodesByPA(ImagePlus binimp, double wsthreshold){
 		ImagePlus imp = this.imp;
-		ArrayList<Node> ns = getPerNucleusBinImgProcessors(imp, binimp);
+		ArrayList<Node> ns = getPerNucleusBinImgProcessors(imp, binimp, wsthreshold);
 		IJ.log("Nodes count after creation" + ns.size());
 		reassignNodes(ns);
 		this.nodes = ns;
@@ -101,7 +107,8 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	 * @param imp: original stack
 	 * @param binimp: binarized stack. This could be rough, as more detailed corrections will be made.  
 	 */
-	public ArrayList<Node> getPerNucleusBinImgProcessors(ImagePlus imp, ImagePlus binimp){
+	public ArrayList<Node> getPerNucleusBinImgProcessors(
+			ImagePlus imp, ImagePlus binimp, double wsthreshold){
 		IJ.log("... subimages being accumulated and segmenting nucleus.");
 		ImageProcessor ip, subip, binip;
 		NucSegRitsukoProject nrp = new NucSegRitsukoProject();
@@ -113,7 +120,7 @@ public class NucleusExtractor extends ParticleAnalyzer {
 			ip.setRoi(roi);
 			subip = ip.crop();
 			n.setOrgip(subip);
-			binip = nrp.binarize(subip);
+			binip = nrp.binarize(subip, wsthreshold);
 			n.setBinip(binip);
 		}
 		return ns;

@@ -27,7 +27,11 @@ public class NucToDots {
 	private ImagePlus imp;
 	private int[] xcoordA;
 	private int[] ycoordA;
-	private int[] frameA;
+	/**
+	 * frame number in image stack.
+	 * frame number starts from 1. 
+	 */
+	private int[] frameA; 
 
 
 	public NucToDots(ImagePlus imp){

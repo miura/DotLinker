@@ -5,7 +5,8 @@ from emblcmci.linker import DotLinkerHeadless as DLH, TrackReLinker
 from emblcmci.linker.costfunctions import LinkCostsOnlyDistance
 from emblcmci.linker import ViewDynamics as VD
 from emblcmci.obj.converters import VecTrajectoryToTracks
-from emblcmci.seg import NucleusExtractor 
+from emblcmci.seg import NucleusExtractor
+from emblcmci.linker.plotter import TrackLabeling
 import jarray
 '''
 a test code for preprocessing nucleus image to derive maxima
@@ -25,14 +26,16 @@ ntd.runmain() # for imp that is already stackCLAHEed.
 
 
 print "Extracting Nucleus ..."
-subwwhh = 110  # this must be guessed in the pre-run, by doing particle analysis and get the approximate sizes. 
+subwwhh = 120  # this must be guessed in the pre-run, by doing particle analysis and get the approximate sizes. 
+WATERSHED_THRESHOLD = 0.25;
 en = NucleusExtractor(imp, ntd.getXcoordA(), ntd.getYcoordA(), ntd.getFrameA())
-en.constructNodesByDots(subwwhh)
+en.constructNodesByDots(subwwhh, WATERSHED_THRESHOLD)
 print 'node length before filtering: ' + str(en.getNodes().size()) 
 en.analyzeDotsandBinImages()
 print 'node length after filtering: ' + str(en.getNodes().size()) 
 
 nodes = en.getNodes()
+
 
 '''
 stk = ImageStack(subwwhh, subwwhh)
@@ -51,13 +54,14 @@ dlh.doLinking(nearestneighbor, False)
 
 # convert to Tracks object
 vttt = VecTrajectoryToTracks()
-vttt.run(dlh.getAll_traj())
+#vttt.run(dlh.getAll_traj())
+vttt.run(dlh.getAll_traj(), nodes)
 tracks = vttt.getTracks()
 print "tracks", str(tracks.size())
 for t in tracks.values():
-    print t.getTrackID(), t.getNodes().get(0).getX(), t.getNodes().size(), t.getFrameStart()
-
-#tracks.accept(TrackReLinker())
+    #print t.getTrackID(), t.getNodes().get(0).getX(), t.getNodes().size(), t.getFrameStart()
+    print t.getNodes().get(0).getOrgroi()
+tracks.accept(TrackReLinker())
 
 # plotting part
 vd = VD(imp)
@@ -65,7 +69,8 @@ vd = VD(imp)
 #outimp = IJ.openImage(img2path)
 #vd.plotTracks(outimp)
 
-
 #vd.plotTracks(tracks, imp)
 vd.trackAllPlotter(tracks, imp)
+
 #vd.trackGapLinkPlotter(tracks, imp)
+

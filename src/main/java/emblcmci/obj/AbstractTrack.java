@@ -7,7 +7,7 @@ import emblcmci.linker.LinkAnalyzer;
 
 public abstract class AbstractTrack implements IBioObj{
 	int trackID;
-	int frameStart;
+	int frameStart; // frame starts from 1
 	int frameEnd;
 	ArrayList<Integer> framelist;// = new ArrayList<Integer>();
 	//HashMap<Integer, Node> nodes;
