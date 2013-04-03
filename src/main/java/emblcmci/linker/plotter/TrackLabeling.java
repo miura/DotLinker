@@ -7,7 +7,7 @@ import emblcmci.obj.Track;
 import emblcmci.obj.Tracks;
 
 public class TrackLabeling {
-	private AbstractTracks<Tracks> tracks;
+	private AbstractTracks tracks;
 	private ImagePlus imp;
 
 	/**
@@ -21,7 +21,7 @@ public class TrackLabeling {
 	}
 	
 	public void dolable(){
-		for (Track track : tracks.getTracks()){
+		for (AbstractTrack track : tracks.getTracks()){
 			
 		}
 	}

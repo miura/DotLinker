@@ -5,25 +5,26 @@ import ij.gui.Roi;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import emblcmci.linker.LinkAnalyzer;
 
-public abstract class AbstractTracks<Integer, V extends AbstractTrack> implements IBioObj {
+public abstract class AbstractTracks implements IBioObj {
 
 //	public  <V extends AbstractTrack> AbstractTracks addTrack(int ID, AbstractTrack V){
 //		put(ID, V);
 //		V.setTrackID(ID);
 //		return this;
 //	}
-	HashMap<Integer, V> map = new HashMap<Integer, V>();
+	HashMap<Integer, AbstractTrack> map = new HashMap<Integer, AbstractTrack>();
 	
 	
-	public  void addTrack(Integer ID, V v){
+	public  void addTrack(Integer ID, AbstractTrack v){
 		map.put(ID, v);
 		v.setTrackID((java.lang.Integer) ID);
 	}
 
-	public abstract <V> Collection<V> getTracks();
+	public abstract Collection<AbstractTrack> getTracks();
 	
 	public boolean removeTrack(int ID){
 		map.remove(ID);
@@ -32,6 +33,26 @@ public abstract class AbstractTracks<Integer, V extends AbstractTrack> implement
 
 	public int getID(AbstractTrack t){
 		return t.getTrackID();
+	}
+	
+	public AbstractTrack get(int id){
+		return map.get(id);
+	}
+	
+	public Collection<AbstractTrack> values(){
+		return map.values();
+	}
+	
+	public Set<Integer> keySet(){
+		return map.keySet();
+	}
+	
+	public void put(int id, AbstractTrack t){
+		map.put(id, t);
+	}
+	
+	public Integer size(){
+		return map.size();
 	}
 	
 	/** 
@@ -61,7 +82,7 @@ public abstract class AbstractTracks<Integer, V extends AbstractTrack> implement
 		return closestTrackID;
 	}
 
-	public Iterator<V> iterator() {
+	public Iterator<AbstractTrack> iterator() {
 		// TODO Auto-generated method stub
 		return map.values().iterator();
 	}	
