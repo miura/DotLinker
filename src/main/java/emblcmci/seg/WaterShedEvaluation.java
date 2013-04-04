@@ -1,6 +1,8 @@
 package emblcmci.seg;
 
+import ij.IJ;
 import ij.ImagePlus;
+import ij.Prefs;
 import ij.plugin.ImageCalculator;
 import ij.plugin.filter.Binary;
 import ij.plugin.filter.EDM;
@@ -14,6 +16,7 @@ public class WaterShedEvaluation {
 	 */
 	public WaterShedEvaluation(Double threshold) {
 		this.PERI_WATERSHEDLINE_THRESHOLD = threshold;
+		Prefs.blackBackground = true;
 	}
 	/**
 	 *  The fastest method for testing watershed splitting.
@@ -22,7 +25,7 @@ public class WaterShedEvaluation {
 	 *  
 	 * @param imp: binary already watershed applied image
 	 */
-	public boolean testWatershedFast(ImageProcessor ip){
+	public boolean testWatershedFast(ImageProcessor iporg, ImageProcessor ip){
 		
 		Binary b = new Binary();
 		ImageCalculator ic = new ImageCalculator();
@@ -34,20 +37,31 @@ public class WaterShedEvaluation {
 		ImagePlus imp2 = new ImagePlus("2", ip2);		
 		ImagePlus impws =  ic.run("Difference create", imp, imp2);
 		
-		ImageProcessor ip3 = ip2.duplicate();
-		b.setup("erode", null);
-		b.run(ip3);
-		ImagePlus imp3 = new ImagePlus("3", ip3);	
-		ImagePlus impperi = ic.run("Difference create", imp2, imp3);
+		//ImageProcessor ip3 = ip2.duplicate();
+		//b.setup("erode", null);
+		//b.run(ip3);
+		//ImagePlus imp3 = new ImagePlus("3", ip3);	
+		ImagePlus imp0 = new ImagePlus("0", iporg);
+		ImagePlus impperi = ic.run("Difference create", imp2, imp0);
 		int[] wshist = impws.getProcessor().getHistogram();
 		int[] perihist = impperi.getProcessor().getHistogram();
 		double ratio = ( ((double) wshist[255]) / ((double)perihist[255])) - 1.0;
+
+//		imp.show();
+//		imp2.show();
+//		imp0.show();
+//		impws.show();
+//		impperi.show();
+//		IJ.log("ws266:"+ wshist[0] + " peri255:" + perihist[0]);
+//		IJ.log("ws266:"+ wshist[255] + " peri255:" + perihist[255]);
+		IJ.log("watershed ratio" + ratio);
 		ip2 = null;
-		ip3 = null;
+		//ip3 = null;
 		if (ratio > PERI_WATERSHEDLINE_THRESHOLD)
 			return false; // no watershed 
 		else
 			return true; //watershed recommended
+						 // if ratio is 0, then no watershed happend. 
 	}
 	
 	/**
@@ -60,7 +74,7 @@ public class WaterShedEvaluation {
 		EDM edm = new EDM();
 		edm.setup("watershed", null);
 		edm.run(ip2);
-		if (testWatershedFast(ip2))
+		if (testWatershedFast(ip, ip2))
 			return ip2;
 		else
 			return ip;
