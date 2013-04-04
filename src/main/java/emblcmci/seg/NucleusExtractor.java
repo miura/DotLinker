@@ -41,6 +41,7 @@ public class NucleusExtractor extends ParticleAnalyzer {
 	
 	public static final RoiToIntA ROI_2_INTA = new RoiToIntA();
 	
+	
 	public NucleusExtractor(ImagePlus imp){
 		this.imp = imp;
 	}
@@ -525,8 +526,8 @@ public class NucleusExtractor extends ParticleAnalyzer {
 				CLEAR_WORKSHEET;
 		return options;
 	}
-
 	
+
 	/**
 	 * 
 	 * @param segimp: degmented binary image
@@ -571,6 +572,5 @@ public class NucleusExtractor extends ParticleAnalyzer {
 			return a;
 		}
 	}
-
 
 }

@@ -16,6 +16,7 @@ import ij.plugin.filter.ParticleAnalyzer;
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
+import ij.Prefs;
 
 /**
  * First do Gaussblurring with a large sigma value to estimate Otsu threshold value. 
@@ -71,7 +72,7 @@ public class NucSegRitsukoProject{
 	ArrayList<ImageProcessor> binList;
 	private int[] frameA;
 	
-	
+	public static final EdgeObjEliminator KILL_EDGE_OBJ = new EdgeObjEliminator();
 	
 	public NucSegRitsukoProject(){}
 	
@@ -190,12 +191,21 @@ public class NucSegRitsukoProject{
 		
 		//originally, fill holes + 2 times erosion, 2 times dilation
 		postProcessing(ip3);
+		
+		//eliminate edge objects
+		//ip3 = KILL_EDGE_OBJ.run(new ImagePlus("tt",ip3));
 		//watershed
 		ImageProcessor ip4 = watershedWithEval(ip3, wsthreshold);
 		
 		//IJ.log("Lower Threshold: " + Integer.toString(lowth));
 		ip2 = null;
 		return ip4;
+	}
+	
+	public ImageProcessor cleanEdge(ImagePlus imp){
+		ImageProcessor ipout = KILL_EDGE_OBJ.run(imp);
+		return ipout;
+		
 	}
 	
 	void postProcessing(ImageProcessor ip){
@@ -309,5 +319,32 @@ public class NucSegRitsukoProject{
 		return binList;
 	}
 	
-
+	private static class EdgeObjEliminator{
+		
+		int MAXSIZE = 10000;
+		int MINSIZE = 100;
+		int options = eliminationOptions();
+		ResultsTable rt = new ResultsTable();
+		ParticleAnalyzer p = 
+				new ParticleAnalyzer(options, ParticleAnalyzer.CENTROID, 
+						rt, MINSIZE, MAXSIZE);
+		public ImageProcessor run(ImagePlus imp){
+			Prefs.blackBackground = true;
+			p.setHideOutputImage(true);
+			p.analyze(imp);
+			//IJ.log("Objects:" + rt.getCounter());
+			ImageProcessor ipout = p.getOutputImage().getProcessor();
+			ipout.invertLut();
+			return ipout;
+		}
+		
+		int eliminationOptions(){
+			int options = 
+					ParticleAnalyzer.SHOW_MASKS + 
+					ParticleAnalyzer.EXCLUDE_EDGE_PARTICLES +
+					ParticleAnalyzer.INCLUDE_HOLES +
+					ParticleAnalyzer.CLEAR_WORKSHEET;
+			return options;
+		}			
+	}
 }
