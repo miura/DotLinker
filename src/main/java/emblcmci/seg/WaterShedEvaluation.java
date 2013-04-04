@@ -54,7 +54,7 @@ public class WaterShedEvaluation {
 //		impperi.show();
 //		IJ.log("ws266:"+ wshist[0] + " peri255:" + perihist[0]);
 //		IJ.log("ws266:"+ wshist[255] + " peri255:" + perihist[255]);
-		IJ.log("watershed ratio" + ratio);
+//		IJ.log("watershed ratio" + ratio);
 		ip2 = null;
 		//ip3 = null;
 		if (ratio > PERI_WATERSHEDLINE_THRESHOLD)

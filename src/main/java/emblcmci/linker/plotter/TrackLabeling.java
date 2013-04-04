@@ -37,13 +37,12 @@ public class TrackLabeling {
 		ImageProcessor ip;
 		int cx, cy, cw, ch;		
 		ns = t.getNodes();
-		Color white = Color.WHITE;
 		
 		for (Node n : ns){
 			if (n.getOrgroi() != null){
 				// frame number starts from 1
 				ip = imp.getStack().getProcessor(n.getFrame());
-				ip.setColor(Color.BLACK);
+				ip.setColor(Color.WHITE);
 				//ip.drawRoi(n.getOrgroi());
 //				cx = n.getOrgroi().getBounds().x;
 //				cy = n.getOrgroi().getBounds().y;

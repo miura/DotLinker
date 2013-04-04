@@ -41,22 +41,32 @@ public class TrackReLinker extends LinkAnalyzer {
 	int distance_threshould = 10;
 	
 	// allowed number of missing frames between tracks for interpolation. 
-	// unit: frames
+	// unit: frames (within initially constracted tracks)
 	int framegap_allowance = 2;
 	
 	/**
 	 * Maximum range of frame gap that allows to link gaps. 
 	 */
-	private final int ALLOWE_FRAME_DIFFERENCE = 5;
+	private int ALLOWE_FRAME_DIFFERENCE = 5;
 	
 //	/**
 //	 * @param tracks
 //	 */
 //	public TrackReLinker(Vector<Trajectory> tracks) {
 //		super();
-//		VecTrajectoryToTracks v2t = new VecTrajectoryToTracks();
-//		this.tracks = v2t.runsimple(tracks);
-//	}
+	//		VecTrajectoryToTracks v2t = new VecTrajectoryToTracks();
+	//		this.tracks = v2t.runsimple(tracks);
+	//	}
+	
+	/**
+	 * @param aLLOWE_FRAME_DIFFERENCE
+	 */
+	public TrackReLinker(int aLLOWE_FRAME_DIFFERENCE) {
+		super();
+		ALLOWE_FRAME_DIFFERENCE = aLLOWE_FRAME_DIFFERENCE;
+	}
+
+
 	/**
 	 * 
 	 */
@@ -72,6 +82,8 @@ public class TrackReLinker extends LinkAnalyzer {
 		
 	}
 		
+
+
 
 	@Override 
 	public void analyze(AbstractTracks ts) {
