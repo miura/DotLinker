@@ -157,9 +157,8 @@ public class TrackReLinker extends LinkAnalyzer {
 					
 			} 	
 		}
-		IJ.log("### Track: " + t.getTrackID());
 		if (candidateList.size() > 0){
-			
+			IJ.log("### Track: " + t.getTrackID());		
 			//Object obj = Collections.min(candidateList.values());
 			Object obj = Collections.max(candidateList.values());
 			//minid = getKeyByValue(candidateList, (Double) obj);

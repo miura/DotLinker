@@ -119,6 +119,7 @@ public abstract class AbstractViewDynamics {
 
 	public void trackAllPlotter(AbstractTracks tracks, ImagePlus imp){
 			multicolor  = true;
+			IJ.log("Plotting All Tracks...");
 			for (AbstractTrack v : tracks.values()) //iterate for tracks
 				if (v != null){
 					//plotTrack((Track) v, imp);
@@ -183,8 +184,8 @@ public abstract class AbstractViewDynamics {
 		int startframe = track.getFrameStart();
 		int endframe = track.getFrameEnd();
 		int framenum = endframe - startframe + 1;
-		IJ.log("Track:" + track.getNodes().get(0).getTrackID() +
-				" frames:" + framenum);
+//		IJ.log("Track:" + track.getNodes().get(0).getTrackID() +
+//				" frames:" + framenum);
 		ArrayList<Node> nodes = track.getNodes();
 		int sx, sy,thisframe;
 		int nodecount = 0;

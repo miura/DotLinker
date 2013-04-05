@@ -24,6 +24,16 @@ public class Node {
 	ImageProcessor binip;	// binary image of the node
 	Roi orgroi;				// roi in the original frame: for knowing the original coordinates and size. 
 
+	boolean isInterpoleted = false;	// whether this Node is a node created by TrackFiller process. 
+	
+	public boolean isInterpoleted() {
+		return isInterpoleted;
+	}
+
+	public void setInterpoleted(boolean isInterpoleted) {
+		this.isInterpoleted = isInterpoleted;
+	}
+
 	public boolean toRemove = false;
 	public Node(double x, double y, int frame,  int id){
 		this.x = x;

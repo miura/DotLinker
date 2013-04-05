@@ -2,6 +2,7 @@ package emblcmci.obj;
 
 import ij.gui.Roi;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -85,6 +86,18 @@ public abstract class AbstractTracks implements IBioObj {
 	public Iterator<AbstractTrack> iterator() {
 		// TODO Auto-generated method stub
 		return map.values().iterator();
-	}	
+	}
+	
+	public int getLastNodeID(){
+		int thelastID = 0;
+		for (AbstractTrack t : values()){
+			ArrayList<Node> nodes = t.getNodes();
+			for (Node n : nodes){
+				if (n.getId() > thelastID)
+					thelastID = n.getId();
+			}
+		}
+		return thelastID;
+	}
 
 }

@@ -128,7 +128,37 @@ public class NucSegRitsukoProject{
 		return stk;
 	}
 	
-	
+	/** see the description of
+	 * loadImagesToNode(Node n, ImageProcessor ip, int wsthreshold)
+	 * 
+	 * @param n
+	 * @param imp: could be either a stack or a single image. 
+	 * @param wsthreshold
+	 */
+	public void loadImagesToNode(Node n, ImagePlus imp, double wsthreshold){
+		ImageProcessor ip;
+		if (imp.getStackSize() > 1)
+			ip = imp.getStack().getProcessor(n.getFrame());
+		else
+			ip = imp.getProcessor();
+		loadImagesToNode(n, ip, wsthreshold);
+	}
+	/**
+	 * extracts image within the original image according to the Roi info 
+	 * that the Node has, do binary segmentation and then store those
+	 * images within Node. 
+	 * @param n a single Node. 
+	 * @param ip original image ImageProcessor, original frame size. 
+	 */
+	public void loadImagesToNode(Node n, ImageProcessor ip, double wsthreshold){
+		ImageProcessor subip = ip.duplicate();
+		subip.setRoi(n.getOrgroi());
+		subip.crop();
+		n.setOrgip(subip);
+		ImageProcessor binip = binarize(subip, wsthreshold);
+		n.setBinip(binip);
+		
+	}
 	/** creates Arrays of images with individual nucleus per frame, binarized.
 	 * position key is based on the parameters, with fixed ROI size.  
 	 * 
