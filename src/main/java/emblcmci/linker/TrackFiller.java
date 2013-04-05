@@ -68,8 +68,14 @@ public class TrackFiller {
 									pre.getFrame() + i + 1, 
 									t.getTrackID(),
 									idcount++);
-							//@TODO avoid going out from frame. 
-							Roi nroi = new Roi(nx - size/2, ny - size/2, size, size);
+							double nroix = nx - size/2;
+							double nroiy = ny - size/2;
+							if (nroix < 0) nroix = 0;
+							if (nroix > imp.getWidth() - size) nroix = imp.getWidth() - size;
+							if (nroiy < 0) nroiy = 0;
+							if (nroiy > imp.getHeight() - size) nroiy = imp.getHeight() - size;
+							
+							Roi nroi = new Roi(nroix, nroiy, size, size);
 							newnode.setOrgroi(nroi);
 							newnode.setInterpoleted(true);
 							nseg.loadImagesToNode(newnode, imp, wsthreshold);
@@ -80,17 +86,18 @@ public class TrackFiller {
 				}
 				
 			}
-			if (gapframe.size() > 0){
-				IJ.log("track"+ t.getTrackID());
-				IJ.log(t.getFramelist().toString());
-				IJ.log(gapframe.toString());
-			}
+//			if (gapframe.size() > 0){
+//				IJ.log("track"+ t.getTrackID());
+//				IJ.log(t.getFramelist().toString());
+//				IJ.log(gapframe.toString());
+//			}
 			for ( Integer frame : gapframe){
 				Integer index = framelist.indexOf(frame);
 				Integer insertindex = index + 1;
 				t.getNodes().addAll(insertindex, insertNodes.get(gapframe.indexOf(frame)));
+				t.checkFrameList();
 			}
-			t.checkFrameList();
+			//t.checkFrameList();
 			
 			
 //				Node pre = 

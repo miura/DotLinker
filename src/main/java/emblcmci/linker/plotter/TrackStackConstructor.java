@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import emblcmci.obj.AbstractTrack;
 import emblcmci.obj.AbstractTracks;
 import emblcmci.obj.Node;
+import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 
@@ -17,24 +18,37 @@ public class TrackStackConstructor {
 
 	public ImagePlus createBinStack(AbstractTracks ts, int trackid){
 		AbstractTrack t = ts.get(trackid);
-		ArrayList<Node> nodes = t.getNodes();
-		ImageStack stack = new ImageStack(
-				nodes.get(0).getOrgip().getWidth(),
-				nodes.get(0).getOrgip().getHeight());
-		for (Node n : nodes)
-			stack.addSlice(Integer.toString(n.getFrame()), n.getBinip());
-		
-		return (new ImagePlus("trackBIN"+ Integer.toString(trackid), stack ));
+		if (t != null){
+			ArrayList<Node> nodes = t.getNodes();
+			ImageStack stack = new ImageStack(
+					nodes.get(0).getBinip().getWidth(),
+					nodes.get(0).getBinip().getHeight());
+			for (Node n : nodes){
+//				IJ.log(n.getId() + ":" + 
+//				n.getBinip().getWidth() + "," + n.getBinip().getHeight());
+				stack.addSlice(Integer.toString(n.getFrame()), n.getBinip());
+			}
+			return (new ImagePlus("trackBIN"+ Integer.toString(trackid), stack ));
+//			return null;
+		} else {
+			IJ.log("could not find track " + Integer.toString(trackid)); 
+			return null;
+		}
 	}
 	public ImagePlus createSubImageStack(AbstractTracks ts, int trackid){
 		AbstractTrack t = ts.get(trackid);
-		ArrayList<Node> nodes = t.getNodes();
-		ImageStack stack = new ImageStack(
-				nodes.get(0).getOrgip().getWidth(),
-				nodes.get(0).getOrgip().getHeight());
-		for (Node n : nodes)
-			stack.addSlice(Integer.toString(n.getFrame()), n.getOrgip());
-		
-		return (new ImagePlus("trackIP"+ Integer.toString(trackid), stack ));
+		if (t == null){
+			ArrayList<Node> nodes = t.getNodes();
+			ImageStack stack = new ImageStack(
+					nodes.get(0).getOrgip().getWidth(),
+					nodes.get(0).getOrgip().getHeight());
+			for (Node n : nodes)
+				stack.addSlice(Integer.toString(n.getFrame()), n.getOrgip());
+
+			return (new ImagePlus("trackIP"+ Integer.toString(trackid), stack ));
+		} else {
+			IJ.log("could not find track " + Integer.toString(trackid)); 
+			return null;
+		}
 	}
 }

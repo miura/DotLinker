@@ -153,7 +153,7 @@ public class NucSegRitsukoProject{
 	public void loadImagesToNode(Node n, ImageProcessor ip, double wsthreshold){
 		ImageProcessor subip = ip.duplicate();
 		subip.setRoi(n.getOrgroi());
-		subip.crop();
+		subip = subip.crop();
 		n.setOrgip(subip);
 		ImageProcessor binip = binarize(subip, wsthreshold);
 		n.setBinip(binip);
