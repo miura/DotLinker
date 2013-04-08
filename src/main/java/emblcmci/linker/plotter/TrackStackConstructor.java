@@ -37,7 +37,7 @@ public class TrackStackConstructor {
 	}
 	public ImagePlus createSubImageStack(AbstractTracks ts, int trackid){
 		AbstractTrack t = ts.get(trackid);
-		if (t == null){
+		if (t != null){
 			ArrayList<Node> nodes = t.getNodes();
 			ImageStack stack = new ImageStack(
 					nodes.get(0).getOrgip().getWidth(),
