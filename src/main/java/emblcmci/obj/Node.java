@@ -1,5 +1,7 @@
 package emblcmci.obj;
 
+import java.util.HashMap;
+
 import ij.gui.Roi;
 import ij.process.ImageProcessor;
 
@@ -25,7 +27,17 @@ public class Node {
 	Roi orgroi;				// roi in the original frame: for knowing the original coordinates and size. 
 
 	boolean isInterpoleted = false;	// whether this Node is a node created by TrackFiller process. 
-	
+
+	HashMap<?, ?> glcmResults;
+
+	public HashMap<?, ?> getGlcmResults() {
+		return glcmResults;
+	}
+
+	public void setGlcmResults(HashMap<?, ?> glcmResults) {
+		this.glcmResults = glcmResults;
+	}
+
 	public boolean isInterpoleted() {
 		return isInterpoleted;
 	}
