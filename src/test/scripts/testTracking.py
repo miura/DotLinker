@@ -19,8 +19,8 @@ and then get track
 #imgpath = '/Users/miura/Dropbox/people/julia/NucSegmentStudy/l5c1_CLAHE.tif'
 #imgpath = '/Users/miura/Dropbox/people/julia/NucSegmentStudy/l5c1_fastCLAHE.tif'
 # imgpath = '/Volumes/D/Julia20130201-/almfscreen/samples_112712/l1/CH2_maxp.tif'
-imgpath = '/Volumes/D/Julia20130201-/almfscreen/samples_112712/l2/l2c1.tif'
-# imgpath = '/Volumes/D/Julia20130201-/almfscreen/samples_112712/l3/l3c1.tif'
+#imgpath = '/Volumes/D/Julia20130201-/almfscreen/samples_112712/l2/l2c1.tif'
+imgpath = '/Volumes/D/Julia20130201-/almfscreen/samples_112712/l3/l3c1.tif'
 #imgpath = '/Volumes/D/Julia20130201-/almfscreen/samples_112712/l4/l4c1.tif'
 imp = IJ.openImage(imgpath)
 ntd = NucToDots(imp);
@@ -31,8 +31,8 @@ ntd.run() # runs CLAHE first, takes a bit of time.
 
 
 print "Extracting Nucleus ..."
-subwwhh = 120  # this must be guessed in the pre-run, by doing particle analysis and get the approximate sizes. 
-WATERSHED_THRESHOLD = 0.20;
+subwwhh = 130  # this must be guessed in the pre-run, by doing particle analysis and get the approximate sizes. 
+WATERSHED_THRESHOLD = 0.10;
 en = NucleusExtractor(imp, ntd.getXcoordA(), ntd.getYcoordA(), ntd.getFrameA())
 en.constructNodesByDots(subwwhh, WATERSHED_THRESHOLD)
 print 'node length before filtering: ' + str(en.getNodes().size()) 
