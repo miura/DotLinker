@@ -8,19 +8,20 @@ from emblcmci.obj.converters import VecTrajectoryToTracks
 from emblcmci.seg import NucleusExtractor
 from emblcmci.linker.plotter import TrackLabeling, TrackStackConstructor
 from emblcmci.linker import TrackFilter, TrackFiller, RoiCorrector
+from emblcmci.obj.analysis import TextureAnalysis
 import jarray
 '''
 a test code for preprocessing nucleus image to derive maxima
 and then get track
 '''
 
-#imgpath = '/Users/miura/Dropbox/people/julia/NucSegmentStudy/l5c1_350_CLAHE.tif'
+imgpath = '/Users/miura/Dropbox/people/julia/NucSegmentStudy/l5c1_350_CLAHE.tif'
 #imgpath = '/Users/miura/Dropbox/people/julia/NucSegmentStudy/L1CH2_maxp_300-374sampleframe.tif'
 #imgpath = '/Users/miura/Dropbox/people/julia/NucSegmentStudy/l5c1_CLAHE.tif'
 #imgpath = '/Users/miura/Dropbox/people/julia/NucSegmentStudy/l5c1_fastCLAHE.tif'
 # imgpath = '/Volumes/D/Julia20130201-/almfscreen/samples_112712/l1/CH2_maxp.tif'
 #imgpath = '/Volumes/D/Julia20130201-/almfscreen/samples_112712/l2/l2c1.tif'
-imgpath = '/Volumes/D/Julia20130201-/almfscreen/samples_112712/l3/l3c1.tif'
+#imgpath = '/Volumes/D/Julia20130201-/almfscreen/samples_112712/l3/l3c1.tif'
 #imgpath = '/Volumes/D/Julia20130201-/almfscreen/samples_112712/l4/l4c1.tif'
 imp = IJ.openImage(imgpath)
 ntd = NucToDots(imp);
@@ -86,9 +87,33 @@ vd.trackAllPlotter(tracks, imp)
 
 #vd.trackGapLinkPlotter(tracks, imp)
 
+tnodes = tracks.get(41).getNodes()
+stk = ImageStack(subwwhh, subwwhh)
+for n in tnodes:
+    binip = n.getOrgip()
+    stk.addSlice(binip)
+ImagePlus("tt1", stk).show()
+
+TextureAnalysis().getTextures(tracks)
+
+tnodes = tracks.get(41).getNodes()
+stk = ImageStack(subwwhh, subwwhh)
+for n in tnodes:
+    binip = n.getOrgip()
+    stk.addSlice(binip)
+ImagePlus("tt2", stk).show()
+
+for t in tracks.values():
+    nodes = t.getNodes()
+    for n in nodes:
+        glcm = n.getGlcmResults()
+        print n.getTrackID(), ':', glcm.get('Contrast'), glcm.get('Energy'), glcm.get('Homogeneity')
+
+'''
 impout1 = TrackStackConstructor().createBinStack(tracks, 4)
 impout2 = TrackStackConstructor().createBinStack(tracks, 21)
 if impout1 is not None:
     impout1.show()
 if impout2 is not None:
     impout2.show()
+'''

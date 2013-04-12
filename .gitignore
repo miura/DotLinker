@@ -3,10 +3,11 @@
 *.DS_Store
 bin/*
 settings/*
-target/*
 .settings/*
 .classpath
 .project
 
 doc/*
 .pydevproject
+target/classes/*
+target/maven-archiver/*
