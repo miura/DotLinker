@@ -92,6 +92,16 @@ public abstract class AbstractTrack implements IBioObj{
 		}
 		detectFrameBounds();
 	}
+	
+	/**
+	 * a clean up method, after all track merging is done, reset the identity of each node's 
+	 * belonging TrackID to correct ones. 
+	 */
+	public void resetNodeTrackIDs(){
+		for (Node n : nodes){
+			n.setTrackID(this.trackID);
+		}
+	}
 	/**
 	 * preparation for evaluating tracks. 
 	 * Store start frame and end frame of a track in the Track object. 
