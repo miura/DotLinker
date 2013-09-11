@@ -44,9 +44,8 @@ public abstract class AbstractResultsTableToTracks {
 				track.getNodes().add(node);
 
 			}
-			
-			calcTrackParameters();
 			this.tracks = tracks;
+			calcTrackParameters();
 			//return tracks;
 		} else {
 			IJ.log("Result table does not contain required header/s");
