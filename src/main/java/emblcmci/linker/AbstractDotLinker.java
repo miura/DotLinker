@@ -109,8 +109,7 @@ public abstract class AbstractDotLinker {
 		IJ.showStatus("Generating Trajectories");		
 		generateTrajectories(frameA, frameA.length);
 		
-		// viewing the trajectories
-
+		// viewing the trajectories  
 		if (showtrack)
 			generateViewXYinverted(); //plot with xy coordinate inverted, the particle tracker bug 
 		

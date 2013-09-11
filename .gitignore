@@ -11,3 +11,4 @@ doc/*
 .pydevproject
 target/classes/*
 target/maven-archiver/*
+tags

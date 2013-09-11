@@ -49,11 +49,20 @@ public class ViewDynamicsArea extends AbstractViewDynamics {
 			double areafracMax = 0;
 			double areafracMin =100;
 			for (AbstractTrack v : tracks.values()){ //iterate for tracks
+				//IJ.log("trackID:" + Integer.toString(v.getTrackID()));
+				//IJ.log("... len:" + v.getNodes().size() + " AreaFrac:" + v.getNodes().get(1).getAreaFraction());
 				if ((v != null) && (v instanceof Track2Dcells)) {
+				//if (v != null) {
 					Track2Dcells t = (Track2Dcells) v;
-					if (t.getAreafracMIN() < areafracMin) 
-						t.setAreafracMIN( areafracMin );
-					if (t.getAreafracMAX() > areafracMax) t.setAreafracMAX( areafracMax );
+					if (t.getAreafracMIN() < areafracMin){
+						areafracMin = t.getAreafracMIN();
+						//t.setAreafracMIN( areafracMin );
+						
+					}	
+					if (t.getAreafracMAX() > areafracMax) {
+						areafracMax = t.getAreafracMAX();
+						//t.setAreafracMAX( areafracMax );
+					}
 				}
 			}
 			IJ.log("Area Fraction Minimum: " + areafracMin);

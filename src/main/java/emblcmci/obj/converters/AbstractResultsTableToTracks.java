@@ -34,10 +34,12 @@ public abstract class AbstractResultsTableToTracks {
 			AbstractTrack track;
 			Node node;		
 			for (int i = 0; i < rowlength; i++){
-				node = generateNode(i);	
+				node = generateNode(i);
+				//IJ.log("node" + node.getTrackID()+ ", " + node.getArea() + ", " + node.getAreaFraction());
 				if (tracks.get(node.getTrackID()) == null){
 					//track =new Track(new ArrayList<Node>());
 					track =createTrack();
+					track.setTrackID(node.getTrackID());
 					tracks.put(node.getTrackID(), track);
 				} else
 					track = tracks.get(node.getTrackID());
