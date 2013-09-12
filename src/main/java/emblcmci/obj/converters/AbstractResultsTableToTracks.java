@@ -35,7 +35,6 @@ public abstract class AbstractResultsTableToTracks {
 			Node node;		
 			for (int i = 0; i < rowlength; i++){
 				node = generateNode(i);
-				//IJ.log("node" + node.getTrackID()+ ", " + node.getArea() + ", " + node.getAreaFraction());
 				if (tracks.get(node.getTrackID()) == null){
 					//track =new Track(new ArrayList<Node>());
 					track =createTrack();

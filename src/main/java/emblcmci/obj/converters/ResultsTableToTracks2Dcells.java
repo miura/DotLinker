@@ -26,7 +26,6 @@ public class ResultsTableToTracks2Dcells extends AbstractResultsTableToTracks {
 
 	public ResultsTableToTracks2Dcells(ResultsTable trt) {
 		super(trt);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
@@ -85,7 +84,7 @@ public class ResultsTableToTracks2Dcells extends AbstractResultsTableToTracks {
 				//calcAreaFraction(v); // commented out, since this value is now calculated in DotLinker
 				}
 			}
-//			return tracks;// TODO Auto-generated method stub
+//			return tracks;
 		
 	}
 
