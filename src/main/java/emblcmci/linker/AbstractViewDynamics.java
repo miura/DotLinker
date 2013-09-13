@@ -67,16 +67,11 @@ public abstract class AbstractViewDynamics {
 	 * @TODO progressive drawing of tracks. 
 	 */
 	public void plotTracks(){
-//		ResultsTable trt = getTrackTable("Tracks");
-//		ResultTableToTracks rttracks = new ResultTableToTracks();
-//		HashMap<Integer, Track> Tracks = rttracks.run(trt);
-//		TrackPlotter(Tracks, imp);
 		plotTracks(this.imp);
 	}	
 
 	/**
 	 * Does plotting to a specific ImagePlus object based on the currently open ResultsTable
-	 * @TODO done Use Tracks class instead of the Hashmap directly. 
 	 * @param outimp
 	 */
 	public void plotTracks(ImagePlus outimp){
@@ -109,7 +104,8 @@ public abstract class AbstractViewDynamics {
 		if (ChosenTrackNumber != 0){
 			track = tracks.get(ChosenTrackNumber);
 			if (track != null){
-				plotTrack(track, imp);
+				//plotTrack(track, imp);
+        plotProgressiveTrack(track, imp);
 			} else {
 				IJ.showMessageWithCancel("No Track", "no such track could be found");
 			}
@@ -195,7 +191,7 @@ public abstract class AbstractViewDynamics {
 		PolygonRoi proi = null;
 //		for (int i = 1; i < nodes.size(); i++){
 		for (int i = 0; i < framenum; i++){
-			thisframe = i + startframe;
+			thisframe = i + startframe + 1;
 			ip = imp.getStack().getProcessor(thisframe);			
 			if (track.getFramelist().contains(thisframe)){
 				n = nodes.get(nodecount);

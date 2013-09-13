@@ -45,6 +45,8 @@ public abstract class AbstractResultsTableToTracks {
 				track.getNodes().add(node);
 
 			}
+      for (AbstractTrack t : tracks.values())
+        t.checkFrameList();
 			this.tracks = tracks;
 			calcTrackParameters();
 			//return tracks;

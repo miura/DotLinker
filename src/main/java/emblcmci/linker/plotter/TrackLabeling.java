@@ -54,7 +54,7 @@ public class TrackLabeling {
 //				ip.drawString(Integer.toString(n.getTrackID()), cx + cw/2, cy + ch/2);				
 				ip.drawString(Integer.toString(n.getTrackID()), cx, cy);
 			} else {
-				IJ.log(n.getId() + ".. no ORI");
+				IJ.log(n.getId() + ".. no ROI ");
 			}
 		}		
 	}
