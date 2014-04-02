@@ -420,7 +420,7 @@ public abstract class AbstractDotLinker {
 				}
 			}
 		}
-		private void drawStatic(Graphics g, ImageCanvas ic) {
+		private void drawStatic_invertedXY(Graphics g, ImageCanvas ic) {
 			int i;
 			g.setColor(this.color);
 			for (i = 0; i<this.existing_particles.length-1; i++) {
@@ -440,6 +440,27 @@ public abstract class AbstractDotLinker {
 						ic.screenYD(this.existing_particles[this.existing_particles.length-1].getX()), 5, 5);
 			}
 		}
+		
+		private void drawStatic(Graphics g, ImageCanvas ic) {
+			int i;
+			g.setColor(this.color);
+			for (i = 0; i<this.existing_particles.length-1; i++) {
+				if (this.existing_particles[i+1].getFrame() - this.existing_particles[i].getFrame() > 1) {	    			   
+					g.setColor(Color.red); //gap
+				}
+				g.drawLine(ic.screenXD(this.existing_particles[i].getX()), 
+						ic.screenYD(this.existing_particles[i].getY()), 
+						ic.screenXD(this.existing_particles[i+1].getX()), 
+						ic.screenYD(this.existing_particles[i+1].getY()));
+
+				g.setColor(this.color);							
+			}
+			//mark death of particle
+			if((this.existing_particles[this.existing_particles.length-1].getFrame()) < frames_number - 1){
+				g.fillOval(ic.screenXD(this.existing_particles[this.existing_particles.length-1].getX()), 
+						ic.screenYD(this.existing_particles[this.existing_particles.length-1].getY()), 5, 5);
+			}
+		}
 		public Particle[] getExisting_particles() {
 			return existing_particles;
 		}
@@ -455,7 +476,7 @@ public abstract class AbstractDotLinker {
 	private class TrajectoryCanvas extends ImageCanvas {
 
 		private static final long serialVersionUID = 1L;
-
+		boolean invertXY = false; //20140402
 		/**
 		 * Constructor.
 		 * <br>Creates an instance of TrajectoryCanvas from a given <code>ImagePlus</code>
@@ -479,7 +500,7 @@ public abstract class AbstractDotLinker {
 		 * Draws each of the trajectories in <code>all_traj</code>
 		 * on this Canvas according to each trajectories <code>to_display</code> value
 		 * @param g
-		 * @see Trajectory#drawStatic(Graphics, ImageCanvas)
+		 * @see Trajectory#drawStatic_invertedXY(Graphics, ImageCanvas)
 		 */
 		private void drawTrajectories(Graphics g) {
 
@@ -489,8 +510,11 @@ public abstract class AbstractDotLinker {
 			while (iter.hasNext()) {
 				Trajectory curr_traj = iter.next();	
 				// if the trajectory to_display value is true
-				if (curr_traj.to_display) {	   		   				   
-					curr_traj.drawStatic(g, this);
+				if (curr_traj.to_display) {
+					if (invertXY)
+						curr_traj.drawStatic_invertedXY(g, this);
+					else
+						curr_traj.drawStatic(g, this);
 				}
 			}
 		}
