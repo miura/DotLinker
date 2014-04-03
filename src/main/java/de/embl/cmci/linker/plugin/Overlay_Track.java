@@ -1,4 +1,4 @@
-package emblcmci.linker.plugin;
+package de.embl.cmci.linker.plugin;
 
 import emblcmci.linker.ViewDynamics;
 import emblcmci.linker.ViewDynamicsArea;
