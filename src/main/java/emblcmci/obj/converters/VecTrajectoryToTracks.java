@@ -3,8 +3,8 @@ package emblcmci.obj.converters;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import emblcmci.linker.AbstractDotLinker.Particle;
-import emblcmci.linker.AbstractDotLinker.Trajectory;
+import de.embl.cmci.linker.DotLinker.Particle;
+import de.embl.cmci.linker.DotLinker.Trajectory;
 import emblcmci.obj.AbstractTrack;
 import emblcmci.obj.AbstractTracks;
 import emblcmci.obj.Node;
