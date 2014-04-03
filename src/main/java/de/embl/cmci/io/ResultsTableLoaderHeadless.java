@@ -3,6 +3,7 @@ package de.embl.cmci.io;
 import ij.IJ;
 import ij.measure.ResultsTable;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -10,6 +11,8 @@ import de.embl.cmci.linker.DotLinker;
 import de.embl.cmci.linker.DotLinker.Particle;
 import de.embl.cmci.linker.DotLinker.StackFrames;
 import de.embl.cmci.linker.DotLinker.Trajectory;
+import emblcmci.obj.Node;
+import emblcmci.obj.converters.NodesToCoordArrays;
 
 /**
  * A simple dataloader for use from scripts. 
@@ -81,5 +84,21 @@ public class ResultsTableLoaderHeadless implements IDataLoader {
 		}
 		return rt;	
 	}
+	
+	public boolean setData(int[] xA, int[] yA, int[] fA){
+		this.xA = xA;
+		this.yA = yA;
+		this.timeA = fA;
+		return true;
+	}
+	
+	public boolean setData(ArrayList<Node> nodes){
+		NodesToCoordArrays ntoa = new NodesToCoordArrays(nodes);
+		this.idA = ntoa.getidA();
+		this.xA = ntoa.getxA();
+		this.yA = ntoa.getyA();
+		this.timeA = ntoa.getfA();		
+		return true;
+	}	
 
 }

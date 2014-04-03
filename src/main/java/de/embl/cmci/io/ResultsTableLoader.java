@@ -12,6 +12,18 @@ import de.embl.cmci.linker.DotLinker.Particle;
 import de.embl.cmci.linker.DotLinker.StackFrames;
 import de.embl.cmci.linker.DotLinker.Trajectory;
 
+/**
+ * Loads data from Results window (such as the particle analysis results)
+ * 
+ * This class was initially wrote for Tina.
+ * 
+ * @author Kota Miura
+ * Centre for Molecular and Cellular Imaging, EMBL Heidelberg
+ * 20110830 First Version, Currently assumes only 2D sequences. 
+ * 
+ * Further development: interface for cost function and implementations. 
+ */
+
 public class ResultsTableLoader implements IDataLoader {
 
 	private StackFrames[] frameA;

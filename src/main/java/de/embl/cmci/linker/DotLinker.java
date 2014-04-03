@@ -18,12 +18,53 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import de.embl.cmci.io.IDataLoader;
-import emblcmci.linker.costfunctions.LinkCosts;
+import de.embl.cmci.linker.costfunctions.LinkCosts;
 
 
 /**
- * @author miura
+ *  * Loads data from whereever that should be implemented by dataloader(). 
+ * Links particles listed in the data. Linked results will be drawn
+ * on the duplicate of the original stack.
+ * 
+ * Linking Algorithm is based on ParticleTrackr3DModular_.java, and other Mosaic resources. 
+ * These sources are available from svn repository linked in 
+ * http://www.mosaic.ethz.ch/Downloads/ParticleTracker 
+ * Huge thanks to Janick Cardinale @ ETH Zuerich, 
+ * for making all these resources available as open source. Applause.
+ * 
+ * A modification to the original algorithm by MOSAIC is that the cost-function is now a 
+ * Interface "LinkCosts", and should be implemented. 
+ * 
+ * In this plugin, emblcmci.linker.LinkCostswithAreaDynamics implements the cost function. 
+ * 
+ * @author Kota Miura
+ * Centre for Molecular and Cellular Imaging, EMBL Heidelberg
+ * 20110830 First Version, Currently assumes only 2D sequences. 
+ * 
+ * Further development: interface for cost function and implementations.
+ * =====
+ * 
+ * Loads data from two different types:
+ * 1. Results window (such as the particle analysis results)
+ * 2. Volocity file
+ * 3. (csv file) not implemented
+ * and links listed particles. Linked results will be drawn
+ * on the duplicate of the original stack.
+ * 
+ * This class was initially wrote for Tina.
+ * 
+ * @author Kota Miura
+ * Centre for Molecular and Cellular Imaging, EMBL Heidelberg
+ * 20110830 First Version, Currently assumes only 2D sequences. 
+ * 
+ * Further development: interface for cost function and implementations. 
+ * 
  * 20140403
+ * 
+ * Instead of using Abstractdotlinker class, this class works by Factory design pattern. 
+ * 1. Uses IDataloader interface for loading data.
+ * 2. (Uses Interface for cost functions)
+ * 3. 
  */
 public class DotLinker {
 	IDataLoader dataload;
