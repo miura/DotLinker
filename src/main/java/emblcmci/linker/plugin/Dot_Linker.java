@@ -1,11 +1,11 @@
 package emblcmci.linker.plugin;
 
-import emblcmci.linker.AbstractDotLinker;
-import emblcmci.linker.DotLinker;
-import emblcmci.linker.DotLinker2;
-import emblcmci.linker.costfunctions.LinkCosts;
-import emblcmci.linker.costfunctions.LinkCostswithAreaDynamics;
-import emblcmci.linker.costfunctions.LinkCostswithIntensityDynamics;
+//import emblcmci.linker.AbstractDotLinker;
+import de.embl.cmci.linker.DotLinker;
+//import emblcmci.linker.DotLinker2;
+import de.embl.cmci.linker.costfunctions.LinkCosts;
+import de.embl.cmci.linker.costfunctions.LinkCostswithAreaDynamics;
+import de.embl.cmci.linker.costfunctions.LinkCostswithIntensityDynamics;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.WindowManager;
@@ -48,7 +48,8 @@ public class Dot_Linker implements PlugIn {
 		else
 			imp = null;
 		
-		AbstractDotLinker dl;
+		//AbstractDotLinker dl;
+		DotLinker dl;
 		LinkCosts linkcostmethod;
 		boolean showtrack = true; 
 		
@@ -68,19 +69,23 @@ public class Dot_Linker implements PlugIn {
 		if (arg.equals("gui")){
 			if (!getParameterDialog())
 				return;			 
-			dl = new DotLinker(imp, linkrange, displacement);
+			//dl = new DotLinker(imp, linkrange, displacement);
+			dl = new DotLinker("ResultsTableLoader", imp, linkrange, displacement);
 			
 		} else if (arg.equals("gui_volocity")){
 			if (!getParameterDialog())
 				return;
-			dl = new DotLinker2(imp, linkrange, displacement);
+			//dl = new DotLinker2(imp, linkrange, displacement);
+			dl = new DotLinker("VolocityFileLoader", imp, linkrange, displacement);			
 			showtrack = false;
 			
 		} else if (arg.equals("volocity")) {
-			dl = new DotLinker2(imp);
+			//dl = new DotLinker2(imp);
+			dl = new DotLinker("VolocityFileLoader", imp);
 			showtrack = false;
 		} else
-			dl = new DotLinker(imp);
+			//dl = new DotLinker(imp);
+			dl = new DotLinker("ResultsTableLoader", imp);
 
 		// incase of volocity data (Mette), choose only distance cost. 
 		if (arg.equals("volocity") || arg.equals("gui_volocity"))
@@ -90,9 +95,9 @@ public class Dot_Linker implements PlugIn {
 		else
 			linkcostmethod = new LinkCostswithAreaDynamics(displacement, 2.0);
 		
-		if (!dl.checkResultsTableParameters()){
-			redoAnalyzeParticle(imp);
-		}
+//		if (!dl.checkResultsTableParameters()){
+//			redoAnalyzeParticle(imp);
+//		}
 		dl.setTrajectoryThreshold(TrajectoryThreshold);
 		dl.doLinking(linkcostmethod, showtrack);
 	}
