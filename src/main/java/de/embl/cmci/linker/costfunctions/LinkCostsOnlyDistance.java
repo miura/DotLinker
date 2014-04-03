@@ -1,6 +1,6 @@
-package emblcmci.linker.costfunctions;
+package de.embl.cmci.linker.costfunctions;
 
-import emblcmci.linker.AbstractDotLinker;
+import de.embl.cmci.linker.DotLinker;
 
 /** an implementation of cost calculation only by distance. The simplest form of "Nearest neighbor".
  * 
@@ -10,7 +10,7 @@ import emblcmci.linker.AbstractDotLinker;
 public class LinkCostsOnlyDistance implements LinkCosts{
 
 	@Override
-	public double calccost(AbstractDotLinker.Particle p1, AbstractDotLinker.Particle p2) {
+	public double calccost(DotLinker.Particle p1, DotLinker.Particle p2) {
 		double cost =	(p2.getX()-p1.getX())*(p2.getX()-p1.getX()) +
 						(p2.getY()-p1.getY())*(p2.getY()-p1.getY()) +
 						(p2.getZ()-p1.getZ())*(p2.getZ()-p1.getZ());

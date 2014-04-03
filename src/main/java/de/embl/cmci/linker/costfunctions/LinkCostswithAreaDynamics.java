@@ -1,7 +1,7 @@
-package emblcmci.linker.costfunctions;
+package de.embl.cmci.linker.costfunctions;
 
-import emblcmci.linker.AbstractDotLinker;
-import emblcmci.linker.AbstractDotLinker.Particle;
+import de.embl.cmci.linker.DotLinker;
+import de.embl.cmci.linker.DotLinker.Particle;
 
 /** an implementation of cost calculation only by distance between linked particle and area change. 
  *  cost = (2D or 3D distance)^2 + MaxSisplacement^2 * abs(ratio of area change);
@@ -34,7 +34,7 @@ public class LinkCostswithAreaDynamics implements LinkCosts{
 		this.areaweight = areaweight;
 	};
 	@Override
-	public double calccost(AbstractDotLinker.Particle p1, AbstractDotLinker.Particle p2) {
+	public double calccost(DotLinker.Particle p1, DotLinker.Particle p2) {
 		double cost =	(p2.getX()-p1.getX())*(p2.getX()-p1.getX()) +
 						(p2.getY()-p1.getY())*(p2.getY()-p1.getY()) +
 						(p2.getZ()-p1.getZ())*(p2.getZ()-p1.getZ()) + 

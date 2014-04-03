@@ -1,7 +1,7 @@
 /**
  * 
  */
-package emblcmci.linker.costfunctions;
+package de.embl.cmci.linker.costfunctions;
 
 import de.embl.cmci.linker.DotLinker.Particle;
 

@@ -1,4 +1,4 @@
-package emblcmci.linker.costfunctions;
+package de.embl.cmci.linker.costfunctions;
 /**
  * For 3D tracking, cost calculation using volume changes (should be mostly constant)
  *  try with volumeweight 2 or so
@@ -6,8 +6,7 @@ package emblcmci.linker.costfunctions;
  * 20111214 changed, so that threshold is 20% +- 
  * @author Kota Miura
  */
-import emblcmci.linker.AbstractDotLinker;
-import emblcmci.linker.AbstractDotLinker.Particle;
+import de.embl.cmci.linker.DotLinker;
 
 public class LinkCostswithIntensityDynamics implements LinkCosts{
 
@@ -22,7 +21,7 @@ public class LinkCostswithIntensityDynamics implements LinkCosts{
 		this.intensityweight = intensitywight;
 	};
 	@Override
-	public double calccost(AbstractDotLinker.Particle p1, AbstractDotLinker.Particle p2) {
+	public double calccost(DotLinker.Particle p1, DotLinker.Particle p2) {
 		double cost =	(p2.getSx()-p1.getSx())*(p2.getSx()-p1.getSx()) +
 						(p2.getSy()-p1.getSy())*(p2.getSy()-p1.getSy()) +
 						(p2.getSz()-p1.getSz())*(p2.getSz()-p1.getSz()) ; 
