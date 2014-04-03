@@ -76,7 +76,9 @@ public class DotLinker {
 	private int number_of_trajectories;
 	private ImagePlus imp;
 	private int frames_number;
-	private int TrajectoryThreshold = 10;	
+	private int TrajectoryThreshold = 10;
+
+	private LinkCosts linkcostmethod;	
 
 	public DotLinker(){
 	}
@@ -106,14 +108,23 @@ public class DotLinker {
 	public IDataLoader getIDataLoader(String loadClassName){
 		IDataLoader dl = null;
 		try {
-			Class c = Class.forName(loadClassName);
+			Class<?> c = Class.forName(loadClassName);
 			dl = (IDataLoader) c.newInstance(); 
 		} catch(Exception e) {
 			System.out.println("No class with name: " + loadClassName);
 		}
 		return dl;
 	}
-
+	public LinkCosts setLinkCostFunction(String linkFunctionName){
+		try {
+			Class<?> c = Class.forName(linkFunctionName);
+			linkcostmethod = (LinkCosts) c.newInstance();
+		} catch(Exception e) {
+			System.out.println("No cost function class with name: " + linkFunctionName);			
+		}
+		return linkcostmethod;
+	}
+	
 	/**
 	 * @param trajectoryThreshold the trajectoryThreshold to set
 	 */
@@ -136,7 +147,7 @@ public class DotLinker {
 	/** Method that should be called from a plugin, or from scripts to
 	 * do all the processing. 
 	 */
-	public void doLinking(LinkCosts linkcostmethod, boolean showtrack){
+	public void doLinking(boolean showtrack){
 		frameA = dataloader();
 		if (frameA !=null){
 			
