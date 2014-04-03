@@ -1,4 +1,4 @@
-package emblcmci.linker.plugin;
+package de.embl.cmci.linker.plugin;
 
 //import emblcmci.linker.AbstractDotLinker;
 import de.embl.cmci.linker.DotLinker;
@@ -49,8 +49,7 @@ public class Dot_Linker implements PlugIn {
 			imp = null;
 		
 		//AbstractDotLinker dl;
-		DotLinker dl;
-		LinkCosts linkcostmethod;
+		DotLinker dotlinker;
 		boolean showtrack = true; 
 		
 		//check image stack
@@ -65,41 +64,44 @@ public class Dot_Linker implements PlugIn {
 
 		
 		//check arguments, whether to do the analysis with GUI dialog or silently using the 
-		//default parameter setting. 
+		//default parameter setting.
+		LinkCosts linkcostfunction;
 		if (arg.equals("gui")){
 			if (!getParameterDialog())
 				return;			 
 			//dl = new DotLinker(imp, linkrange, displacement);
-			dl = new DotLinker("ResultsTableLoader", imp, linkrange, displacement);
+			dotlinker = new DotLinker("ResultsTableLoader", imp, linkrange, displacement);
+			linkcostfunction = dotlinker.setLinkCostFunction("LinkCostswithAreaDynamics");
+			((LinkCostswithAreaDynamics) linkcostfunction).setParameters(displacement, 2.0);
 			
 		} else if (arg.equals("gui_volocity")){
 			if (!getParameterDialog())
 				return;
 			//dl = new DotLinker2(imp, linkrange, displacement);
-			dl = new DotLinker("VolocityFileLoader", imp, linkrange, displacement);			
+			dotlinker = new DotLinker("VolocityFileLoader", imp, linkrange, displacement);			
 			showtrack = false;
+			// incase of volocity data (Mette), choose only distance cost. 
+			linkcostfunction = dotlinker.setLinkCostFunction("LinkCostswithIntensityDynamics");
+			((LinkCostswithIntensityDynamics) linkcostfunction).setParameters(displacement, 2.0);
 			
 		} else if (arg.equals("volocity")) {
 			//dl = new DotLinker2(imp);
-			dl = new DotLinker("VolocityFileLoader", imp);
+			dotlinker = new DotLinker("VolocityFileLoader", imp);
 			showtrack = false;
-		} else
-			//dl = new DotLinker(imp);
-			dl = new DotLinker("ResultsTableLoader", imp);
+			linkcostfunction = dotlinker.setLinkCostFunction("LinkCostswithIntensityDynamics");
+			((LinkCostswithIntensityDynamics) linkcostfunction).setParameters(displacement, 2.0);
+		} else {
+			dotlinker = new DotLinker("ResultsTableLoader", imp);
+			linkcostfunction = dotlinker.setLinkCostFunction("LinkCostswithAreaDynamics");
+			((LinkCostswithAreaDynamics) linkcostfunction).setParameters(displacement, 2.0);
+		}
 
-		// incase of volocity data (Mette), choose only distance cost. 
-		if (arg.equals("volocity") || arg.equals("gui_volocity"))
-			//linkcostmethod = new LinkCostsOnlyDistance();
-			//linkcostmethod = new LinkCostsOnlyScaledDistance();
-			linkcostmethod = new LinkCostswithIntensityDynamics(displacement, 2.0);
-		else
-			linkcostmethod = new LinkCostswithAreaDynamics(displacement, 2.0);
 		
 //		if (!dl.checkResultsTableParameters()){
 //			redoAnalyzeParticle(imp);
 //		}
-		dl.setTrajectoryThreshold(TrajectoryThreshold);
-		dl.doLinking(linkcostmethod, showtrack);
+		dotlinker.setTrajectoryThreshold(TrajectoryThreshold);
+		dotlinker.doLinking(showtrack);
 	}
 	
 	public void redoAnalyzeParticle(ImagePlus imp){
