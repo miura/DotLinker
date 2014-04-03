@@ -42,7 +42,10 @@ public class LinkCostswithAreaDynamics implements LinkCosts{
 		// TODO Auto-generated method stub
 		return cost;
 	}
-
+	public void setParameters(double displacement, double areaweight){
+		this.displacement = displacement;
+		this.areaweight = areaweight;
+	}
 	
 }
 

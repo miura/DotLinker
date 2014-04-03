@@ -39,5 +39,9 @@ public class LinkCostswithIntensityDynamics implements LinkCosts{
 		return cost;		
 	}
 
+	public void setParameters(double displacement, double intensitywight){
+		this.displacement = displacement;
+		this.intensityweight = intensitywight;
+	};
 	
 }
