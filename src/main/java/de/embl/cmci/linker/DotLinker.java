@@ -13,6 +13,7 @@ import ij.plugin.Duplicator;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
@@ -78,7 +79,8 @@ public class DotLinker {
 	private int frames_number;
 	private int TrajectoryThreshold = 10;
 
-	private LinkCosts linkcostmethod;	
+	private LinkCosts linkcostmethod;
+	private boolean showTrackTable = true;
 
 	public DotLinker(){
 	}
@@ -86,6 +88,14 @@ public class DotLinker {
 	public DotLinker(String loadtype){
 		this.dataload = getIDataLoader(loadtype);
 	}
+
+	public DotLinker(String loadtype, String pathToData){
+		this.dataload = getIDataLoader(loadtype, pathToData);
+	}
+
+	public DotLinker(String loadtype, ResultsTable rt){
+		this.dataload = getIDataLoader(loadtype, rt);
+	}	
 	
 	public DotLinker(String loadtype, ImagePlus imp){
 		this.dataload = getIDataLoader(loadtype);
@@ -97,7 +107,15 @@ public class DotLinker {
 		this.imp = imp;
 		this.linkrange = linkrange;
 		this.displacement = displacement;
+	}
+
+	public DotLinker(String loadtype, String pathToData, ImagePlus imp, int linkrange, double displacement){
+		this.dataload = getIDataLoader(loadtype, pathToData);
+		this.imp = imp;
+		this.linkrange = linkrange;
+		this.displacement = displacement;
 	}	
+	
 	/**
 	 * @return the trajectoryThreshold
 	 */
@@ -115,6 +133,37 @@ public class DotLinker {
 		}
 		return dl;
 	}
+	
+	public <T> IDataLoader getIDataLoader(String loadClassName, String path){
+		IDataLoader dl = null;
+		try {
+			Class<?> c = Class.forName(loadClassName);
+			Constructor<IDataLoader> constructor = (Constructor<IDataLoader>) c.getConstructor(String.class);
+			dl = (IDataLoader) constructor.newInstance(path);
+
+			//dl = (IDataLoader) c.newInstance(); 
+		} catch(Exception e) {
+			System.out.println("File Data Loading, No class with name: " + loadClassName);
+			System.out.println(e);
+		}
+		return dl;
+	}
+	
+	public <T> IDataLoader getIDataLoader(String loadClassName, ResultsTable rt){
+		IDataLoader dl = null;
+		try {
+			Class<?> c = Class.forName(loadClassName);
+			Constructor<IDataLoader> constructor = (Constructor<IDataLoader>) c.getConstructor(ResultsTable.class);
+			dl = (IDataLoader) constructor.newInstance(rt);
+
+			//dl = (IDataLoader) c.newInstance(); 
+		} catch(Exception e) {
+			System.out.println("ResultsTable object Loading, No class with name: " + loadClassName);
+			System.out.println(e);
+		}
+		return dl;
+	}	
+	
 	public LinkCosts setLinkCostFunction(String linkFunctionName){
 		try {
 			Class<?> c = Class.forName(linkFunctionName);
@@ -147,7 +196,7 @@ public class DotLinker {
 	/** Method that should be called from a plugin, or from scripts to
 	 * do all the processing. 
 	 */
-	public void doLinking(boolean showtrack){
+	public ResultsTable doLinking(boolean showtrack){
 		frameA = dataloader();
 		if (frameA !=null){
 			
@@ -156,8 +205,8 @@ public class DotLinker {
 			this.frames_number = frameA.length;
 		}
 		else {
-			IJ.error("data loading from Results table failed");
-			return;
+			IJ.error("data loading failed");
+			return null;
 		}
 		IJ.showStatus("Generating Trajectories");		
 		generateTrajectories(frameA, frameA.length);
@@ -169,8 +218,9 @@ public class DotLinker {
 		printTrajectories();
 		//putLinkedParticeID();
 		ResultsTable trackrt = showTrajectoryTable();
-		if (trackrt != null)
+		if ((trackrt != null) && isShowTrackTable())
 			trackrt.show("Tracks");
+		return trackrt;
 	}
 	
 	/** simplified version of MyFrame class in Particle tracker. 
@@ -812,7 +862,7 @@ public class DotLinker {
 
 
 	/**
-	 * Generates <code>Trajectory</code> objects according to the infoamtion 
+	 * Generates <code>Trajectory</code> objects according to the information 
 	 * avalible in each MyFrame and Particle. 
 	 * <br>Populates the <code>all_traj</code> Vector.
 	 */
@@ -1061,6 +1111,20 @@ public class DotLinker {
 	
 	public Vector<Trajectory> getAll_traj() {
 		return all_traj;
+	}
+
+	/**
+	 * @return the showTrackTable
+	 */
+	public boolean isShowTrackTable() {
+		return showTrackTable;
+	}
+
+	/**
+	 * @param showTrackTable the showTrackTable to set
+	 */
+	public void setShowTrackTable(boolean showTrackTable) {
+		this.showTrackTable = showTrackTable;
 	}
 	
 
