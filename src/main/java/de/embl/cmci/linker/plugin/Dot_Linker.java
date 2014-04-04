@@ -66,33 +66,38 @@ public class Dot_Linker implements PlugIn {
 		//check arguments, whether to do the analysis with GUI dialog or silently using the 
 		//default parameter setting.
 		LinkCosts linkcostfunction;
+		String rl = "de.embl.cmci.io.ResultsTableLoader";
+		String volo = "de.embl.cmci.io.VolocityFileLoader";
+		String lcAD = "de.embl.cmci.linker.costfunctions.LinkCostswithAreaDynamics";
+		String lcID = "de.embl.cmci.linker.costfunctions.LinkCostswithIntensityDynamics";
 		if (arg.equals("gui")){
 			if (!getParameterDialog())
 				return;			 
 			//dl = new DotLinker(imp, linkrange, displacement);
-			dotlinker = new DotLinker("ResultsTableLoader", imp, linkrange, displacement);
-			linkcostfunction = dotlinker.setLinkCostFunction("LinkCostswithAreaDynamics");
+			
+			dotlinker = new DotLinker(rl, imp, linkrange, displacement);
+			linkcostfunction = dotlinker.setLinkCostFunction(lcAD);
 			((LinkCostswithAreaDynamics) linkcostfunction).setParameters(displacement, 2.0);
 			
 		} else if (arg.equals("gui_volocity")){
 			if (!getParameterDialog())
 				return;
 			//dl = new DotLinker2(imp, linkrange, displacement);
-			dotlinker = new DotLinker("VolocityFileLoader", imp, linkrange, displacement);			
+			dotlinker = new DotLinker(volo, imp, linkrange, displacement);			
 			showtrack = false;
 			// incase of volocity data (Mette), choose only distance cost. 
-			linkcostfunction = dotlinker.setLinkCostFunction("LinkCostswithIntensityDynamics");
+			linkcostfunction = dotlinker.setLinkCostFunction(lcID);
 			((LinkCostswithIntensityDynamics) linkcostfunction).setParameters(displacement, 2.0);
 			
 		} else if (arg.equals("volocity")) {
 			//dl = new DotLinker2(imp);
-			dotlinker = new DotLinker("VolocityFileLoader", imp);
+			dotlinker = new DotLinker(volo, imp);
 			showtrack = false;
-			linkcostfunction = dotlinker.setLinkCostFunction("LinkCostswithIntensityDynamics");
+			linkcostfunction = dotlinker.setLinkCostFunction(lcID);
 			((LinkCostswithIntensityDynamics) linkcostfunction).setParameters(displacement, 2.0);
 		} else {
-			dotlinker = new DotLinker("ResultsTableLoader", imp);
-			linkcostfunction = dotlinker.setLinkCostFunction("LinkCostswithAreaDynamics");
+			dotlinker = new DotLinker(rl, imp);
+			linkcostfunction = dotlinker.setLinkCostFunction(lcAD);
 			((LinkCostswithAreaDynamics) linkcostfunction).setParameters(displacement, 2.0);
 		}
 

@@ -12,6 +12,9 @@ public class LinkCostswithIntensityDynamics implements LinkCosts{
 
 	double displacement;
 	double intensityweight;
+	
+	public LinkCostswithIntensityDynamics(){}
+	
 	/**Constructor. 
 	 * 
 	 * @param displacement: user-defined displacement value

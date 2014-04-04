@@ -17,5 +17,11 @@ public class LinkCostsOnlyDistance implements LinkCosts{
 		// TODO Auto-generated method stub
 		return cost;
 	}
+
+	@Override
+	public void setParameters(double a1, double a2) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

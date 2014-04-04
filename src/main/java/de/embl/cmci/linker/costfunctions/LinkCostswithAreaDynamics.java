@@ -25,6 +25,10 @@ public class LinkCostswithAreaDynamics implements LinkCosts{
 
 	double displacement;
 	double areaweight;
+	
+	public LinkCostswithAreaDynamics(){
+	}
+			
 	/**Constructor. 
 	 * 
 	 * @param displacement: user-defined displacement value

@@ -19,5 +19,7 @@ public interface LinkCosts {
 	 * @return
 	 */
 	public abstract double calccost(Particle p1, Particle p2);
+	
+	public abstract void setParameters(double a1, double a2);
 
 }
