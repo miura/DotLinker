@@ -9,7 +9,7 @@ loadmethod = 'de.embl.cmci.io.ResultsTableLoader'
 path = '/Users/miura/Dropbox/people/Giogia_Stefano/toJoe/coords.csv'
 
 rt = ResultsTable.open2(path)
-dotlinker = DotLinker(loadmethod, rt)
+dotlinker = DotLinker(loadmethod, rt) #better there is a constructor also with linkkost function object. 
 dotlinker.setTrajectoryThreshold(5)
 dotlinker.setShowTrackTable(False)
 #dotlinker = DotLinker(loadmethod)
