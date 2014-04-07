@@ -8,7 +8,7 @@ from emblcmci.obj.converters import VecTrajectoryToTracks
 from emblcmci.seg import NucleusExtractor
 from emblcmci.linker.plotter import TrackLabeling, TrackStackConstructor
 from emblcmci.linker import TrackFilter, TrackFiller, RoiCorrector
-from emblcmci.obj.analysis import TextureAnalysis
+from de.embl.cmci.obj.analysis import TextureAnalysis
 import jarray
 from util.opencsv import CSVReader
 from java.io import FileReader

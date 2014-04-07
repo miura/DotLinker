@@ -1,7 +1,7 @@
 package de.embl.cmci.linker.plugin;
 
-import emblcmci.linker.ViewDynamics;
-import emblcmci.linker.ViewDynamicsArea;
+import de.embl.cmci.linker.plotter.ViewDynamics;
+import de.embl.cmci.linker.plotter.ViewDynamicsArea;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.plugin.PlugIn;

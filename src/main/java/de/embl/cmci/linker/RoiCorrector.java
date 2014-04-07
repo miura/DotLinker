@@ -1,4 +1,4 @@
-package emblcmci.linker;
+package de.embl.cmci.linker;
 
 import java.util.ArrayList;
 

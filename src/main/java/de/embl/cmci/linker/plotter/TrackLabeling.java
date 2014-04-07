@@ -1,4 +1,4 @@
-package emblcmci.linker.plotter;
+package de.embl.cmci.linker.plotter;
 
 import java.awt.Color;
 import java.util.ArrayList;

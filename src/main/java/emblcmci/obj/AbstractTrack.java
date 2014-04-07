@@ -3,7 +3,8 @@ package emblcmci.obj;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import emblcmci.linker.LinkAnalyzer;
+import de.embl.cmci.linker.LinkAnalyzer;
+
 
 public abstract class AbstractTrack implements IBioObj{
 	int trackID;

@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import emblcmci.linker.LinkAnalyzer;
+import de.embl.cmci.linker.LinkAnalyzer;
+
 
 public abstract class AbstractTracks implements IBioObj {
 

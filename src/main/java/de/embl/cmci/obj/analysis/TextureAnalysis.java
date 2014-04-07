@@ -1,4 +1,4 @@
-package emblcmci.obj.analysis;
+package de.embl.cmci.obj.analysis;
 
 import ij.IJ;
 import ij.gui.Roi;

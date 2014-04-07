@@ -1,4 +1,4 @@
-package emblcmci.linker;
+package de.embl.cmci.linker;
 
 import ij.IJ;
 import ij.ImagePlus;

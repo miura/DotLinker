@@ -1,4 +1,4 @@
-package emblcmci.linker;
+package de.embl.cmci.linker.plotter;
 /**
  * ViewDynamics.java
  * 
@@ -13,6 +13,7 @@ package emblcmci.linker;
 
 
 import java.awt.Color;
+
 
 import ij.ImagePlus;
 import ij.gui.Line;

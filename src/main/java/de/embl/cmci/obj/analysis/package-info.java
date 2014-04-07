@@ -5,4 +5,4 @@
  * @author miura
  *
  */
-package emblcmci.obj.analysis;
+package de.embl.cmci.obj.analysis;

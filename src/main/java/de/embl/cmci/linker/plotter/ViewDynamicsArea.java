@@ -1,8 +1,9 @@
-package emblcmci.linker;
+package de.embl.cmci.linker.plotter;
 
 import java.awt.Font;
 import java.awt.Frame;
 import java.util.Iterator;
+
 
 import emblcmci.obj.AbstractTrack;
 import emblcmci.obj.AbstractTracks;
@@ -11,7 +12,6 @@ import emblcmci.obj.Track;
 import emblcmci.obj.Track2Dcells;
 import emblcmci.obj.Tracks2Dcells;
 import emblcmci.obj.converters.AbstractResultsTableToTracks;
-import emblcmci.obj.converters.ResultTableToTracks;
 import emblcmci.obj.converters.ResultsTableToTracks2Dcells;
 import ij.IJ;
 import ij.ImagePlus;

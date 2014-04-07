@@ -1,4 +1,4 @@
-package emblcmci.linker;
+package de.embl.cmci.linker.plotter;
 
 import java.awt.Color;
 import java.awt.Frame;
@@ -6,7 +6,6 @@ import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import emblcmci.linker.plotter.TrackLabeling;
 import emblcmci.obj.AbstractTrack;
 import emblcmci.obj.AbstractTracks;
 import emblcmci.obj.Node;

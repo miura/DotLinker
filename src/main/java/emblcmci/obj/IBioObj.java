@@ -1,6 +1,6 @@
 package emblcmci.obj;
 
-import emblcmci.linker.LinkAnalyzer;
+import de.embl.cmci.linker.LinkAnalyzer;
 
 
 /**
