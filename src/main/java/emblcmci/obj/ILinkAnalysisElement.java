@@ -8,6 +8,6 @@ import de.embl.cmci.linker.LinkAnalyzer;
  * @author miura
  *
  */
-public interface IBioObj {
+public interface ILinkAnalysisElement {
 	public abstract void accept(LinkAnalyzer analyzer); 
 }

@@ -6,7 +6,7 @@ import java.util.Collections;
 import de.embl.cmci.linker.LinkAnalyzer;
 
 
-public abstract class AbstractTrack implements IBioObj{
+public abstract class AbstractTrack implements ILinkAnalysisElement{
 	int trackID;
 	int frameStart; // frame starts from 1
 	int frameEnd;

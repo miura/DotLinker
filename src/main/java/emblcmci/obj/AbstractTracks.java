@@ -11,7 +11,7 @@ import java.util.Set;
 import de.embl.cmci.linker.LinkAnalyzer;
 
 
-public abstract class AbstractTracks implements IBioObj {
+public abstract class AbstractTracks implements ILinkAnalysisElement {
 
 //	public  <V extends AbstractTrack> AbstractTracks addTrack(int ID, AbstractTrack V){
 //		put(ID, V);
