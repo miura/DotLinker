@@ -1,4 +1,4 @@
-package emblcmci.seg;
+package de.embl.cmci.seg;
 
 import de.embl.cmci.obj.Node;
 import ij.IJ;

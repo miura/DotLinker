@@ -1,4 +1,4 @@
-package emblcmci.seg;
+package de.embl.cmci.seg;
 
 import ij.IJ;
 import ij.ImagePlus;

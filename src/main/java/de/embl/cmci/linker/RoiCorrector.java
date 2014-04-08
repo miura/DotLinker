@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import de.embl.cmci.obj.AbstractTrack;
 import de.embl.cmci.obj.AbstractTracks;
 import de.embl.cmci.obj.Node;
+import de.embl.cmci.seg.NucSegRitsukoProject;
 
 import ij.ImagePlus;
-import emblcmci.seg.NucSegRitsukoProject;
 
 /**
  * Adjust the position of the Roi of each nodes, updates the ip and the binary image. 

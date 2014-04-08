@@ -5,4 +5,4 @@
  * @author miura
  *
  */
-package emblcmci.seg;
+package de.embl.cmci.seg;

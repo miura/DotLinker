@@ -1,9 +1,9 @@
-from emblcmci.seg import NucToDots
+from de.embl.cmci.seg import NucToDots
 from ij import IJ
-from emblcmci.seg import NucSegRitsukoProject as NRP
+from de.embl.cmci.seg import NucSegRitsukoProject as NRP
 from ij import ImageStack
 from ij import ImagePlus
-from emblcmci.seg import NucleusExtractor 
+from de.embl.cmci.seg import NucleusExtractor 
 '''
 a test code for segmenting multiple nucleus based on positions detected by MaxFinder. 
 '''

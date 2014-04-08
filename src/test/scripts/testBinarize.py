@@ -1,5 +1,5 @@
 from ij import IJ, ImagePlus, Prefs
-from emblcmci.seg import NucSegRitsukoProject
+from de.embl.cmci.seg import NucSegRitsukoProject
 from ij.gui import Roi
 
 #imp = IJ.getImage()

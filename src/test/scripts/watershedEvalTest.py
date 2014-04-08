@@ -1,4 +1,4 @@
-from emblcmci.seg import WaterShedEvaluation as WSE
+from de.embl.cmci.seg import WaterShedEvaluation as WSE
 from ij import IJ, ImagePlus
 
 imgpath = "/Users/miura/Dropbox/people/julia/NucSegmentStudy/binimage.tif"

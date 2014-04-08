@@ -1,11 +1,11 @@
-from emblcmci.seg import NucToDots
-from emblcmci.seg import NucSegRitsukoProject as NRP
+from de.embl.cmci.seg import NucToDots
+from de.embl.cmci.seg import NucSegRitsukoProject as NRP
 from ij import IJ, ImageStack, ImagePlus
 from emblcmci.linker import DotLinkerHeadless as DLH, TrackReLinker
 from emblcmci.linker.costfunctions import LinkCostsOnlyDistance
 from emblcmci.linker import ViewDynamics as VD
 from de.embl.cmci.obj.converters import VecTrajectoryToTracks
-from emblcmci.seg import NucleusExtractor 
+from de.embl.cmci.seg import NucleusExtractor 
 import jarray
 '''
 a test code for preprocessing nucleus image to derive maxima

@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import de.embl.cmci.obj.AbstractTrack;
 import de.embl.cmci.obj.Node;
 import de.embl.cmci.obj.Tracks;
+import de.embl.cmci.seg.NucSegRitsukoProject;
 
-import emblcmci.seg.NucSegRitsukoProject;
 
 /**
  * Fills interpolated nodes in the gaps in tracks. 

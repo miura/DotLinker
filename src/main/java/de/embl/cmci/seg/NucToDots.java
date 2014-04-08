@@ -1,4 +1,4 @@
-package emblcmci.seg;
+package de.embl.cmci.seg;
 
 import java.awt.Polygon;
 import java.util.ArrayList;

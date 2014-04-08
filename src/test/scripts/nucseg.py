@@ -1,4 +1,4 @@
-from emblcmci.seg import NucSegRitsukoProject as NSP
+from de.embl.cmci.seg import NucSegRitsukoProject as NSP
 from ij import IJ
 from ij import ImagePlus
 imp = IJ.openImage("http://imagej.nih.gov/ij/images/blobs.gif");

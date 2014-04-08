@@ -1,4 +1,4 @@
-from emblcmci.seg import NucToDots
+from de.embl.cmci.seg import NucToDots
 from ij import IJ
 from emblcmci.linker import DotLinkerHeadless as DLH, TrackReLinker
 import jarray
