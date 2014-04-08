@@ -2,9 +2,10 @@ package de.embl.cmci.linker.plotter;
 
 import java.util.ArrayList;
 
-import emblcmci.obj.AbstractTrack;
-import emblcmci.obj.AbstractTracks;
-import emblcmci.obj.Node;
+import de.embl.cmci.obj.AbstractTrack;
+import de.embl.cmci.obj.AbstractTracks;
+import de.embl.cmci.obj.Node;
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;

@@ -1,10 +1,11 @@
-package emblcmci.obj.converters;
+package de.embl.cmci.obj.converters;
 
 import java.util.ArrayList;
 
-import emblcmci.obj.Node;
+import de.embl.cmci.obj.Node;
 
-/** Converting emblcmci.obj.Node ArrayList to int[] arrays.
+
+/** Converting de.embl.cmci.obj.Node ArrayList to int[] arrays.
  * 
  * @author miura
  *

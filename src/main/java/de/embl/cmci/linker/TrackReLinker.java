@@ -9,11 +9,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import emblcmci.obj.AbstractTrack;
-import emblcmci.obj.AbstractTracks;
-import emblcmci.obj.CoordTwoD;
-import emblcmci.obj.Node;
-import emblcmci.obj.Tracks;
+import de.embl.cmci.obj.AbstractTrack;
+import de.embl.cmci.obj.AbstractTracks;
+import de.embl.cmci.obj.CoordTwoD;
+import de.embl.cmci.obj.Node;
+import de.embl.cmci.obj.Tracks;
+
 
 /**
  * Re-evaluat tracks to check  

@@ -1,4 +1,4 @@
-package emblcmci.obj;
+package de.embl.cmci.obj;
 
 import de.embl.cmci.linker.LinkAnalyzer;
 

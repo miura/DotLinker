@@ -1,7 +1,7 @@
 package de.embl.cmci.linker;
 
-import emblcmci.obj.AbstractTrack;
-import emblcmci.obj.Tracks;
+import de.embl.cmci.obj.AbstractTrack;
+import de.embl.cmci.obj.Tracks;
 
 /**
  * go through tracks and take only long tracks.

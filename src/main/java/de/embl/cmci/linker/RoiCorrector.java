@@ -2,10 +2,11 @@ package de.embl.cmci.linker;
 
 import java.util.ArrayList;
 
+import de.embl.cmci.obj.AbstractTrack;
+import de.embl.cmci.obj.AbstractTracks;
+import de.embl.cmci.obj.Node;
+
 import ij.ImagePlus;
-import emblcmci.obj.AbstractTrack;
-import emblcmci.obj.AbstractTracks;
-import emblcmci.obj.Node;
 import emblcmci.seg.NucSegRitsukoProject;
 
 /**

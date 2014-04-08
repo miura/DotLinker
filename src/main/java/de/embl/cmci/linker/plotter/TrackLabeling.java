@@ -3,13 +3,14 @@ package de.embl.cmci.linker.plotter;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import de.embl.cmci.obj.AbstractTrack;
+import de.embl.cmci.obj.AbstractTracks;
+import de.embl.cmci.obj.Node;
+import de.embl.cmci.obj.Tracks;
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
-import emblcmci.obj.AbstractTrack;
-import emblcmci.obj.AbstractTracks;
-import emblcmci.obj.Node;
-import emblcmci.obj.Tracks;
 
 public class TrackLabeling {
 	private AbstractTracks tracks;

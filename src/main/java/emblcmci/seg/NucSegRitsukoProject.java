@@ -2,7 +2,8 @@ package emblcmci.seg;
 
 import java.util.ArrayList;
 
-import emblcmci.obj.Node;
+import de.embl.cmci.obj.Node;
+
 import fiji.threshold.Auto_Threshold;
 import ij.IJ;
 import ij.ImagePlus;

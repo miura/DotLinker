@@ -4,7 +4,7 @@ from emblcmci.linker import DotLinkerHeadless as DLH, TrackReLinker
 import jarray
 from emblcmci.linker.costfunctions import LinkCostsOnlyDistance
 from emblcmci.linker import ViewDynamics as VD
-from emblcmci.obj import VecTrajectoryToTracks
+from de.embl.cmci.obj import VecTrajectoryToTracks
 '''
 a test code for preprocessing nucleus image to derive maxima
 and then get track

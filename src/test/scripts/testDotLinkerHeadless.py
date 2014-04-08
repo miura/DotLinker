@@ -4,7 +4,7 @@ from ij.plugin.filter import MaximumFinder
 import jarray
 from emblcmci.linker.costfunctions import LinkCostsOnlyDistance
 from emblcmci.linker import ViewDynamics as VD
-from emblcmci.obj import VecTrajectoryToTracks
+from de.embl.cmci.obj import VecTrajectoryToTracks
 '''
 A script for loading binary dot image stack, recover their coordinate, link position to 
 find out tracks (using DotLinker class) and then show tracks plotted on image stack. 

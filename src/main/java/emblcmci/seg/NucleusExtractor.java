@@ -12,10 +12,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import de.embl.cmci.obj.Node;
+
 import util.FindConnectedRegions;
 import util.FindConnectedRegions.Results;
 
-import emblcmci.obj.Node;
 
 /**
  * Associate MaxFinder Dots with Segmented Nucleus images.

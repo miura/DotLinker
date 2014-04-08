@@ -6,9 +6,10 @@ import ij.gui.Roi;
 
 import java.util.ArrayList;
 
-import emblcmci.obj.AbstractTrack;
-import emblcmci.obj.Node;
-import emblcmci.obj.Tracks;
+import de.embl.cmci.obj.AbstractTrack;
+import de.embl.cmci.obj.Node;
+import de.embl.cmci.obj.Tracks;
+
 import emblcmci.seg.NucSegRitsukoProject;
 
 /**

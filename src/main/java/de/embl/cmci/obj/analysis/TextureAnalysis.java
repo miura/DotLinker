@@ -9,10 +9,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import de.embl.cmci.obj.AbstractTrack;
+import de.embl.cmci.obj.AbstractTracks;
+import de.embl.cmci.obj.Node;
+
 import emblcmci.glcm.GLCMtexture;
-import emblcmci.obj.AbstractTrack;
-import emblcmci.obj.AbstractTracks;
-import emblcmci.obj.Node;
 
 /**
  * Measures texture of Node, in the ROI defined as small rectangle surrounding 

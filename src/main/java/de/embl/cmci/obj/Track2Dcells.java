@@ -1,4 +1,4 @@
-package emblcmci.obj;
+package de.embl.cmci.obj;
 
 import java.util.ArrayList;
 

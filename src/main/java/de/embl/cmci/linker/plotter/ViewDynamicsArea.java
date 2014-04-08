@@ -4,15 +4,16 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.util.Iterator;
 
+import de.embl.cmci.obj.AbstractTrack;
+import de.embl.cmci.obj.AbstractTracks;
+import de.embl.cmci.obj.Node;
+import de.embl.cmci.obj.Track;
+import de.embl.cmci.obj.Track2Dcells;
+import de.embl.cmci.obj.Tracks2Dcells;
+import de.embl.cmci.obj.converters.AbstractResultsTableToTracks;
+import de.embl.cmci.obj.converters.ResultsTableToTracks2Dcells;
 
-import emblcmci.obj.AbstractTrack;
-import emblcmci.obj.AbstractTracks;
-import emblcmci.obj.Node;
-import emblcmci.obj.Track;
-import emblcmci.obj.Track2Dcells;
-import emblcmci.obj.Tracks2Dcells;
-import emblcmci.obj.converters.AbstractResultsTableToTracks;
-import emblcmci.obj.converters.ResultsTableToTracks2Dcells;
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;

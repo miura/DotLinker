@@ -1,4 +1,4 @@
-package emblcmci.obj;
+package de.embl.cmci.obj;
 
 /**
  * mini class for passing coordinates

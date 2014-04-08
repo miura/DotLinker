@@ -1,6 +1,6 @@
 package emblcmci.seg;
 
-import emblcmci.obj.Node;
+import de.embl.cmci.obj.Node;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.Prefs;

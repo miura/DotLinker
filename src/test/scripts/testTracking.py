@@ -4,7 +4,7 @@ from ij import IJ, ImageStack, ImagePlus
 from emblcmci.linker import DotLinkerHeadless as DLH, TrackReLinker
 from emblcmci.linker.costfunctions import LinkCostsOnlyDistance
 from emblcmci.linker import ViewDynamics as VD
-from emblcmci.obj.converters import VecTrajectoryToTracks
+from de.embl.cmci.obj.converters import VecTrajectoryToTracks
 from emblcmci.seg import NucleusExtractor
 from emblcmci.linker.plotter import TrackLabeling, TrackStackConstructor
 from emblcmci.linker import TrackFilter, TrackFiller, RoiCorrector

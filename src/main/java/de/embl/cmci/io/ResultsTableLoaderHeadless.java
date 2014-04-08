@@ -11,8 +11,8 @@ import de.embl.cmci.linker.DotLinker;
 import de.embl.cmci.linker.DotLinker.Particle;
 import de.embl.cmci.linker.DotLinker.StackFrames;
 import de.embl.cmci.linker.DotLinker.Trajectory;
-import emblcmci.obj.Node;
-import emblcmci.obj.converters.NodesToCoordArrays;
+import de.embl.cmci.obj.Node;
+import de.embl.cmci.obj.converters.NodesToCoordArrays;
 
 /**
  * A simple dataloader for use from scripts. 

@@ -14,17 +14,18 @@ package de.embl.cmci.linker.plotter;
 
 import java.awt.Color;
 
+import de.embl.cmci.obj.AbstractTracks;
+import de.embl.cmci.obj.Node;
+import de.embl.cmci.obj.Track;
+import de.embl.cmci.obj.Tracks;
+import de.embl.cmci.obj.converters.AbstractResultsTableToTracks;
+import de.embl.cmci.obj.converters.ResultTableToTracks;
+
 
 import ij.ImagePlus;
 import ij.gui.Line;
 import ij.measure.ResultsTable;
 import ij.process.ImageProcessor;
-import emblcmci.obj.AbstractTracks;
-import emblcmci.obj.Node;
-import emblcmci.obj.Track;
-import emblcmci.obj.Tracks;
-import emblcmci.obj.converters.AbstractResultsTableToTracks;
-import emblcmci.obj.converters.ResultTableToTracks;
 
 public class ViewDynamics extends AbstractViewDynamics{
 

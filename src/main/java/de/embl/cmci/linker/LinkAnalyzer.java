@@ -1,7 +1,7 @@
 package de.embl.cmci.linker;
 
-import emblcmci.obj.AbstractTrack;
-import emblcmci.obj.AbstractTracks;
+import de.embl.cmci.obj.AbstractTrack;
+import de.embl.cmci.obj.AbstractTracks;
 
 /**
  * Visitor Pattern (abstract Visitor)
