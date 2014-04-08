@@ -27,6 +27,9 @@ import ij.process.ImageProcessor;
 
 public class ViewDynamicsArea extends AbstractViewDynamics {
 
+	static public final boolean PLOTALL = true;
+	static public final boolean PLOTGUI = false;
+	
 	public ViewDynamicsArea(ImagePlus imp) {
 		super(imp);
 	}
@@ -41,6 +44,10 @@ public class ViewDynamicsArea extends AbstractViewDynamics {
 	 */
 	public void plotAreaDynamics(){
 		ResultsTable trt = getTrackTable("Tracks");
+		plotAreaDynamics(trt, false);
+	}
+	
+	public void plotAreaDynamics(ResultsTable trt, boolean plotall){	
 		ResultsTableToTracks2Dcells rttracks = new ResultsTableToTracks2Dcells(trt);
 		rttracks.run();
 		AbstractTracks abstracks = rttracks.getTracks();
@@ -73,7 +80,10 @@ public class ViewDynamicsArea extends AbstractViewDynamics {
 				IJ.log("... areaFracMax Corrected to:" + areafracMax);
 			}
 
-			areaPlotter(tracks, imp, areafracMin, areafracMax);		
+			if (plotall)
+				areaPlotter(tracks, imp, areafracMin, areafracMax, 0);
+			else
+				areaPlotter(tracks, imp, areafracMin, areafracMax); //GUI pops up				
 			//addAreaColorScale(imp, areafracMin, areafracMax);
 		}
 
@@ -104,8 +114,12 @@ public class ViewDynamicsArea extends AbstractViewDynamics {
 			imp.killRoi();
 		}
 		int ChosenTrackNumber = (int) IJ.getNumber("Choose a Track (if 0, all tracks)", defaultID);
+		areaPlotter( tracks,  imp, areafracMin,  areafracMax,  ChosenTrackNumber);
+	}
+	
+	public void areaPlotter(Tracks2Dcells tracks, ImagePlus imp,
+				double areafracMin, double areafracMax, int ChosenTrackNumber){		
 		Track2Dcells track;
-
 		if (ChosenTrackNumber != 0){
 			track = (Track2Dcells) tracks.get(ChosenTrackNumber);
 			if (track != null)

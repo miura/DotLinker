@@ -14,7 +14,6 @@ package de.embl.cmci.linker.plotter;
 
 import java.awt.Color;
 
-import de.embl.cmci.obj.AbstractTracks;
 import de.embl.cmci.obj.Node;
 import de.embl.cmci.obj.Track;
 import de.embl.cmci.obj.Tracks;

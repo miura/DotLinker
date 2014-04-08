@@ -221,6 +221,13 @@ public abstract class AbstractViewDynamics {
 	}
 	
 	/**
+	 * @return the imp
+	 */
+	public ImagePlus getImp() {
+		return imp;
+	}
+
+	/**
 	 * Returns random RGB color array based on Physics LUT.
 	 * Used for coloring tracks.   
 	 * It might be better directly look for LUT file. 
