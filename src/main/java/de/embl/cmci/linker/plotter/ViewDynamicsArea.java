@@ -23,6 +23,7 @@ import ij.gui.Roi;
 import ij.gui.Wand;
 import ij.measure.ResultsTable;
 import ij.plugin.CanvasResizer;
+import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
 public class ViewDynamicsArea extends AbstractViewDynamics {
@@ -157,15 +158,22 @@ public class ViewDynamicsArea extends AbstractViewDynamics {
 		return true;
 	}
 	
-	/**
+
+	public void addAreaColorScale(){
+		ResultsTable trt = getTrackTable("Tracks");
+    ImagePlus imp = this.imp;
+    addAreaColorScale(imp, trt);
+  }
+
+  	/**
 	 * Adds color scale bar to the stack painted with area dynamics.  
 	 * Resizes canvas so that the scale could be placed in the right side of original stack.
 	 * 
 	 * ...way it is done is a bit ugly so this should be redone...  
 	 * @param imp
 	 */
-	public void addAreaColorScale(){
-		ResultsTable trt = getTrackTable("Tracks");
+	public void addAreaColorScale(ImagePlus imp, ResultsTable trt){
+
 		ResultsTableToTracks2Dcells rttracks = new ResultsTableToTracks2Dcells(trt);
 		rttracks.run();
 		AbstractTracks abstracks = rttracks.getTracks();
@@ -176,11 +184,16 @@ public class ViewDynamicsArea extends AbstractViewDynamics {
 			double areafracMax = 0;
 			double areafracMin =100;
 			for (AbstractTrack v : tracks.values()){ //iterate for tracks
+				IJ.log("trackID:" + Integer.toString(v.getTrackID()));
+				IJ.log("... len:" + v.getNodes().size() + " AreaFrac:" + v.getNodes().get(1).getAreaFraction());
 				if ((v != null) && (v instanceof Track2Dcells)) {
 					Track2Dcells t = (Track2Dcells) v;
 					if (t.getAreafracMIN() < areafracMin) 
-						t.setAreafracMIN( areafracMin );
-					if (t.getAreafracMAX() > areafracMax) t.setAreafracMAX( areafracMax );
+						//t.setAreafracMIN( areafracMin );
+						areafracMin = t.getAreafracMIN();
+					if (t.getAreafracMAX() > areafracMax) 
+						//t.setAreafracMAX( areafracMax );
+						areafracMax = t.getAreafracMAX();
 				}
 			}
 			IJ.log("Area Fraction Minimum: " + areafracMin);
@@ -205,12 +218,15 @@ public class ViewDynamicsArea extends AbstractViewDynamics {
 
 			//pixel height per color scale step, could be less than 1.
 			double stepwidth = 256*unitheight/256;
+      
+      int scaleheight = Math.round(oldheight/2);
 
 			//y-position of the top of the scale bar
-			int toppos = oldheight - 10 - (int) Math.round(256*unitheight);
-
+			int toppos = oldheight - scaleheight - 10;
+      int bottompos = toppos + scaleheight;
 			// y-position corresponding to 1.0 relative area ... reference area at [0] of each track.
-			int pos1 = toppos + 256 - (int) ((1 - areafracMin)/((areafracMax - areafracMin))* 256 * unitheight); 
+      int pos1 = toppos + (int) Math.round( (areafracMax - 1) / (areafracMax - areafracMin) * scaleheight );
+			//int pos1 = toppos + 256 - (int) ((1 - areafracMin)/((areafracMax - areafracMin))* 256 * unitheight); 
 
 			ImageProcessor ipslice;
 			Font font = new Font("SansSerif", Font.PLAIN, 8);
@@ -227,7 +243,7 @@ public class ViewDynamicsArea extends AbstractViewDynamics {
 
 				ipslice.drawString(Double.toString(areafracMax), oldwidth + 28, toppos);
 				ipslice.drawString(Double.toString(1.0), oldwidth + 28, pos1);
-				ipslice.drawString(Double.toString(areafracMin), oldwidth + 28, (int) (toppos + 256*unitheight));
+				ipslice.drawString(Double.toString(areafracMin), oldwidth + 28, (int) bottompos );
 			}
 
 			imp.updateAndDraw();
@@ -302,6 +318,80 @@ public class ViewDynamicsArea extends AbstractViewDynamics {
 		return new ResultsTableToTracks2Dcells(trt);
 	}
 	
+	/**
+	 * For generating AP axis projection
+	 * 20140408
+	 * 
+	 * @param imp : colorcoded area 
+	 * @return An array of Max projection horizontally. Length = image height. 
+	 */
+	public byte[] horizontalMaxProjection(ImageProcessor ip){
+		int ww = ip.getWidth();
+		int hh = ip.getHeight();
+		byte[] data = (byte[]) ip.getPixels();
+		byte[] projMax = new byte[hh];
+		byte pixmax = 0;
+		for (int j = 0; j < hh; j++){
+			pixmax = 0;
+			for (int i = 0; i < ww; i++){
+				if (data[ ww * j + i ] < 255){
+					if ( data[ ww * j + i ] > pixmax){
+						pixmax = data[ ww * j + i ];
+					}
+				}
+			}
+			projMax[j] = pixmax;
+		}
+		return projMax;
+	}
+  /**
+   * Mean Projection
+   *
+   */
+  public byte[] horizontalMeanProjection(ImageProcessor ip){
+    int ww = ip.getWidth();
+    int hh = ip.getHeight();
+    byte[] data = (byte[]) ip.getPixels();
+    byte[] projMean = new byte[hh];
+    int pixsum = 0;
+    int pixcount = 0;
+    for (int j = 0; j < hh; j++){
+      pixsum = 0;
+      pixcount = 0;
+      for (int i = 0; i < ww; i++){
+        if ((data[ ww * j + i ] > 0) && (data[ ww * j + i ] < 255)){
+          pixsum += data[ ww * j + i ];
+          pixcount += 1;
+        }
+      }
+      if ( (pixsum > 0) && (pixcount > 0) )
+        projMean[j] = (byte) (pixsum/pixcount);
+    }
+    return projMean;
+  }
+  
+	/**
+	 * Processes a astack and get horizontal max projection. 
+	 * @param imp
+	 * @return
+	 */
+	public ImagePlus projectStackHorizontally(ImagePlus imp) {
+		int hh = imp.getHeight();
+		int ww = imp.getStackSize();
+		ImagePlus outimg = new ImagePlus("AP_Projection", new ByteProcessor( ww, hh));
+		byte[] outdata = (byte[]) outimg.getProcessor().getPixels();
+		ImageProcessor aframe;
+		byte[] arow;
+		for (int j = 0 ; j < ww; j++){
+			aframe = imp.getStack().getProcessor( j + 1 );
+			//arow = horizontalMaxProjection(aframe);
+			arow = horizontalMeanProjection(aframe);
+			for (int i = 0; i < hh; i++){
+				outdata[ ww * i  + j] = (byte) arow[i];
+			}
+		}
+		return outimg;
+	}
 	
 	//--------------- Area Plottting tools down to here ---------------
 
